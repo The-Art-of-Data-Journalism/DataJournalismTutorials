@@ -1,0 +1,221 @@
+---
+title: "Data Journalism Lesson 16: Dumbbell charts"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  Making quick graphics for publication
+---
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(tidyverse)
+library(ggalt)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+```
+
+## The Goal
+
+In this lesson, you'll learn how to create dumbbell charts, a powerful tool for visualizing the difference between two related values. By the end of this tutorial, you'll understand when to use dumbbell charts, how to prepare your data for this type of visualization, and how to create and customize dumbbell charts using ggplot2 and the ggalt package. You'll practice filtering data, reordering chart elements, and adding color to enhance the visual story. These skills will enable you to effectively communicate comparisons and gaps in your data, a crucial ability for data journalists looking to highlight meaningful differences.
+
+## The Basics.
+
+Second to my love of waffle charts because or their name and I'm always hungry, dumbbell charts are an excellently named way of **showing the difference between two things on a number line** -- a start and a finish, for instance. Or the difference between two related things. When the gap between numbers is the news, dumbbell charts are what you want.
+
+Dumbbell charts come batteries included in `ggalt` which we will have to load. Like usual, you already installed this if you followed the install instructions at the beginning of the course. But if you're having trouble getting this to work, go to your console in R Studio and install it with `install.packages("ggalt")`
+
+Let's give it a whirl.
+
+```{r load-tidyverse, exercise=TRUE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggalt)
+
+```
+```{r load-tidyverse-solution}
+library(tidyverse)
+library(ggalt)
+```
+```{r load-tidyverse-check}
+grade_this_code()
+```
+
+For this, let's use a list of a colleges from the Department of Education's College Scorecard. I've gone ahead and limited it to colleges that grant bachelor's degrees and are the main campus. I've also thinned the number of columns from 3,214 down to 8. 
+
+```{r echo=FALSE, class.output="bg-info", results="asis",  message=FALSE,  warning=FALSE}
+library(downloadthis)
+library(glue)
+
+dllink <- download_link(
+  link = "https://mattwaite.github.io/datajournalismfiles/colleges.csv",
+  button_label = "Download csv file",
+  button_type = "danger",
+  has_icon = TRUE,
+  icon = "fa fa-save",
+  self_contained = FALSE
+)
+
+glue("<pre><p><strong>For this walkthrough:</strong></p><p>{dllink}</p></pre>")
+```
+
+And load it.
+
+```{r dumbbell-load-data, message=FALSE, warning=FALSE}
+colleges <- read_csv("https://mattwaite.github.io/datajournalismfiles/colleges.csv")
+
+big <- c("University of Nebraska-Lincoln", "University of Iowa", "University of Minnesota-Twin Cities", "University of Illinois Urbana-Champaign", "Northwestern University", "Indiana University-Bloomington", "Purdue University-Main Campus", "Michigan State University", "University of Michigan-Ann Arbor", "Ohio State University-Main Campus", "The Pennsylvania State University", "University of Maryland-College Park", "Rutgers University-New Brunswick", "University of Wisconsin-Madison", "University of Washington-Seattle Campus", "University of Oregon", "University of Southern California", "University of California-Los Angeles")
+
+
+bigten <- colleges |> 
+  filter(INSTNM %in% big)
+```
+```{r dumbbell-load-data-exercise, exercise = TRUE}
+colleges <- read_csv("https://mattwaite.github.io/datajournalismfiles/colleges.csv")
+```
+```{r dumbbell-load-data-exercise-solution}
+colleges <- read_csv("https://mattwaite.github.io/datajournalismfiles/colleges.csv")
+```
+```{r dumbbell-load-data-exercise-check}
+grade_this_code()
+```
+
+Let's look at what we've got here:
+
+```{r head-data, exercise=TRUE, exercise.setup = "dumbbell-load-data"}
+head(colleges)
+```
+```{r head-data-solution}
+head(colleges)
+```
+```{r head-data-check}
+grade_this_code()
+```
+
+For this example, let's look at the difference between a Big Ten school's in state tuition vs out of state tuition. The problem we have? There's no conference column for us to filter on, so we've got to build a list of schools and filter that way. Because I like you, I've done that part for you. 
+
+### Exercise 1: Preparing the data
+
+To get this, we need to filter our school names -- in the `INSTNM` column -- by a list. And in the end, we'll end up with a dataframe called bigten that'll have the 14 schools currently in the conference and the four new schools coming in next year. 
+
+```{r dumbbell1, exercise=TRUE, exercise.setup = "dumbbell-load-data", message=FALSE}
+big <- c("University of Nebraska-Lincoln", "University of Iowa", "University of Minnesota-Twin Cities", "University of Illinois Urbana-Champaign", "Northwestern University", "Indiana University-Bloomington", "Purdue University-Main Campus", "Michigan State University", "University of Michigan-Ann Arbor", "Ohio State University-Main Campus", "The Pennsylvania State University", "University of Maryland-College Park", "Rutgers University-New Brunswick", "University of Wisconsin-Madison", "University of Washington-Seattle Campus", "University of Oregon", "University of Southern California", "University of California-Los Angeles")
+
+
+bigten <- ____ |> 
+  filter(INSTNM %in% ____)
+```
+```{r dumbbell1-solution, exercise.reveal_solution = FALSE}
+big <- c("University of Nebraska-Lincoln", "University of Iowa", "University of Minnesota-Twin Cities", "University of Illinois Urbana-Champaign", "Northwestern University", "Indiana University-Bloomington", "Purdue University-Main Campus", "Michigan State University", "University of Michigan-Ann Arbor", "Ohio State University-Main Campus", "The Pennsylvania State University", "University of Maryland-College Park", "Rutgers University-New Brunswick", "University of Wisconsin-Madison", "University of Washington-Seattle Campus", "University of Oregon", "University of Southern California", "University of California-Los Angeles")
+
+
+bigten <- colleges |> 
+  filter(INSTNM %in% big)
+```
+```{r dumbbell1-check}
+grade_this_code()
+```
+
+Now, the way that the `geom_dumbbell` works is pretty simple when viewed through what we've done before. There's just some tweaks. 
+
+### Exercise 2: The first dumbbell
+
+First: We start with the y axis. The reason is we want our dumbbells going left and right, so the label is going to be on the y axis. 
+
+Second: Our x is actually two things: x and xend. What you put in there will decide where on the line the dot appears. What goes in the x and xend are the two numbers where the gap between them is meaningful. So for us, it's our two tuition columns. 
+
+```{r dumbbell2, exercise=TRUE, exercise.setup = "dumbbell-load-data", message=FALSE}
+ggplot() + 
+  geom_dumbbell(
+    data=bigten, 
+    aes(y=____, x=____, xend=____)
+  )
+```
+```{r dumbbell2-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_dumbbell(
+    data=bigten, 
+    aes(y=INSTNM, x=TUITIONFEE_IN, xend=TUITIONFEE_OUT)
+  )
+```
+```{r dumbbell2-check}
+grade_this_code()
+```
+
+Well, that's a chart alright, but what dot is the in-state tuition and what the out of state? To fix this, we'll add colors.
+
+### Exercise 3: Colors and size
+
+To make this work, we'll need to do three things: first, use the English spelling of color, so `colour`. The, uh, `colour` is the bar between the dots, the `colour_x` is the color of the x value dot and the `colour_xend` is the color of the xend dot. So in our setup, in-state tuition is the x, so let's make that green. And let's make the out-of-state tuition red. While we're at it, we'll add a size to make the dots stand out.
+
+```{r dumbbell3, exercise=TRUE, exercise.setup = "dumbbell-load-data", message=FALSE}
+ggplot() + 
+  geom_dumbbell(
+    data=____, 
+    aes(y=____, x=TUITIONFEE_IN, xend=TUITIONFEE_OUT),
+    size = 2,
+    colour = "____",
+    colour_x = "____",
+    colour_xend = "____")
+```
+```{r dumbbell3-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_dumbbell(
+    data=bigten, 
+    aes(y=INSTNM, x=TUITIONFEE_IN, xend=TUITIONFEE_OUT),
+    size = 2,
+    colour = "grey",
+    colour_x = "green",
+    colour_xend = "red")
+```
+```{r dumbbell3-check}
+grade_this_code()
+```
+
+And now we have a chart that is trying to tells a story. We know, logically, that green on the left is good, because it means cheaper tuition. A long distance between green and red? That shows a massive gap between what in-state students pay and what out-of-state students pay. 
+
+### Exercise 4: Arrange helps tell the story
+
+But what if we sort it by in-state tuition, so we see them in order of cost. 
+
+```{r dumbbell4, exercise=TRUE, exercise.setup = "dumbbell-load-data", message=FALSE}
+ggplot() + 
+  geom_dumbbell(
+    data=____, 
+    aes(y=reorder(____, ____), x=TUITIONFEE_IN, xend=TUITIONFEE_OUT),
+    size = 2,
+    colour = "____",
+    colour_x = "____",
+    colour_xend = "____")
+```
+```{r dumbbell4-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_dumbbell(
+    data=bigten, 
+    aes(y=reorder(INSTNM, TUITIONFEE_IN), x=TUITIONFEE_IN, xend=TUITIONFEE_OUT),
+    size = 2,
+    colour = "grey",
+    colour_x = "green",
+    colour_xend = "red")
+```
+```{r dumbbell4-check}
+grade_this_code()
+```
+
+Guess who is the cheapest in the Big Ten?
+
+## The Recap
+
+Throughout this lesson, you've learned how to create and customize dumbbell charts to visualize differences between two related values. You've practiced preparing data by filtering for specific institutions, creating basic dumbbell charts, and enhancing them with color and size adjustments. You've also seen how reordering the chart elements can help tell a clearer story, as demonstrated with the comparison of in-state and out-of-state tuition costs across Big Ten universities. Remember, dumbbell charts are particularly effective when the gap between two values is the key story you want to tell. As you continue your data journalism journey, consider how this visualization technique can help you highlight important comparisons in your datasets.
+
+## Terms to Know
+
+- Dumbbell chart: A type of chart that displays the difference between two related values for multiple categories, resembling a dumbbell shape.
+- `ggalt`: An extension package for ggplot2 that includes additional geoms, including geom_dumbbell for creating dumbbell charts.
+- `geom_dumbbell()`: The specific function in ggalt used to create dumbbell charts in ggplot2.
+- `x` and `xend`: In dumbbell charts, these aesthetics define the start and end points of each "dumbbell."
+- `colour`, `colour_x`, `colour_xend`: Aesthetics in geom_dumbbell() used to set the colors of the connecting line and the start and end points of each dumbbell.
+- `size`: An aesthetic in geom_dumbbell() used to adjust the thickness of the points and connecting line.

@@ -1,0 +1,221 @@
+---
+title: "Data Journalism Lesson 6: Working with dates"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  Learn how to make a "date" into a real date you can work with.
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(glue)
+library(tidyverse)
+library(lubridate)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+```
+
+## The Goal
+
+In this lesson, you'll learn how to work with dates in R, a critical skill for data analysis. By the end of this tutorial, you'll understand how to convert character strings into proper date formats using both base R and the lubridate package. You'll practice reformatting dates using as.POSIXct() and lubridate functions, and learn how to use floor_date() to group dates by month. These skills will enable you to perform time-based analyses and answer questions about trends over time in your datasets.
+
+## The Basics
+
+One of the most frustrating things in data is working with dates. Everyone has a different opinion on how to record them, and every software package on the planet has to sort it out. Dealing with it can be a little ... confusing. And every dataset has something new to throw at you. So consider this an introduction. 
+
+We're going to do this two ways. First I'm going to show you how to use base R to solve a tricky problem. And then we'll use a library called `lubridate` to solve a more common and less tricky problem. And then we'll use a new library to solve most of the common problems before they start. 
+
+## The hard way
+
+First, we'll import `tidyverse` like we always do and we're going to load in `lubridate` now so we have it when we need it. 
+
+```{r load-tidyverse, exercise=TRUE}
+library(tidyverse)
+library(lubridate)
+```
+```{r load-tidyverse-solution}
+library(tidyverse)
+library(lubridate)
+```
+```{r load-tidyverse-check}
+grade_this_code()
+```
+
+We're going to use our dataset of every UNLPD police call. You may not have noticed when you imported it last time, but the dates came in as a character field, not as dates. Why? Because they're not formatted in a way that R can read, so we've got to reformat it. **For purposes of this exercise, you don't need to do this. The data is included here if you want to try this in your own notebook.**
+
+```{r echo=FALSE, class.output="bg-info", results="asis",  message=FALSE,  warning=FALSE}
+library(downloadthis)
+library(glue)
+
+dllink <- download_link(
+  link = "http://mattwaite.github.io/datajournalismfiles/crimelogs.csv",
+  button_label = "Download csv file",
+  button_type = "danger",
+  has_icon = TRUE,
+  icon = "fa fa-save",
+  self_contained = FALSE
+)
+
+glue("<pre><p><strong>For this walkthrough:</strong></p><p>{dllink}</p></pre>")
+
+```
+
+Now we'll read it into a new dataframe. 
+
+```{r load-data, message=FALSE, warning=FALSE}
+calls <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
+```
+```{r load-data-exercise, exercise = TRUE}
+calls <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
+```
+```{r load-data-exercise-solution}
+calls <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
+```
+```{r load-data-exercise-check}
+grade_this_code()
+```
+
+And let's look at it quick using glimpse.
+
+```{r glimpse-data, exercise=TRUE, exercise.setup = "load-data"}
+glimpse(____)
+```
+```{r glimpse-data-solution, exercise.reveal_solution = FALSE}
+glimpse(calls)
+```
+```{r glimpse-data-check}
+grade_this_code()
+```
+
+See that reported column? See how it's a character? We have to fix that. There's a lot of ways to fix dates. The base R way is to use formatting. The code is ... a little odd ... but it's useful to know if you get a really odd date format. What you are doing is essentially parsing the date into it's component parts then reassmbling it into a date using formatting. 
+
+### Exercise 1: Formatting the date
+
+To walk through this, we're going to use `mutate` to create a new column. Why not just overwrite our original column? It's good practice never to delete or overwrite data. What do you have to compare it to and how will you know you did it write if you overwrite it? We'll name that new column clean_reported. It's a habit I picked up where when I clean a column, I name it clean_originalcolumnname. Helps keep track of which is original and which has been modified. 
+
+Then, we're going to use the `as.POSIXct` function. That function parses text into dates. The inputs it takes are first, what column are you parsing? Second, what is the `format`? That format can get really complicated, but look at one of the dates and times we have. You have things like `1/19/2023 12:32`. So we can see the format of the date we have. It's the month, with just one number, then the day, then the four digit year. Then you have a space and the hour colon minute. 
+
+Posix date formatting has notations for all of those and more. 
+
+| Code | Meaning                                        |
+|------|------------------------------------------------|
+| %a	   | Abbreviated weekday (Mon, Tue, Wed, etc)       |
+| %A	   | Full weekday (Monday, Tuesday, Wednesday, etc) |
+| %b	   | Abbreviated month (Jan, Feb, Mar, etc.)        |
+| %B	   | Full month                                     |
+| %c	   | Locale-specific date and time                  |
+| %d	   | Decimal date                                   |
+| %H	   | Decimal hours (24 hour)                        |
+| %I	   | Decimal hours (12 hour)                        |
+| %j	   | Decimal day of the year                        |
+| %m	   | Decimal month                                  |
+| %M	   | Decimal minute                                 |
+| %p	   | Locale-specific AM/PM                          |
+| %S	   | Decimal second                                 |
+| %U	   | Decimal week of the year (starting on Sunday)  |
+| %w	   | Decimal Weekday (0=Sunday)                     |
+| %W	   | Decimal week of the year (starting on Monday)  |
+| %x	   | Locale-specific Date	                           |
+| %X	   | Locale-specific Time                           |
+| %y	   | 2-digit year                                   |
+| %Y	   | 4-digit year                                   |
+| %z	   | Offset from GMT                                |
+| %Z	   | Time zone (character)                          |
+
+Reminder: You need month, day, four-digit year, hour (24 hour clock) and minute. 
+
+```{r posix, exercise=TRUE, exercise.setup = "load-data"}
+calls |> mutate(
+    clean_reported = as.POSIXct(reported, format="%____/%____/%____ %____:%____")
+)
+```
+```{r posix-solution, exercise.reveal_solution = FALSE}
+calls |> mutate(
+    clean_reported = as.POSIXct(reported, format="%m/%d/%Y %H:%M")
+)
+```
+```{r posix-check}
+grade_this_code()
+```
+
+And just like that, clean-reported is now a special date format that includes times.
+
+You can almost read the code that created it: The format of the date is %Y, which means a four digit year SLASH %m or two digit month SLASH %d or two digit day SPACE %H or two digit hour COLON %M or two digit minute. You can remix that as you need. If you had a date that was `20021212` then you would do `format="%Y%m%d"` and so on. 
+
+## The easy way
+
+There is a [library called lubridate](https://lubridate.tidyverse.org/reference/index.html) that can parse some common date problems. 
+
+Lubridate can handle this calls data easier with one of it's many functions. The functions parse dates given a basic pattern. In this case, our data is in a very common pattern of **month day year hours minutes**. Lubridate names its functions after the pattern you need. Need year month day, there's a function called `ymd` that will parse what you have with year month and day. And this is all on our reported column.  
+
+### Exercise 2: Lubridate
+
+We have month day year hours minutes. See if you can figure out how it works. 
+
+```{r lubridate, exercise=TRUE, exercise.setup = "load-data"}
+calls |> mutate(
+    clean_reported = _________(_________)
+)
+```
+```{r lubridate-solution, exercise.reveal_solution = FALSE}
+calls |> mutate(
+    clean_reported = mdy_hm(reported)
+)
+```
+```{r lubridate-check}
+grade_this_code()
+```
+
+That's less code and less weirdness, so that's good. 
+
+## More with dates
+
+But you're not done with lubridate yet. It has some interesting pieces parts we'll use elsewhere. 
+
+What's a question you might have about calls on campus involving dates? 
+
+How about what month are the most calls? 
+
+### Exercise 3: Floor dates
+
+We could use formatting to create a Month field but that would group all the Aprils together, regardless of if they were in 2022 or 2021. We could create a year and a month together, but that would give us an invalid date object and that would create problems later. Lubridate has something called a floor date that we can use. 
+
+We're going to use mutate to create a floor_month field out of our properly formatted date column. Keep this code handy -- you'll need it for the homework.  
+
+```{r floormonth, exercise=TRUE, exercise.setup = "load-data"}
+calls |> 
+  mutate(
+    clean_reported = _________(reported),
+    floor_month = floor_date(_________, "month")
+    ) 
+```
+```{r floormonth-solution, exercise.reveal_solution = FALSE}
+calls |> 
+  mutate(
+    clean_reported = mdy_hm(reported),
+    floor_month = floor_date(clean_reported, "month")
+    ) 
+```
+```{r floormonth-check}
+grade_this_code()
+```
+
+## The Recap
+
+Throughout this lesson, you've learned several ways to handle dates in R. You've practiced using as.POSIXct() to parse dates with specific formats, and discovered how lubridate can simplify this process with intuitive functions like mdy_hm(). You've also learned about floor_date(), which allows you to group dates by larger time units like months. Remember, working with dates is a common challenge in data journalism, and these skills will help you analyze time-based patterns in your data more effectively. As you continue to work with different datasets, you'll encounter various date formats, and the techniques you've learned here will serve as a foundation for handling these challenges.
+
+## Terms to Know
+
+- `as.POSIXct()`: A base R function used to convert character strings to date-time objects.
+- `lubridate`: An R package designed to make working with dates and times easier.
+- `mdy_hm()`: A lubridate function that parses dates in the month-day-year hour-minute format.
+- `floor_date()`: A lubridate function that rounds dates down to a specified time unit (e.g., month, year).
+- Date format codes: Special character combinations (like %Y, %m, %d) used to specify date formats in R.
+- Character field: A data type that stores text, including improperly formatted dates.
+- Date object: A special data type in R that represents dates and allows for date-based calculations.

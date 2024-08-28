@@ -1,0 +1,211 @@
+---
+title: "Data Journalism Lesson 5: Mutating data"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  Learn how to make new columns of data.
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(glue)
+library(tidyverse)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+```
+## The Goal
+
+In this lesson, you'll learn about mutating data - a powerful technique for creating new columns based on existing data. By the end of this tutorial, you'll understand how to use the mutate() function in R to perform calculations, such as percent change, on your data. You'll also learn how to combine mutate with other dplyr functions like arrange() to answer specific questions about your dataset. This skill is essential for data journalists who often need to derive new insights from raw data.
+
+## The Basics
+
+One of the most common data analysis techniques is to look at change over time. The most common way of comparing change over time is through percent change. The math behind calculating percent change is very simple, and you should know it off the top of your head. The easy way to remember it is:
+
+`(new - old) / old` 
+
+Or new minus old divided by old. Your new number minus the old number, the result of which is divided by the old number. To do that in R, we can use `dplyr` and `mutate` to calculate new metrics in a new field using existing fields of data. 
+
+So first we'll import the tidyverse so we can read in our data and begin to work with it.
+
+```{r load-tidyverse, exercise=TRUE}
+library(tidyverse)
+```
+```{r load-tidyverse-solution}
+library(tidyverse)
+```
+```{r load-tidyverse-check}
+grade_this_code()
+```
+
+Now we'll import a common and simple dataset of county  population estimates from the US Census Bureau. Each year, the Census Bureau publishes estimates for states and counties. This one has every county in the US. A common question: who are the winners and losers?  **For purposes of this exercise, you don't need to do this. The data is included here if you want to try this in your own notebook.**
+
+```{r echo=FALSE, class.output="bg-info", results="asis",  message=FALSE,  warning=FALSE}
+library(downloadthis)
+library(glue)
+
+dllink <- download_link(
+  link = "https://mattwaite.github.io/datajournalismfiles/estimates22.csv",
+  button_label = "Download csv file",
+  button_type = "danger",
+  has_icon = TRUE,
+  icon = "fa fa-save",
+  self_contained = FALSE
+)
+
+glue("<pre><p><strong>For this walkthrough:</strong></p><p>{dllink}</p></pre>")
+
+```
+
+Your first task is to import the data. For this exercise, you need to simply run this:
+
+```{r mutating-load-data, message=FALSE, warning=FALSE}
+counties <- read_csv("https://mattwaite.github.io/datajournalismfiles/estimates22.csv")
+
+fastest <- counties |> mutate(
+  change = ((`2022` - `2021`)/`2021`)*100
+) |>
+  arrange(desc(change)) |> slice(1)
+
+biggest <- counties |> mutate(
+  rawchange = `2022` - `2021`
+) |>
+  arrange(desc(rawchange)) |> slice(1)
+```
+```{r mutating-load-data-exercise, exercise = TRUE}
+counties <- read_csv("https://mattwaite.github.io/datajournalismfiles/estimates22.csv")
+```
+```{r mutating-load-data-exercise-solution}
+counties <- read_csv("https://mattwaite.github.io/datajournalismfiles/estimates22.csv")
+```
+```{r mutating-load-data-exercise-check}
+grade_this_code()
+```
+
+Remember, if you want to see the first six rows -- handy to take a peek at your data -- you can use the function `head`.
+
+```{r head-data, exercise=TRUE, exercise.setup = "mutating-load-data"}
+head(____)
+```
+```{r head-data-solution}
+head(counties)
+```
+```{r head-data-check}
+grade_this_code()
+```
+
+### Exercise 1: Calculating percent change 
+
+The code to calculate percent change is pretty simple. Remember, with `summarize`, we used `n()` to count things. With `mutate`, we use very similar syntax to calculate a new value -- a new column of data -- using other values in our dataset. So in this case, we're trying to do (new-old)/old, but we're doing it with fields. 
+
+If we look at what we got when we imported the data, you'll see there's a column called 2022 as the new data, and we'll use 2021 as the old data. So we're looking at one year. Then, to help us, we'll use arrange again to sort it, so we get the fastest growing county over one year. 
+
+NOTE: Pay attention to those backticks. They're the key next to the 1 key on your computer. Those backticks are there because R does not like numbers as column names. When you get a column name that starts with a number or has a space in it, you'll need backticks around it. 
+
+```{r mutate-change, exercise=TRUE, exercise.setup = "mutating-load-data", message=FALSE}
+____ |> mutate(
+  change = (`____` - `____`)/`____`
+) 
+```
+```{r mutate-change-solution, exercise.reveal_solution = FALSE}
+counties |> mutate(
+  change = (`2022` - `2021`)/`2021`
+) 
+```
+```{r mutate-change-check}
+grade_this_code()
+```
+
+Look out on the right and you'll see your change column. But what do you see right away? Do those numbers look like we expect them to? No. 
+
+### Exercise 2: Converting to a percentage.
+
+Those numbers are a decimal -- a really, really small decimal when you see things like e-03, which means that number is to the -10 power, which means move the decimal that many spaces to the left. We want it expressed as a percentage. So let's fix that by multiplying by 100. 
+
+```{r mutate-change2, exercise=TRUE, exercise.setup = "mutating-load-data", message=FALSE}
+____ |> mutate(
+  change = ((`____` - `____`)/`____`)*____
+) 
+```
+```{r mutate-change2-solution, exercise.reveal_solution = FALSE}
+counties |> mutate(
+  change = ((`2022` - `2021`)/`2021`)*100
+) 
+```
+```{r mutate-change2-check}
+grade_this_code()
+```
+
+Better. But ... unless we really care about Autuga County, Alabama, this isn't doing much for us. 
+
+### Exercise 3: Arranging to answer a question
+
+So who had the most growth last year from the year before? We can find that with arrange, which we learned about in the last tutorial.
+
+```{r mutate-change-percent, exercise=TRUE, exercise.setup = "mutating-load-data", message=FALSE, warning=FALSE}
+counties |> mutate(
+  change = ((`2022` - `2021`)/`2021`)*100
+) |>
+  arrange(desc(____))
+```
+```{r mutate-change-percent-solution, exercise.reveal_solution = FALSE}
+counties |> mutate(
+  change = ((`2022` - `2021`)/`2021`)*100
+) |>
+  arrange(desc(change))
+```
+```{r mutate-change-percent-check}
+grade_this_code()
+```
+
+```{r fastest, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "mutating-load-data", results='asis'}
+glue("Which county is the fastest growing?  {fastest$County}, {fastest$State}, which grew {format(fastest$change, digits=1)}% in just one year.")
+``` 
+
+## More mutating
+
+### Exercise 4: Looking at change differently
+
+With this data, we have every county and the population in two years. We've looked at the percent change, which allows us to put Los Angeles County, California and Arthur County, Nebraska on the same playing field. But what if we wanted to know which county was growing just at a raw number?
+
+What you're going to learn about data journalism is that often, the simplest way is going to be the best. Simple math means you can explain what you've done easily to anyone. So how do we get a raw number? Subtraction! Let's call this new column rawchange and the rest should be obvious to you.
+
+```{r mutate-change-percent-arrange, exercise=TRUE, exercise.setup = "mutating-load-data", message=FALSE, warning=FALSE}
+counties |> mutate(
+  ____ = `____` - `____`
+) |>
+  arrange(desc(____))
+```
+```{r mutate-change-percent-arrange-solution, exercise.reveal_solution = FALSE, warning=FALSE}
+counties |> mutate(
+  rawchange = `2022` - `2021`
+) |>
+  arrange(desc(rawchange))
+```
+```{r mutate-change-percent-arrange-check}
+grade_this_code()
+```
+
+```{r rawchange, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "mutating-load-data", results='asis'}
+glue("What county added the most people by raw number? It's {biggest$County}, {biggest$State} adding {biggest$rawchange} people in one year. Know where that is?")
+``` 
+
+## The Recap
+
+Throughout this lesson, you've learned how to use the mutate() function to create new columns in your dataset. You've calculated percent change and raw change in population data, demonstrating how to perform simple mathematical operations on existing columns. You've also combined mutate() with arrange() to identify the fastest-growing counties and those with the largest absolute population increases. Remember, mutating data allows you to uncover new insights and tell more complex stories with your data. As you continue your data journalism journey, you'll find that the ability to create new variables is an invaluable tool in your analytical toolkit.
+
+## Terms to Know
+
+- Mutate: A dplyr function used to create new columns or modify existing ones in a dataset.
+- Percent change: A calculation that shows the relative change between two values over time.
+- Raw change: The absolute difference between two values, without considering proportional change.
+- dplyr: A package in R that provides a set of tools for efficiently manipulating datasets.
+- Pipe operator (|>): A symbol used in R to chain together multiple operations on data.
+- Arrange: A dplyr function used to sort data based on one or more columns.
+- desc(): A function used within arrange() to sort data in descending order.
+- Backticks (`): Symbols used in R to enclose column names that start with numbers or contain spaces.

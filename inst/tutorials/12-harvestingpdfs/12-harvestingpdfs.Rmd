@@ -1,0 +1,154 @@
+---
+title: "Data Journalism Lesson 12: PDFs"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  Pulling data out of a hellscape.
+---
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(glue)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+```
+
+## The Goal
+
+In this lesson, you'll learn how to extract data from PDF files, a common challenge in data journalism. By the end of this tutorial, you'll understand two methods for converting PDFs to spreadsheets: using Adobe's online PDF converter and Adobe Acrobat software. You'll also practice cleaning and organizing the extracted data in Google Sheets. These skills will enable you to access and analyze information trapped in PDF format, expanding your ability to work with a wider range of data sources.
+
+## The Basics
+
+The next circle of Hell on the Dante's Inferno of Data Journalism is the PDF. Governments everywhere love the PDF and publish all kinds of records in a PDF. The problem is a PDF isn't a data format -- it's a middle finger, saying I've Got Your Accountability Right Here, Pal.
+
+It's so ridiculous that there's a constellation of tools that do nothing more than try to harvest tables out of PDFs. There are online services like [CometDocs](https://www.cometdocs.com/) where you can upload your PDF and point and click your way into an Excel file. There are mobile device apps that take a picture of a table and convert it into a spreadsheet. 
+
+But as a student at the Harvard of the Plains, you have an advantage: You have an Adobe Creative Suite account. And that opens some very useful doors.
+
+## Adobe online PDF converter
+
+With an Adobe account, there's two ways to do this. The latest is [an online PDF converter](https://www.adobe.com/acrobat/online/pdf-to-excel.html), which works quite well for reasonably sized PDFs. 
+
+Before we go forward, I want to make something very clear: You should *never* send a PDF with sensitive information in it to an online converter. If, someday, you're sent a pdf of secrets or one with private information about people, do *not* send it to an online converter. You do not know if it will remain private. In fact, you know it isn't private because someone else's computer has it now, in spite of what they say about maintaining privacy. So don't do it. 
+
+But the data we'll work with today isn't sensitive and is very public. Let's use it to test out Adobe's online converter.
+
+First, [download the 2022 General Election Canvas Book](https://sos.nebraska.gov/sites/sos.nebraska.gov/files/doc/elections/2022/2022%20General%20Canvass%20Book.pdf) from the Nebraska Secretary of State. This document represents the official election results for the state, certified by the canvasing board. These are the numbers history will remember.
+
+Now go to [Adobe's online converter](https://www.adobe.com/acrobat/online/pdf-to-excel.html). 
+
+Now, sign into Adobe. In the top right of the screen, you'll see a login button. You sign in with your huskers.unl.edu address. So your Canvas name @ huskers.unl.edu. Do *not* use a unl.edu address. 
+
+Once you are signed in, you can select the file to upload. If you downloaded the file from the Secretary of State, the file is in your downloads. 
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/pdfs1.png"))
+```
+
+Once you do that, you'll see a progress bar. 
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/pdfs2.png"))
+```
+
+And, if you approve Microsoft online, you'll see your spreadsheet in an Excel window in your browser. 
+
+But we're not going to edit this here. I am not filled with faith in Microsoft's online version of Excel. So click the download button on the top right. 
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/pdfs3.png"))
+```
+
+If you don't have Microsoft Excel Online approved, you'll see a big blue download button on the top left. Click that. 
+
+From here, if you have Excel installed on your computer, you could use it there. Since not everyone does, let's use Google Sheets. 
+
+Open a browser and type this address into the address bar: `sheets.new`. You'll be taken to a new Google sheet (you may have to sign in if you aren't already). 
+
+Go up to File > Import.
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/pdfs4.png"))
+```
+
+And then go to Upload. Click on Browse or drag the .xlsx file you downloaded from Adobe and then, when it's done uploading, click Import data. 
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/pdfs5.png"))
+```
+
+What you get is *everything* that was in the PDF. Graphics, headlines, everything. We don't want that. We're going to focus on just a table of registered voters at the time of the election. Scroll down to line 15 of the sheet. That's the table.
+
+Click and hold on line 15 and drag all the way down to line 111, which is York County, which should highlight all of the table we're after. 
+
+Go up to Edit > Copy and then click the + sign at the bottom left of your screen to add a new sheet.
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/pdfs6.png"))
+```
+
+Once you have your new sheet, paste in your data you copied from the first sheet.
+
+Now, to get this in shape, we need to do some editing in the sheet. First, you'll see the first row is Statewide totals. We need to delete that. Click on the 2 next to Statewide totals so the whole row is highlighted and go to Edit > Delete > Row 2.
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/pdfs7.png"))
+```
+
+Now go down to lines 50 and 51. Repeat the process, deleting those two rows out. Once you've done that, you've fixed the rows, but the columns have a weirder problem that's harder to see if you haven't done this before -- the columns are merged. What does that mean? It means column 2 is actually in column 48. We need them to be side by side. 
+
+To fix this, go to Format > Merge cells > Unmerge.
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/pdfs8.png"))
+```
+
+Unfortunately, that means now that we have to delete those empty columns. So click on the B, so the second column is highlighted, and then drag over to column K. Then, go to Edit > Delete > Columns B-K.
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/pdfs9.png"))
+```
+
+Repeat that process until all the blank columns are deleted and your data looks like this:
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/pdfs10.png"))
+```
+
+Then, to get it out of Google Sheets and into a CSV, go to File > Download > Comma Separated Values (which is what CSV stands for).
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/pdfs11.png"))
+```
+
+## Using Adobe Acrobat
+
+If indeed you have sensitive data, you can do the same thing in Adobe Acrobat -- the software that makes PDFs. 
+
+In Acrobat, you can open the PDF you downloaded from the Secretary of State. Then go to File > Export To > Spreadsheet > Microsoft Excel Workbook. 
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/pdfs12.png"))
+```
+
+After that, it's the same steps as above. You'll get the same file, with the same problems, and you'll use the same fixes. 
+
+## The Recap
+
+Throughout this lesson, you've learned valuable techniques for harvesting data from PDFs. You've practiced using Adobe's online converter and Adobe Acrobat to transform PDF tables into spreadsheets. You've also gained experience in cleaning and formatting the extracted data using Google Sheets, including unmerging cells, deleting unnecessary rows and columns, and exporting to CSV format. Remember, while PDFs can be challenging, these skills allow you to access important information that might otherwise be difficult to analyze. As you continue your data journalism journey, you'll find these techniques invaluable for working with government records and other PDF-based data sources.
+
+## Terms to Know
+
+- PDF (Portable Document Format): A file format used to present documents, including text formatting and images, independent of software, hardware, or operating systems.
+- CSV (Comma-Separated Values): A simple file format used to store tabular data, where each line of the file is a data record and each record consists of fields separated by commas.
+- Adobe Creative Suite: A collection of applications for graphic design, video editing, web development, and photography made by Adobe Inc.
+- CometDocs: An online service that converts various file formats, including PDFs to spreadsheets.
+- Merge cells: A spreadsheet function that combines two or more adjacent cells into a single cell.
+- Unmerge cells: The process of separating previously merged cells back into individual cells.
+- Google Sheets: A web-based spreadsheet program offered by Google as part of its free, web-based Google Docs Editors suite.
+- Microsoft Excel: A spreadsheet program developed by Microsoft for Windows, macOS, Android, and iOS.

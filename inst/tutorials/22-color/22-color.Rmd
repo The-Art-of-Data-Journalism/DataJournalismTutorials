@@ -1,0 +1,258 @@
+---
+title: "Data Journalism Lesson 22: Color"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  Learn how to add color to draw attention.
+---
+
+
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(tidyverse)
+library(ggrepel)
+library(ggtext)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+```
+
+## The Goal
+
+In this lesson, you'll learn how to effectively use color in data visualizations to enhance storytelling and guide reader attention. By the end of this tutorial, you'll understand key principles of color usage in charts, including limiting color palette, using contrast for emphasis, and avoiding overuse of color. You'll practice applying these concepts by creating a bar chart of campus police calls, using color strategically to highlight specific data points. These skills will enable you to create more impactful and clear visualizations in your data journalism projects.
+
+## The Basics
+
+The main focus of this whole class -- indeed the whole journalism major -- is to tell a story. If the chart is not telling a story, then it doesn't serve a purpose and we've failed. And if our chart does tell a story, but the reader can't find it, then that means we've still failed the main purpose. 
+
+Some charts do a lot of work showing the reader what the story is before we even anything to it. Some need more help. One way we can offer that help is to use color. 
+
+Color can be very powerful. It can also ruin a graphic. And the right use of color isn't science -- it's art. That means color has been argued about for centuries, even in the world of graphics. 
+
+The basic rules of color we're going to use are:
+
+1. Limit the number of colors. The fewer the better. If everything is a color, nothing is a color. 
+2. Use contrasting colors to draw attention. A color in a sea of grey stands out. 
+3. Don't abuse color. Choose appropriate colors, avoid the defaults.
+
+Where do these rules come from? Experience of people who have made graphics before. Looking at what has succeeded and what has failed. 
+
+**Rule 1:** Alberto Cairo, a professor in the University of Miami School of Communication and expert in data visualization, wrote in his book The Functional Art that limiting color was "not just a minimalist aesthetic choice, but a practical one. Limiting the amount of colors and different fonts in your graphics will help you create a sense of unity in the composition."
+
+He went on: 
+
+"The best way to disorient your readers is to fill your graphic with objects colored in pure accent tones. Pure colors are uncommon in nature, so limit them to highlight whatever is important in your graphics, and use subdued hues — grays, light blues, and greens — for everything else. In other words: If you know that the brain prioritizes what it pays attention to, prioritize beforehand."
+
+**Rule 2:** Swiss cartographer Eduard Imhof wrote in 1982 his first rule of of color composition: "Pure, bright or very strong colors have loud unbearable effects when they stand unrelieved over large areas adjacent to each other, but extraordinary effects can be achieved when they are used sparingly on or between dull background tones."
+
+**Rule 3:** Edward Tufte, in Envisioning Information, wrote that adding color was the easy part. "The often scant benefits derived from coloring data indicate that putting a good color in a good place is a complex matter. Indeed, so difficult and subtle that avoiding catastrophe becomes the first principle in bringing color to information: Above all, do no harm."
+
+## An example of using color
+
+We're going to build a simple bar chart and layer in come color as an example. We're going to wind the clock back and look at the top 20 calls to campus police since 2018. You did this before -- as a top 10 list -- in the first bar charts assignment. 
+
+First load the tidyverse.
+
+```{r load-tidyverse, exercise=TRUE}
+library(tidyverse)
+```
+```{r load-tidyverse-solution}
+library(tidyverse)
+```
+```{r load-tidyverse-check}
+grade_this_code()
+```
+
+And the data. We're going to do three things here: first, we'll load in the calls data. Then, we'll make our top 20 list with a simple group by, summarize and top_n. Lastly, we'll use grepl to find all incident_codes that contain the word NARCOTICS.   
+
+```{r colors-load-data, message=FALSE, warning=FALSE}
+crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
+
+top20 <- crimes |> 
+  group_by(incident_code) |>
+  summarize(
+    count = n()
+  ) |>
+  ungroup() |>
+  top_n(20, wt=count)
+
+drugs <- top20 |> filter(grepl("NARCOTICS", incident_code) == TRUE)
+
+```
+```{r colors-load-data-exercise, exercise = TRUE}
+crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
+
+top20 <- crimes |> 
+  group_by(incident_code) |>
+  summarize(
+    count = n()
+  ) |>
+  ungroup() |>
+  top_n(20, wt=count)
+
+drugs <- top20 |> filter(grepl("NARCOTICS", incident_code) == TRUE)
+```
+```{r colors-load-data-exercise-solution}
+crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
+
+top20 <- crimes |> 
+  group_by(incident_code) |>
+  summarize(
+    count = n()
+  ) |>
+  ungroup() |>
+  top_n(20, wt=count)
+
+drugs <- top20 |> filter(grepl("NARCOTICS", incident_code) == TRUE)
+```
+```{r colors-load-data-exercise-check}
+grade_this_code()
+```
+
+And we can see that `top20` data with head. The `drugs` dataframe has the same columns. 
+
+```{r head-data, exercise=TRUE, exercise.setup = "colors-load-data"}
+head(top20)
+```
+```{r head-data-solution}
+head(top20)
+```
+```{r head-data-check}
+grade_this_code()
+```
+
+### Exercise 1: Making the first bar
+
+Let's start by making a simple bar chart of `count`. We're going to re-order it and coord_flip it like we've done before. 
+
+```{r colors-bar, exercise=TRUE, exercise.setup = "colors-load-data", message=FALSE}
+ggplot() + 
+  geom_bar(data=top20, aes(x=reorder(incident_code, ____), weight=____)) + 
+  coord_flip()
+```
+```{r colors-bar-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_bar(data=top20, aes(x=reorder(incident_code, count), weight=count)) + 
+  coord_flip()
+```
+```{r colors-bar-check}
+grade_this_code()
+```
+
+Now we've got a base. 
+
+### Exercise 2: Using color to reduce attention
+
+Let's make that base fade into the background by changing the color to light grey (which is one word in ggplot). With bar charts, we're changing the `fill`. Changing the `color` will only change the outline of the bar. 
+
+```{r colors-bar2, exercise=TRUE, exercise.setup = "colors-load-data", message=FALSE}
+ggplot() + 
+  geom_bar(data=top20, aes(x=reorder(incident_code, ____), weight=____), fill="____") + 
+  coord_flip()
+```
+```{r colors-bar2-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_bar(data=top20, aes(x=reorder(incident_code, count), weight=count), fill="lightgrey") + 
+  coord_flip()
+```
+```{r colors-bar2-check}
+grade_this_code()
+```
+
+Now we can add layers.
+
+### Exercise 3: More layers, more colors
+
+Now we're going to add `drugs` to our chart and make it waaaay cooler. Kidding. Don't do drugs kids. We want them to stand out from the rest of the incident codes, so we're going to make `narcotics` dark green, and just like light grey, it's one word. 
+
+```{r colors-bar3, exercise=TRUE, exercise.setup = "colors-load-data", message=FALSE}
+ggplot() + 
+  geom_bar(data=top20, aes(x=reorder(incident_code, count), weight=count), fill="____") + 
+  geom_bar(data=____, aes(x=reorder(incident_code, count), weight=count), fill="____") +    
+  coord_flip()
+```
+```{r colors-bar3-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_bar(data=top20, aes(x=reorder(incident_code, count), weight=count), fill="lightgrey") + 
+  geom_bar(data=drugs, aes(x=reorder(incident_code, count), weight=count), fill="darkgreen") +    
+  coord_flip()
+```
+```{r colors-bar3-check}
+grade_this_code()
+```
+
+See how you can now see how often campus police are called to people involved in some kind of substance? It's a lot.
+
+We've got one last color-based thing to do -- get rid of the grey background.
+
+### Exercise 4: Getting out of the way of our colors
+
+`ggplot` by default adds a grey background to every chart. I don't know why, but it's there. That grey takes away from our contrast and makes the reader's eye wander more. We want to draw attention to our shapes, and use color to draw the eye to the shape we want them to see. Something that impacts that is bad, so we want to get rid of it. 
+
+The fastest way is to use pre-made themes. The two that come in the most handy are `theme_minimal` and `theme_light`, both of which ditch the grey background. 
+
+Let's use `theme_minimal` here. 
+
+```{r colors-bar4, exercise=TRUE, exercise.setup = "colors-load-data", message=FALSE}
+ggplot() + 
+  geom_bar(data=top20, aes(x=reorder(incident_code, count), weight=count), fill="____") + 
+  geom_bar(data=____, aes(x=reorder(incident_code, count), weight=count), fill="____") +    
+  coord_flip() + 
+  ___()
+```
+```{r colors-bar4-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_bar(data=top20, aes(x=reorder(incident_code, count), weight=count), fill="lightgrey") + 
+  geom_bar(data=drugs, aes(x=reorder(incident_code, count), weight=count), fill="darkgreen") +    
+  coord_flip() + 
+  theme_minimal()
+```
+```{r colors-bar4-check}
+grade_this_code()
+```
+
+This chart has some work left -- headlines, some text to explain the dark grey bars, the axis labels are garbage -- but this chart tells a story and our reader can find it. 
+
+## Using color wrong
+
+The best way to know you're using color wrong is to watch what is without argument the best Pixar movie: The Incredibles. In it, the bad guy tries to not only destroy superheroes but the very idea of them by making everyone a superhero. This is the money quote: 
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/e2hO2tALgCY?si=V6PtKEM1PaHMgGSq" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+So how do you do that here? By moving the fill inside the aes and making everything a color. 
+
+### Exercise 5: Doing it wrong
+
+So what do we use for our fill? We've already used count to make the width of the bars We need the other column name we have.
+
+```{r colorswrong-bar, exercise=TRUE, exercise.setup = "colors-load-data", message=FALSE}
+ggplot() + 
+  geom_bar(data=top20, aes(x=reorder(incident_code, ____), weight=____, fill=____)) + 
+  coord_flip()
+```
+```{r colorswrong-bar-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_bar(data=top20, aes(x=reorder(incident_code, count), weight=count, fill=incident_code)) + 
+  coord_flip()
+```
+```{r colorswrong-bar-check}
+grade_this_code()
+```
+Good luck reading that -- the legend needed to tell you which color is which bar consumes the whole graph area. Even if you could see it, good luck finding something to focus on. If you give your reader too much to focus on, there's nothing they can focus on. 
+
+## The Recap
+
+Throughout this lesson, you've explored the power of color in data visualization and learned how to use it judiciously to enhance your charts. You've practiced creating a base chart, using color to fade less important elements into the background, and highlighting key data points with contrasting colors. Remember, effective use of color is about balance - drawing attention to the most important aspects of your data while avoiding visual clutter. As you continue your data journalism journey, consider how thoughtful color choices can make your visualizations more engaging and easier to understand, ultimately helping you tell stronger data-driven stories.
+
+## Terms to Know
+
+- Color contrast: The use of different colors to create visual distinction between elements in a chart.
+- Fill: In ggplot2, the color used to fill the interior of graphical elements like bars or points.
+- Color: In ggplot2, typically refers to the outline color of graphical elements.
+- `theme_minimal()`: A ggplot2 function that applies a minimal theme, removing background colors and grids.
+- `theme_light()`: Another ggplot2 theme function that applies a light background with minimal gridlines.

@@ -1,0 +1,282 @@
+---
+title: "Data Journalism Lesson 7: Filters"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  Learn how to narrow in on what's important and remove what isn't.
+--- 
+
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(tidyverse)
+library(glue)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+```
+
+## The Goal
+
+In this lesson, you'll learn about filtering data - a crucial skill for focusing your analysis on specific subsets of information. By the end of this tutorial, you'll understand how to use the filter() function in R to narrow down your dataset based on various criteria. You'll practice filtering with exact matches, partial matches using grepl(), and filtering with lists. You'll also learn how to combine multiple filters and use select() to simplify your data view. These skills will enable you to efficiently extract the most relevant information from large datasets, a key ability in data journalism.
+
+## The Basics
+
+More often than not, we have more data than we want. Sometimes we need to be rid of that data. In `dplyr`, there's two ways to go about this: filtering and selecting.
+
+**Filtering creates a subset of the data based on criteria**. All records where the count is greater than 10. All records that match "Nebraska". Something like that. 
+
+**Selecting simply returns only the fields named**. So if you only want to see School and Attendance, you select those fields. When you look at your data again, you'll have two columns. If you try to use one of your columns that you had before you used select, you'll get an error.  
+
+Let's work on some examples using the UNLPD reports data. You can download the data here if you want to use it in your own notebook -- and this is the same data we've used before, so if you already downloaded it, you don't need to do it again. **For purposes of this exercise, you don't need to do this. The data is included here if you want to try this in your own notebook.**
+
+```{r echo=FALSE, class.output="bg-info", results="asis",  message=FALSE,  warning=FALSE}
+library(downloadthis)
+library(glue)
+
+dllink <- download_link(
+  link = "http://mattwaite.github.io/datajournalismfiles/crimelogs.csv",
+  button_label = "Download csv file",
+  button_type = "danger",
+  has_icon = TRUE,
+  icon = "fa fa-save",
+  self_contained = FALSE
+)
+
+glue("<pre><p><strong>For this walkthrough:</strong></p><p>{dllink}</p></pre>")
+
+```
+
+First we'll need the tidyverse. Your first step is always loading libraries and you'll need to run this step in nearly every single thing you do.
+
+```{r load-tidyverse, exercise=TRUE}
+library(tidyverse)
+```
+```{r load-tidyverse-solution}
+library(tidyverse)
+```
+```{r load-tidyverse-check}
+grade_this_code()
+```
+Now import the data.
+
+```{r filtering-load-data, message=FALSE, warning=FALSE}
+crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
+
+drunks <- crimes |> filter(grepl("ALCOHOL", incident_code) == TRUE)
+
+arrests <- crimes |> 
+  filter(grepl("ALCOHOL", incident_code) == TRUE) |>
+  filter(grepl("Cleared by Arrest", disposition) == TRUE)
+```
+```{r filtering-load-data-exercise, exercise = TRUE}
+crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
+```
+```{r filtering-load-data-exercise-solution}
+crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
+```
+```{r filtering-load-data-exercise-check}
+grade_this_code()
+```
+
+So, first things first, let's look at one building on campus. We do that with `filter` and then we pass it a condition. 
+
+Before we do anything, a note about conditions. Most of the conditional operators you'll understand -- greater than and less than are > and <. The tough one to remember is equal to. In conditional statements, equal to is == not =. If you haven't noticed, = is a variable assignment operator, not a conditional statement. So equal is == and NOT equal is !=. You can also combine greater than and equal to. So, for instance, if you want all values that are 10 or greater, you can use >= 10, which is the same thing as > 9. Both will include 10 and everything greater. But one is more clear -- >= 10 -- and one is a trick. Always be clear. 
+
+So if you want to see every row that exactly matches the Nebraska Union, what would you do?
+
+First, let's use head to give us a peek at the data.
+
+```{r head-data, exercise=TRUE, exercise.setup = "filtering-load-data"}
+head(____)
+```
+```{r head-data-solution, exercise.reveal_solution = FALSE}
+head(crimes)
+```
+```{r head-data-check}
+grade_this_code()
+```
+
+Now that we can see the column names, we now know `location` is where the addresses of the buildings are. The address of the Nebraska Union is `1400 R St` without a period after the St. Replace the all caps and question marks here and see if you can get only incidents at the Union.
+
+### Exercise 1: Hanging out at the Union 
+
+```{r filtering-nebraska, exercise=TRUE, exercise.setup = "filtering-load-data"}
+____ |> filter(____ == "____")
+```
+```{r filtering-nebraska-solution, exercise.reveal_solution = FALSE}
+crimes |> filter(location == "1400 R St")
+```
+```{r filtering-nebraska-check}
+grade_this_code()
+```
+
+And what do you see? You see a lot of things going on at the Union.
+
+### Exercise 2: Filter with fragments
+
+If you look at the crimes being reported to UNLPD, you'll see there's lots of different types. For example, there's four different kinds of narcotics charges on campus. There's nine unique alcohol related calls. 
+
+But how do you write a filter that captures "ALCOHOL - DRUNK" and "ALCOHOL - MINOR IN POSSESSION"? You *could* do something like `... |> filter(incident_code="ALCOHOL - DRUNK" | incident_code="ALCOHOL - MINOR IN POSSESSION")` where the pipe means this *or* this. But what about the seven other alcohol related incidents? Do you want to write all that code? No, you don't. 
+
+Computers have solved this. You can write a filter where a chunk of text contains a word or even part of a word. The function here is called `grepl`, and the basic pattern here is grepl is looking for X word in Y column of data. And if it finds it, it says `TRUE`. So our filter is saying if grepl == TRUE, then keep the row. See if you can fill it out, looking for ALCOHOL. 
+
+```{r filtering-alcohol, exercise=TRUE, exercise.setup = "filtering-load-data"}
+____ |> filter(grepl("____", incident_code) == ____)
+```
+```{r filtering-alcohol-solution, exercise.reveal_solution = FALSE}
+crimes |> filter(grepl("ALCOHOL", incident_code) == TRUE)
+```
+```{r filtering-alcohol-check}
+grade_this_code()
+```
+
+But how many of those were drunks were arrested? To do this we're going to *chain* filters together, which is a fancy way of just saying we're going to add another. And when we do that, the effect is like saying AND. The data must match this AND this, so both things must be true.
+
+### Exercise 3: Drunks under arrest
+
+```{r filtering-drunks, exercise=TRUE, exercise.setup = "filtering-load-data"}
+____ |> 
+  filter(grepl("____", incident_code) == ____) |>
+  filter(____("Cleared by Arrest", ____) == ____)
+```
+```{r filtering-drunks-solution, exercise.reveal_solution = FALSE}
+crimes |> 
+  filter(grepl("ALCOHOL", incident_code) == TRUE) |>
+  filter(grepl("Cleared by Arrest", disposition) == TRUE)  
+```
+```{r filtering-drunks-check}
+grade_this_code()
+```
+
+```{r drunsummary, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "filtering-load-data", results='asis'}
+glue("In this data, going back to 2018, there were {nrow(drunks)} alcohol related incidents. Of them, {nrow(arrests)} ended with an arrest. What does that say to you about alcohol incidents on campus?")
+```
+
+But what if we want to see all of the dorms? We *could* use conditional logic in our filter. The conditional logic operators are `|` for OR and `&` for AND. **NOTE: AND means all conditions have to be met. OR means any of the conditions work.** So be careful about boolean logic. 
+
+Here's what that looks like with the first few residence hall addresses for the example. It's a lot of extra code that you've got to be careful with.
+
+```{r filtering-dorms, exercise=TRUE, exercise.setup = "filtering-load-data"}
+crimes |>
+  filter(
+    location == "880 N 17th St" |
+    location == "860 N 17th St" |
+    location == "1150 N 14th St" |
+    location == "630 N 14th St"
+  )
+```
+```{r filtering-dorms-solution, exercise.reveal_solution = FALSE}
+crimes |>
+  filter(
+    location == "880 N 17th St" |
+    location == "860 N 17th St" |
+    location == "1150 N 14th St" |
+    location == "630 N 14th St"
+  )
+```
+```{r filtering-dorms-check}
+grade_this_code()
+```
+
+But that's a lot of repetitive code. And a lot of typing. And typing is the devil. So what if we could create a list of addresses and pass it into the filter just once? It's pretty simple.
+
+### Exercise 4: Filtering with a list
+
+We can create a new variable -- remember variables can represent just about anything -- and create a list. To do that we use the `c` operator, which stands for concatenate. That just means take all the stuff in the parenthesis after the c and bunch it into a list. 
+
+Note here: text is in quotes. If they were numbers, we wouldn't need the quotes. And `c()` gives us a list that we can use. 
+
+With a list, we can use the %in% operator. It does what you think it does -- it gives you data that matches things IN the list you give it. 
+
+```{r filtering-list, exercise=TRUE, exercise.setup = "filtering-load-data"}
+addresses <- c("880 N 17th St", "860 N 17th St", "1150 N 14th St", "630 N 14th St")
+
+____ |> filter(____ %in% ____ )
+```
+```{r filtering-list-solution, exercise.reveal_solution = FALSE}
+addresses <- c("880 N 17th St", "860 N 17th St", "1150 N 14th St", "630 N 14th St")
+
+crimes |> filter(location %in% addresses)
+```
+```{r filtering-list-check}
+grade_this_code()
+```
+
+## Selecting data to make it easier to read
+
+So now we have a partial dorm list. What if we just wanted to see incident_codes, reported dates and locations and ignore all the rest? Select to the rescue. With select, we just spell out exactly which columns we want to see. In our case, we've got three we're interested in seeing: incident_code, reported and location. 
+
+### Exercise 5: Select to simplify 
+
+```{r selecting-dorms, exercise=TRUE, exercise.setup = "filtering-load-data"}
+addresses <- c("880 N 17th St", "860 N 17th St", "1150 N 14th St", "630 N 14th St")
+
+____ |> 
+  filter(____ %in% ____) |>
+  select(____, ____, ____)
+```
+```{r selecting-dorms-solution, exercise.reveal_solution = FALSE}
+addresses <- c("880 N 17th St", "860 N 17th St", "1150 N 14th St", "630 N 14th St")
+
+crimes |> 
+  filter(location %in% addresses) |>
+  select(incident_code, reported, location)
+```
+```{r selecting-dorms-check}
+grade_this_code()
+```
+
+If you have truly massive data, `select` has tools to help you select fields that start_with the same things or ends with a certain word. [The documentation will guide you](https://dplyr.tidyverse.org/reference/select.html) if you need those someday. For 90 plus percent of what we do, just naming the fields will be sufficient. 
+
+## Top list
+
+One last little dplyr trick that's nice to have in the toolbox is a shortcut for selecting only the top values for your dataset. Want to make a Top 10 List? Or Top 25? Or Top Whatever You Want? It's easy. 
+
+### Exercise 6: Top N lists
+
+So what are the top locations for alcohol? All we're doing here is chaining commands together with what we've already got. We're *filtering* our alcohol related charges, we're *grouping* by location, in summarize we're creating a count. We'll arrange it to get the largest count to the top. Now we'll introduce the new function: `top_n`. The `top_n` function just takes a number and a weight, abbreviated wt.
+
+```{r selecting-top-locations, exercise=TRUE, exercise.setup = "filtering-load-data"}
+____ |>
+  group_by(____) |>
+  summarize(
+    count = n()
+  ) |>
+  arrange(desc(____)) |>
+  top_n(10, wt=____)
+```
+```{r selecting-top-locations-solution, exercise.reveal_solution = FALSE}
+crimes |>
+  group_by(location) |>
+  summarize(
+    count = n()
+  ) |>
+  arrange(desc(count)) |>
+  top_n(10, wt=count)
+```
+```{r selecting-top-locations-check}
+grade_this_code()
+```
+
+Anyone know where 300 N 17th Street is? It's the address of the university police. Is the most crime-ridden place on campus the police department? Not exactly. It's a convenient address for reports that don't have a clear location. 
+
+## The Recap
+
+Throughout this lesson, you've learned how to use filters to focus on specific parts of your dataset. You've practiced filtering with exact matches, using grepl() for partial matches, and filtering with lists. You've also learned how to chain multiple filters together and use select() to simplify your data view. Remember, filtering is a powerful tool that allows you to zoom in on the most relevant data for your story. As you continue your data journalism journey, you'll find these filtering techniques invaluable for uncovering specific trends and patterns within larger datasets.
+
+## Terms to Know
+
+- `filter()`: A dplyr function used to subset data based on specific conditions.
+- `select()`: A dplyr function used to choose specific columns from a dataset.
+- `grepl()`: A function used for pattern matching in strings, often used with filter() for partial matches.
+- Conditional operators: Symbols used in filtering (e.g., ==, !=, >, <) to compare values.
+- Boolean logic: The use of AND (&) and OR (|) in filtering to combine multiple conditions.
+- `%in%` operator: Used to check if values are present in a list, useful for filtering with multiple options.
+- `c()`: A function used to concatenate values into a vector or list.
+- Chaining: The process of connecting multiple dplyr operations using the pipe operator (|>).
+- `top_n()`: A dplyr function used to select the top N rows based on a specified column.

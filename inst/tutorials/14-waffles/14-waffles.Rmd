@@ -1,0 +1,265 @@
+---
+title: "Data Journalism Lesson 14: Waffle charts"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  Making quick graphics for reporting.
+---
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(waffle)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+```
+
+## The Goal
+
+In this lesson, you'll learn how to create waffle charts, an effective alternative to pie charts for visualizing proportions. By the end of this tutorial, you'll understand how to use the waffle library in R to construct single and comparative waffle charts. You'll practice creating these charts with real data from university enrollment statistics, learning how to adjust chart parameters for clarity and how to handle uneven data comparisons. This skill will enable you to present proportional data in a clear, visually appealing format that's easier to interpret than traditional pie charts.
+
+## The Basics
+
+Pie charts are the devil. They should be an instant F in any data visualization class. The problem? How carefully can you evaluate angles and area? Unless they are blindingly obvious and only a few categories, not well. If you've got 25 categories, how can you tell the difference between 7 and 9 percent? You can't.
+
+So let's introduce a better way: The Waffle Chart. Some call it a square pie chart. I personally hate that. Waffles it is. 
+
+**A waffle chart is designed to show you parts of the whole -- proportionality**. How many things make up the whole.
+
+Let's look extremely locally to us and look at the College of Journalism. 
+
+To start, we load the waffle library. For this exercise, we don't need the tidyverse. 
+
+```{r load-waffle, exercise=TRUE}
+library(waffle)
+```
+```{r load-waffle-solution}
+library(waffle)
+```
+```{r load-waffle-check}
+grade_this_code()
+```
+
+## Making waffles with vectors
+
+The easiest way to do waffle charts is to make vectors of your data and plug them in. To make a vector, we use the `c` or concatenate function. We did this all the way back in Lesson 1. 
+
+So let's look at the college. These are the latest numbers from the university.  
+
+```{r waffle-load-data, message=FALSE, warning=FALSE}
+enrollment <- c("Advertising" = 436, "Broadcasting" = 118, "Journalism" = 107, "Sports Media" = 314)
+
+cojmc <- c("Men" = 324, "Women" = 431)
+cob <- c("Men" = 1890, "Women" = 1104)
+
+cojmc2 <- c("Men" = 324, "Women" = 431, 2239)
+cob2 <- c("Men" = 1890, "Women" = 1104)
+```
+```{r waffle-load-data-exercise, exercise = TRUE}
+enrollment <- c("Advertising" = 436, "Broadcasting" = 118, "Journalism" = 107, "Sports Media" = 314)
+```
+```{r waffle-load-data-exercise-solution}
+enrollment <- c("Advertising" = 436, "Broadcasting" = 118, "Journalism" = 107, "Sports Media" = 314)
+```
+```{r waffle-load-data-exercise-check}
+grade_this_code()
+```
+
+So what does the breakdown of the college look like?
+
+### Exercise 1: Make a waffle chart
+
+The waffle library can break this down in a way that's easier on the eyes than a pie chart. We call the `waffle` function, add the data for the college, specify the number of rows (5 is a good start), give it a title and an x value label, and to clean up a quirk of the library, we've got to specify colors. 
+
+```{r waffle, exercise=TRUE, exercise.setup = "waffle-load-data", message=FALSE}
+waffle(
+        ____, 
+        rows = ____, 
+        title="COJMC majors", 
+        xlab="1 square = 1 major", 
+        colors = c("#E41C38", "#045CB8", "#249C38", "#44DCB8")
+)
+```
+```{r waffle-solution, exercise.reveal_solution = FALSE}
+waffle(
+        enrollment, 
+        rows = 5, 
+        title="COJMC majors", 
+        xlab="1 square = 1 major", 
+        colors = c("#E41C38", "#045CB8", "#249C38", "#44DCB8")
+)
+```
+```{r waffle-check}
+grade_this_code()
+```
+
+Uh oh. We did everything right, but we see nothing. Why might that be? Well, you're trying to cram almost 1,000 squares in 5 rows into this small window. The waffle library is doing that, but in order to make them all fit, they have to be tiny. That isn't working very well. The solution? Division! 
+
+### Exercise 2: Divide by 10
+
+The Waffle library has a neat feature that you can automatically turn each square into a factor of whatever number you want by just dividing your data vector by a number. So 1000 squares too many? Why not try dividing the data by 10? 
+
+```{r waffle2, exercise=TRUE, exercise.setup = "waffle-load-data", message=FALSE}
+waffle(
+        ____/____, 
+        rows = ____, 
+        title="COJMC majors", 
+        xlab="1 square = 10 majors", 
+        colors = c("#E41C38", "#045CB8", "#249C38", "#44DCB8")
+)
+```
+```{r waffle2-solution, exercise.reveal_solution = FALSE}
+waffle(
+        enrollment/10, 
+        rows = 5, 
+        title="COJMC majors", 
+        xlab="1 square = 10 majors", 
+        colors = c("#E41C38", "#045CB8", "#249C38", "#44DCB8")
+)
+```
+```{r waffle2-check}
+grade_this_code()
+```
+
+And now you have a waffle chart that shows journalism and broadcasting are two slices sandwiched between advertising and sports. 
+
+## Two waffles = waffle iron
+
+What does it look like if we compare the gender breakdown of two colleges? In other words -- what if we have two waffles? To do that -- and I am not making this up -- you have to create a waffle iron. Get it? Waffle charts? Iron?
+
+To make an waffle iron, you wrap your `waffle` functions in an `iron` function. The `iron` is just a wrapper -- it just combines them together. Each waffle functions separately in the iron. 
+
+In this block, we're going to set up vectors comparing the College of Journalism and the College of Business (boo, we hate them).
+
+```{r waffle3, exercise=TRUE, exercise.setup = "waffle-load-data", message=FALSE}
+cojmc <- c("Men" = 324, "Women" = 431)
+cob <- c("Men" = 1890, "Women" = 1104)
+```
+```{r waffle3-solution, exercise.reveal_solution = FALSE}
+cojmc <- c("Men" = 324, "Women" = 431)
+cob <- c("Men" = 1890, "Women" = 1104)
+```
+```{r waffle3-check}
+grade_this_code()
+```
+
+### Exercise 3: The waffle iron
+
+Now we just have to plug our cojmc and cob vectors into waffles. This time, however, we're going to divide by 20 because the numbers are bigger.  
+
+```{r waffle4, exercise=TRUE, exercise.setup = "waffle-load-data", message=FALSE}
+iron(
+  waffle(
+  ____/20,
+  rows=5,
+  title="COJMC gender breakdown", 
+  xlab="1 square = 20 students",
+  colors = c("orange", "green")
+),
+  waffle(
+  ____/20,
+  rows=5,
+  title="COB gender breakdown", 
+  xlab="1 square = 20 students",
+  colors = c("orange", "green")
+)
+)
+```
+```{r waffle4-solution, exercise.reveal_solution = FALSE}
+iron(
+  waffle(
+  cojmc/20,
+  rows=5,
+  title="COJMC gender breakdown", 
+  xlab="1 square = 20 students",
+  colors = c("orange", "green")
+),
+  waffle(
+  cob/20,
+  rows=5,
+  title="COB gender breakdown", 
+  xlab="1 square = 20 students",
+  colors = c("orange", "green")
+)
+)
+```
+```{r waffle4-check}
+grade_this_code()
+```
+
+What do you notice about this chart? Notice how the squares aren't the same size? Well, I'm sad to say, the COB is much larger than COJMC. So the squares aren't the same size because the numbers aren't the same. 
+
+### Exercise 4: Adding padding
+
+We can fix the uneven box sizes by adding an unnamed padding number so the number of majors add up to the same thing. The COB's total majors is 2994, to COJMC's 755. To make the squares the same, we need to make the total for COJMC be 2994. To do that, we need to add 2239 to COJMC. IMPORTANT NOTE: Don't name it or it'll show up in the legend.
+
+Now, in our waffle iron, if we don't give that padding a color, we'll get an error. So we need to make it white. Which, given our white background, means it will disappear.
+
+```{r waffle5, exercise=TRUE, exercise.setup = "waffle-load-data", message=FALSE}
+cojmc2 <- c("Men" = 324, "Women" = 431, ____)
+cob2 <- c("Men" = 1890, "Women" = 1104)
+
+iron(
+  waffle(
+  ____/20,
+  rows=5,
+  title="COJMC gender breakdown", 
+  xlab="1 square = 20 students",
+  colors = c("orange", "green", "____")
+),
+  waffle(
+  ____/20,
+  rows=5,
+  title="COB gender breakdown", 
+  xlab="1 square = 20 students",
+  colors = c("orange", "green")
+)
+)
+```
+```{r waffle5-solution, exercise.reveal_solution = FALSE}
+cojmc2 <- c("Men" = 324, "Women" = 431, 2239)
+cob2 <- c("Men" = 1890, "Women" = 1104)
+
+iron(
+  waffle(
+  cojmc2/20,
+  rows=5,
+  title="COJMC gender breakdown", 
+  xlab="1 square = 20 students",
+  colors = c("orange", "green", "white")
+),
+  waffle(
+  cob2/20,
+  rows=5,
+  title="COB gender breakdown", 
+  xlab="1 square = 20 students",
+  colors = c("orange", "green")
+)
+)
+```
+```{r waffle5-check}
+grade_this_code()
+```
+
+News flash: COB is big. Also, lots and lots of dudes. 
+
+## The Recap
+
+Throughout this lesson, you've learned how to create and customize waffle charts using R's waffle library. You've practiced making single waffle charts to display proportions within a dataset, such as college majors within COJMC. You've also learned how to create comparative waffle charts using the iron() function, allowing you to visually compare proportions across different datasets, like gender breakdowns between colleges. You've discovered how to adjust your data and chart parameters to handle issues like scale differences and visual clarity. Remember, waffle charts offer a more precise and visually appealing alternative to pie charts for displaying proportional data, making them a valuable tool in your data visualization toolkit.
+
+## Terms to Know
+
+- Waffle chart: A chart type that represents data as squares in a grid, where each square represents a proportion of the whole.
+- Vector: In R, a basic data structure that holds elements of the same type in a specific order.
+- `waffle()` function: The main function in the waffle library used to create a single waffle chart.
+- `iron()` function: A function in the waffle library used to combine multiple waffle charts for comparison.
+- Concatenate (`c()`): An R function used to create vectors by combining elements.
+- `rows` parameter: In waffle charts, determines the number of rows in the grid of squares.
+- `xlab`: A parameter in the waffle() function used to label the x-axis, often explaining what each square represents.
+- `colors` parameter: Used in waffle charts to specify the colors for each category in the data.
+- Division in waffle charts: A technique used to reduce the number of squares by making each square represent multiple units of data.
+- Padding: In comparative waffle charts, additional unnamed data added to make totals equal across charts for visual consistency.

@@ -1,0 +1,129 @@
+---
+title: "Data Journalism Lesson 26: Datawrapper for maps"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  Making quick graphics for publication
+---
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(tidyverse)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+```
+
+## The Goal
+
+In this lesson, you'll learn how to create interactive maps using Datawrapper, a powerful online visualization tool. By the end of this tutorial, you'll understand how to prepare data for mapping, create symbol maps with customized colors and tooltips, and add essential elements like titles and source information. You'll practice these skills using real groundhog prediction data, gaining hands-on experience in transforming raw data into an engaging, interactive visualization. This ability to create professional-looking maps will be invaluable for presenting geographic data in your journalism projects.
+
+## The Basics
+
+Making charts in Datawrapper is preposterously simple. Making maps is less so, but not hard. 
+
+First, we need some data. **Start a notebook in your homework directory**, copy this block of code and run it: 
+
+```
+library(tidyverse)
+
+predictions <- read_csv("https://mattwaite.github.io/datajournalismfiles/predictions.csv")
+
+preds <- predictions |> filter(year == 2024) |>
+  separate(coordinates, into=c("latitude", "longitude"), sep=",") 
+
+write_csv(preds, "predictions.csv")
+```
+
+This block of code does a few things -- it pulls in the groundhog predictions data we've worked with, filters for just this last year and separates the latitude and longitude coordinates into separate columns. Then, using write_csv it writes the dataframe out to a csv file. It's the opposite of read_csv. 
+
+After you run that, you'll have a csv file in your homework directory called predictions.csv. We'll use that for our datawrapper example. 
+
+## Working in Datawrapper
+
+In your Datawrapper dashboard, we want to start with a new chart. One thing Datawrapper does exceptionally well is create interactive maps. So let's make one.
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/datawrapper1.png"))
+```
+
+We're going to make a symbol map because our data is made up of points. Another very common map type is the Cholopleth map where each unit of geography is shaded in by the value.
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/datawrapper2.png"))
+```
+
+Our data includes points in Canada, so we want to select North America as our base map and then proceed.
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/datawrapper3.png"))
+```
+
+Here's where that work of creating the data comes in. Go find the predictions.csv file on your computer and add it here.
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/datawrapper4.png"))
+```
+
+We'll go to match and make sure Datawrapper found our latitude and longitude coordinates worked.
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/datawrapper5.png"))
+```
+
+We'll start with refining our map. We'll start to work with color palletes. You should change it to Step given that we're going to shade it by the shadow column -- which is only 1 or 0. 
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/datawrapper6.png"))
+```
+
+Now we can fiddle with the legend to make it so instead of saying 1 or 0 it says late winter or early spring. 
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/datawrapper7.png"))
+```
+
+Now we need to annotate our chart. We need a headline, some chatter (the description), the [data source](https://groundhog-day.com/) and a credit line. 
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/datawrapper11.png"))
+```
+
+One great part of interactive maps are tooltips, where you can click on the dot and get information about it. So let's enable tooltips and customize them.
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/datawrapper9.png"))
+```
+
+You can always test what you see on the tooltips using the preview map on the right. Hover over a dot, see what it looks like.
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/datawrapper10.png"))
+```
+
+If you're happy with it, go on and proceed to the end. For credit for doing this, click the png button and upload that to Canvas.
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/datawrapper12.png"))
+```
+
+## The Recap
+
+Throughout this lesson, you've mastered the process of creating interactive maps with Datawrapper. You've learned to prepare your data in R, import it into Datawrapper, and customize various aspects of your map, including color schemes, legends, and tooltips. Remember, effective data visualization is about more than just plotting points—it's about telling a story through your data. As you continue your data journalism journey, consider how tools like Datawrapper can help you present complex geographic information in a clear, engaging format that resonates with your audience.
+
+## Terms to Know
+
+- Symbol map: A type of map that uses symbols or markers to represent data points at specific geographic locations.
+- Choropleth map: A thematic map where areas are shaded or patterned proportionally to a statistical variable.
+- Base map: The underlying map onto which data is plotted, often showing geographic features like country borders or continents.
+- Latitude: The angular distance of a place north or south of the earth's equator, expressed in degrees.
+- Longitude: The angular distance of a place east or west of the Prime Meridian in Greenwich, London, expressed in degrees.
+- Tooltip: An informational box that appears when hovering over or clicking on a data point in an interactive visualization.
+- Color palette: A set of colors chosen to represent different categories or values in a visualization.
+- Legend: An explanatory list of the symbols or colors used on a map or chart.
+- Chatter: In journalism, a brief explanatory text that follows the headline and provides context for the visualization.
+- Interactive map: A digital map that allows users to interact with the data, often through clicking, hovering, or zooming.

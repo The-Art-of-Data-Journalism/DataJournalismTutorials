@@ -1,0 +1,204 @@
+---
+title: "Data Journalism Lesson 13: Bar charts"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  Making quick graphics for reporting.
+---
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(tidyverse)
+library(lubridate)
+library(glue)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+```
+
+## The Goal
+
+In this lesson, you'll learn how to create basic bar charts using ggplot2, a powerful data visualization package in R. By the end of this tutorial, you'll understand how to prepare data for visualization, create a simple bar chart, reorder bars for better readability, and flip coordinates to improve label visibility. You'll practice these skills using real-world data from UNLPD crime reports, gaining practical experience in visualizing data for reporting purposes.
+
+## The Basics
+
+Visualizing data is becoming a much greater part of journalism. Large news organizations are creating graphics desks that create complex visuals with data to inform the public about important events. 
+
+To do it well is a course on it's own. And not every story needs a feat of programming and art. Sometimes, you can help yourself and your story by just creating a quick chart. 
+
+Good news: one of the best libraries for visualizing data is in the tidyverse and it's pretty simple to make simple charts quickly with just a little bit of code.
+
+Let's revisit some data we've used in the past and turn it into charts.
+
+```{r load-tidyverse, exercise=TRUE}
+library(tidyverse)
+```
+```{r load-tidyverse-solution}
+library(tidyverse)
+```
+```{r load-tidyverse-check}
+grade_this_code()
+```
+
+Let's work on some examples using the UNLPD reports data. You can download the data here if you want to use it in your own notebook -- and this is the same data we've used before, so if you already downloaded it, you don't need to do it again. **For purposes of this exercise, you don't need to do this. The data is included here if you want to try this in your own notebook.**
+
+```{r echo=FALSE, class.output="bg-info", results="asis",  message=FALSE,  warning=FALSE}
+library(downloadthis)
+library(glue)
+
+dllink <- download_link(
+  link = "https://mattwaite.github.io/datajournalismfiles/crimelogs.csv",
+  button_label = "Download csv file",
+  button_type = "danger",
+  has_icon = TRUE,
+  icon = "fa fa-save",
+  self_contained = FALSE
+)
+
+glue("<pre><p><strong>For this walkthrough:</strong></p><p>{dllink}</p></pre>")
+
+```
+
+Now import the data.
+
+```{r chart-load-data, message=FALSE, warning=FALSE}
+crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
+
+top10 <- crimes |> 
+  group_by(incident_code) |>
+  summarize(
+    count = n()
+  ) |>
+  ungroup() |>
+  top_n(10, wt=count)
+```
+```{r chart-load-data-exercise, exercise = TRUE}
+crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
+```
+```{r chart-load-data-exercise-solution}
+crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
+```
+```{r chart-load-data-exercise-check}
+grade_this_code()
+```
+
+## Bar charts
+
+The first kind of chart we'll create is a simple bar chart. It's a chart designed to show differences between things -- the magnitude of one compared to the next and the next and the next. So if we have thing, like a county, or a state, or a group name, and then a count or a number attached to the group, we can make a bar chart.
+
+So what does the chart of the top 10 crimes on campus since 2018 look like? 
+
+First, we'll create a dataframe of those top 10, called ... top10. Something we haven't worked with a lot here? The top_n function, which creates a top X list where X is the number you want. So ... 10. 
+
+### Excercise 1: Making data
+
+```{r top10, exercise=TRUE, exercise.setup = "chart-load-data"}
+____ <- ____ |> 
+  group_by(incident_code) |>
+  summarize(
+    count = n()
+  ) |>
+  ungroup() |>
+  top_n(____, wt=count)
+```
+```{r top10-solution, exercise.reveal_solution = FALSE}
+top10 <- crimes |> 
+  group_by(incident_code) |>
+  summarize(
+    count = n()
+  ) |>
+  ungroup() |>
+  top_n(10, wt=count)
+```
+```{r top10-check}
+grade_this_code()
+```
+
+Now ggplot. The first thing we do with ggplot is invoke it, which creates the canvas. In ggplot, we work with geometries -- the shape that the data will take -- and aesthetics -- the data that will give it that shape. In a bar chart, we first pass in the data to the geometry, then set the aesthetic. We tell ggplot what the x value is -- in a bar chart, that's almost always your grouping variable from the data you created. Then we tell it the weight of the bar -- the number that will set the height. To find these, look in the code from exercise 1. What did we call the number? What did we group it by?
+
+Best to take a look:
+
+```{r top10head, exercise=TRUE, exercise.setup = "chart-load-data"}
+head(top10)
+```
+```{r top10head-solution, exercise.reveal_solution = FALSE}
+head(top10)
+```
+```{r top10head-check}
+grade_this_code()
+```
+
+Now that you know the names of your columns, you've got what you need to make a bar chart.
+
+### Exercise 2: Your first bar
+
+```{r bar1, exercise=TRUE, exercise.setup = "chart-load-data"}
+ggplot() + 
+  geom_bar(data=top10, aes(x=_________, weight=____))
+```
+```{r bar1-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_bar(data=top10, aes(x=incident_code, weight=count))
+```
+```{r bar1-check}
+grade_this_code()
+```
+
+The bars look good, but the order makes no sense. And, can you read the x axis labels? I can't. 
+
+We'll start with the bars. In ggplot, we use reorder. The thing to understand about reorder is it's WHAT ARE YOU REORDERING, HOW ARE YOU REORDERING IT. So if I had a list of students in a column called Name, and each of their grades were in a column called Grades, I am reordering Name by Grades, so `reorder(Name, Grades)`, for an example. Now apply that same pattern from the data you're working with here: 
+
+### Exercise 3: Reordering
+
+```{r bar2, exercise=TRUE, exercise.setup = "chart-load-data"}
+ggplot() + 
+  geom_bar(data=top10, aes(x=reorder(_________, ____), weight=____))
+```
+```{r bar2-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_bar(data=top10, aes(x=reorder(incident_code, count), weight=count))
+```
+```{r bar2-check}
+grade_this_code()
+```
+
+Better, but it still looks ... not great on the bottom. We can fix that by flipping the coordinates with `coord_flip()`. That makes vertical bars go horizontal, which makes the labels easier to read. 
+
+### Exercise 4: Flipping
+
+```{r bar3, exercise=TRUE, exercise.setup = "chart-load-data"}
+ggplot() + 
+  geom_bar(data=top10, aes(x=reorder(_________, ____), weight=____)) + 
+  coord_flip()
+```
+```{r bar3-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_bar(data=top10, aes(x=reorder(incident_code, count), weight=count)) + 
+  coord_flip()
+```
+```{r bar3-check}
+grade_this_code()
+```
+
+Art? No. Tells you the story? Yep. And for reporting purposes, that's enough. 
+
+## The Recap
+
+Throughout this lesson, you've learned the fundamentals of creating bar charts with ggplot2. You've practiced preparing data by grouping and summarizing, creating a basic bar chart, reordering bars based on values, and flipping coordinates for better readability. Remember, while these charts may not be publication-ready visualizations, they serve as valuable tools for quickly understanding and reporting on data trends. As you continue your data journalism journey, these skills will help you rapidly explore datasets and identify stories worth telling.
+
+## Terms to Know
+
+- `ggplot2`: A data visualization package in R that is part of the tidyverse.
+- Geometry: In ggplot2, the visual representation of data (e.g., bars, points, lines).
+- Aesthetics: In ggplot2, the visual properties of geometries, such as x and y positions, colors, or sizes.
+- `geom_bar()`: A ggplot2 function used to create bar charts.
+- `reorder()`: A function used to change the order of categorical variables, often used for improving chart readability.
+- `coord_flip()`: A ggplot2 function that switches the x and y axes, useful for making horizontal bar charts.
+- `top_n()`: A dplyr function used to select the top (or bottom) n rows from a dataset based on a specified variable.
+- `ungroup()`: A dplyr function that removes grouping from a dataset, often used after group-based operations.
+- `aes()`: Short for "aesthetics," this function in ggplot2 maps variables in your data to visual properties in the plot.
+- Canvas: In ggplot2, the initial plotting area created by the ggplot() function, onto which layers of geometries and other elements are added.

@@ -1,0 +1,264 @@
+---
+title: "Data Journalism Lesson 9: Janitor"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  Clean up your data with code.
+---
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(tidyverse)
+library(glue)
+library(janitor)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+```
+## The Goal
+
+In this lesson, you'll learn how to use the janitor package to clean and standardize your data more efficiently. By the end of this tutorial, you'll understand how to clean column names, remove empty rows and columns, identify duplicates, and explore data consistency using janitor functions. These skills will help you prepare messy datasets for analysis more quickly and reliably, saving you time and reducing errors in your data journalism work.
+
+## The Basics
+
+The bane of every data analyst's existence is data cleaning. 
+
+Every developer, every data system, every agency, the all have opinions about how data gets collected. Some decisions make sense from the outside. Some decisions are based entirely on internal politics: who is creating the data, how they are creating it, why they are creating it. Is it automated? Is it manual? Are data normalized? Are there free form fields where users can just type into or does the system restrict them to choices? 
+
+Your question -- what you want to do with the data -- is almost never part of that equation. 
+
+So cleaning data is the process of fixing issues in your data so you can answer the questions you want to answer. Unfortunately, there's no template here. There's no checklist. It's just a big bag of tricks that eventually runs out and you'll be left fixing individual issues by hand, if it's really bad.
+
+But let's start simple. There are certain things that need we can start with that will make our lives easier. We'll slowly make it harder as we dig deeper.
+
+One of the first places we can start with cleaning data is cleaning the headers. Every system has their own way of recording headers, and every developer has their own thoughts of what a good idea is within it. R is most happy when headers are one word, lower case, without special characters. If you've noticed `tidyverse`  output with backticks around headers like Incident Date, it's because of the space. Headers that start with numbers or are just a number -- 2002 -- also get backticks in the `tidyverse`. 
+
+There is an external library in R called `janitor` that makes fixing headers trivially simple. You should already have it, but if you don't, you can install it by running `install.packages("janitor")` in your console. 
+
+Let's work on some examples using the roster of current inmates in Nebraska prisons as of Sunday, Feb. 12. You can download the data here if you want to use it in your own notebook. **For purposes of this exercise, you don't need to do this. The data is included here if you want to try this in your own notebook.**
+
+```{r echo=FALSE, class.output="bg-info", results="asis",  message=FALSE,  warning=FALSE}
+library(downloadthis)
+library(glue)
+
+dllink <- download_link(
+  link = "http://mattwaite.github.io/datajournalismfiles/inmateDownloadActive.csv",
+  button_label = "Download csv file",
+  button_type = "danger",
+  has_icon = TRUE,
+  icon = "fa fa-save",
+  self_contained = FALSE
+)
+
+glue("<pre><p><strong>For this walkthrough:</strong></p><p>{dllink}</p></pre>")
+```
+
+First things first, as always: we load the libraries we need.
+
+```{r load-tidyverse, exercise=TRUE}
+library(tidyverse)
+library(janitor)
+```
+```{r load-tidyverse-solution}
+library(tidyverse)
+library(janitor)
+```
+```{r load-tidyverse-check}
+grade_this_code()
+```
+
+Now we load our data. There's some issues with this data that requires you to add a `guess_max` to this to ensure the columns load as they should. 
+
+```{r janitor-load-data, message=FALSE, warning=FALSE}
+inmates <- read_csv("http://mattwaite.github.io/datajournalismfiles/inmateDownloadActive.csv", guess_max = 5000)
+
+clean_headers_inmates <- inmates |> 
+  clean_names() |> 
+  remove_empty(which = c("cols", "rows"))
+```
+```{r janitor-load-data-exercise, exercise = TRUE}
+inmates <- read_csv("http://mattwaite.github.io/datajournalismfiles/inmateDownloadActive.csv", guess_max = 5000)
+```
+```{r janitor-load-data-exercise-solution}
+inmates <- read_csv("http://mattwaite.github.io/datajournalismfiles/inmateDownloadActive.csv", guess_max = 5000)
+```
+```{r janitor-load-data-exercise-check}
+grade_this_code()
+```
+
+## Cleaning headers
+
+From the output of `readr`, you can see all kinds of problems from the get go. Three columns repeat -- first name, middle name and name extension. And many field names have spaces or other not-allowed characters. Not to mention: All of them are in ALL CAPS.
+
+Janitor makes this easy to fix. How easy? This easy. How easy? Janitor has a function called `clean_names()`. That's it. 
+
+### Exercise 1: Cleaning up column names
+
+```{r cleannames-data, exercise=TRUE, exercise.setup = "janitor-load-data"}
+inmates |> _________
+```
+```{r cleannames-data-solution, exercise.reveal_solution = FALSE}
+inmates |> clean_names()
+```
+```{r cleannames-data-check}
+grade_this_code()
+```
+
+Just like that, all lower case, all one word, no backticks necessary to confuse our code later on. 
+
+### Exercise 2: Dropping empty columns
+
+Another thing janitor does well is to make it easy to drop empty columns and rows. Sometimes columns are in the data and there's nothing in them. Nada. Blank. Rarer, but still possible: Rows of blank data. We could use `select` and `filter` but janitor reduces the labor involved there.
+
+If you look at the output of `readr`, you'll see 7,838 observations of 35 variables. Janitor has a function called `remove_empty()` where you have to specify which of `rows` or `cols` you want to remove. If they're empty, why have them at all?
+
+```{r remove-data, exercise=TRUE, exercise.setup = "janitor-load-data"}
+inmates |> 
+  clean_names() |> 
+  remove_empty(which = c("c____", "r____"))
+```
+```{r remove-data-solution, exercise.reveal_solution = FALSE}
+inmates |> 
+  clean_names() |> 
+  remove_empty(which = c("cols", "rows"))
+```
+```{r remove-data-check}
+grade_this_code()
+```
+
+And by using `remove_empty()`, how many columns and rows do we get rid of that were empty anyway? Hard to see the number of rows in these tutorials -- you lost none. But look at columns there on the bottom of the output.
+
+Let's save what we've done so we can use it for the rest of the exercise into a new dataframe called `clean_headers_inmates`.
+
+```{r save-data, exercise=TRUE, exercise.setup = "janitor-load-data"}
+clean_headers_inmates <- inmates |> 
+  clean_names() |> 
+  remove_empty(which = c("cols", "rows"))
+```
+```{r save-data-solution, exercise.reveal_solution = FALSE}
+clean_headers_inmates <- inmates |> 
+  clean_names() |> 
+  remove_empty(which = c("cols", "rows"))
+```
+```{r save-data-check}
+grade_this_code()
+```
+
+## Duplicates
+
+One of the most difficult problems to fix in data is duplicates in the data. They can creep in with bad joins, bad data entry practices, mistakes -- all kinds of reasons. One trick is determining if a duplicate is indeed a duplicate. 
+
+So the question is, do we have any inmates repeated? Anyone in prison twice? 
+
+### Exercise 3: Dupes
+
+Here we'll use a function called `get_dupes`. And we'll use the inmate's last name, first name and date of birth. The likelihood that someone has the same name and date of birth is very small, so if there are no duplicates, we should get zero records returned. 
+
+```{r dupes-data, exercise=TRUE, exercise.setup = "janitor-load-data"}
+clean_headers_inmates |> 
+  _________(committed_last_name, first_name_3, date_of_birth)
+```
+```{r dupes-data-solution, exercise.reveal_solution = FALSE}
+clean_headers_inmates |> 
+  get_dupes(committed_last_name, first_name_3, date_of_birth)
+```
+```{r dupes-data-check}
+grade_this_code()
+```
+
+This data appears to have no duplicates. That's good. 
+
+## Inconsistency
+
+Janitor also has some handy tools for our data smells. One is called `tabyl`, which creates a table of unique records in a single field. All you need to do is feed the column name to `tabyl` and it'll do the rest.
+
+### Exercise 4: Data smells with tabyl
+
+So does the Department of Corrections record gender consistently? `tabyl` will tell us and will tell us a little bit about the data.
+
+```{r tabyl1-data, exercise=TRUE, exercise.setup = "janitor-load-data"}
+clean_headers_inmates |> tabyl(____)
+```
+```{r tabyl1-data-solution, exercise.reveal_solution = FALSE}
+clean_headers_inmates |> tabyl(gender)
+```
+```{r tabyl1-data-check}
+grade_this_code()
+```
+
+Clearly, the Department of Corrections doesn't buy into more modern sentiments about gender, but they are at least consistent. Every inmate has a gender -- no NAs -- and note that 90 percent of inmates are men. 
+
+How about race? 
+
+### Exercise 5: More consistency?
+
+To find the race column, you'll need to quick glimpse your data.
+
+```{r glimpse-data, exercise=TRUE, exercise.setup = "janitor-load-data"}
+glimpse(clean_headers_inmates)
+```
+```{r glimpse-data-solution, exercise.reveal_solution = FALSE}
+glimpse(clean_headers_inmates)
+```
+```{r glimpse-data-check}
+grade_this_code()
+```
+Got the column name?
+```{r tabyl2-data, exercise=TRUE, exercise.setup = "janitor-load-data"}
+clean_headers_inmates |> tabyl(_________)
+```
+```{r tabyl2-data-solution, exercise.reveal_solution = FALSE}
+clean_headers_inmates |> tabyl(race_desc)
+```
+```{r tabyl2-data-check}
+grade_this_code()
+```
+
+Nine people do not have a race -- and according to the Census Bureau, Hispanic is not a race, it's an ethnicity -- but otherwise, it looks solid enough to do some analysis. There's very little in the way of inconsistency. 
+
+How about what facilities they are in? 
+
+```{r tabyl3-data, exercise=TRUE, exercise.setup = "janitor-load-data"}
+clean_headers_inmates |> tabyl(____)
+```
+```{r tabyl3-data-solution, exercise.reveal_solution = FALSE}
+clean_headers_inmates |> tabyl(facility)
+```
+```{r tabyl3-data-check}
+grade_this_code()
+```
+
+Not sure how I feel about 11 inmates not having a facility. That's probably worth investigating.
+
+But sometimes, NAs are not bad data. Sometimes they're just NA. Let's look at `inst_release_type` or how inmates were released. 
+
+```{r tabyl4-data, exercise=TRUE, exercise.setup = "janitor-load-data"}
+clean_headers_inmates |> tabyl(inst_release_type)
+```
+```{r tabyl4-data-solution, exercise.reveal_solution = FALSE}
+clean_headers_inmates |> tabyl(inst_release_type)
+```
+```{r tabyl4-data-check}
+grade_this_code()
+```
+By far the largest group here is NA. Why is that? They haven't been released yet. They're still in prison.
+
+## The Recap
+
+Throughout this lesson, you've learned several key data cleaning techniques using the janitor package. You've practiced cleaning column names with clean_names(), removing empty rows and columns with remove_empty(), identifying duplicates with get_dupes(), and exploring data consistency with tabyl(). Remember, data cleaning is an essential step in any data analysis project, and the tools you've learned here will help you tackle common data issues more efficiently. As you work with different datasets, you'll find these janitor functions invaluable for quickly standardizing and exploring your data before diving into deeper analysis.
+
+## Terms to Know
+
+- `janitor`: An R package designed to simplify data cleaning tasks.
+clean_names(): A janitor function that standardizes column names to lowercase, removes spaces and special characters.
+remove_empty(): A janitor function that removes empty rows, columns, or both from a dataset.
+get_dupes(): A janitor function that identifies duplicate records based on specified columns.
+tabyl(): A janitor function that creates a frequency table of unique values in a column.
+Data cleaning: The process of identifying and correcting errors or inconsistencies in datasets.
+Duplicates: Multiple identical records in a dataset that may skew analysis results.
+Data consistency: The uniformity and reliability of data across a dataset.
+NA (Not Available): A special value in R representing missing or undefined data.

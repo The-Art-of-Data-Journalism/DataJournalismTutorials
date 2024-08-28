@@ -1,0 +1,271 @@
+---
+title: "Data Journalism Lesson 21: The importance of text"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  Learn how to add important labels and annotations to your charts.
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(tidyverse)
+library(ggrepel)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+```
+
+## The Goal
+
+In this lesson, you'll learn about the critical role of text elements in creating effective data visualizations for journalism. By the end of this tutorial, you'll understand how to craft compelling headlines, write informative subtitles, add clear axis labels, and use strategic annotations to guide readers through your charts. You'll practice applying these text elements to a bubble chart, gaining hands-on experience in transforming raw data into a story-driven visualization. These skills will enable you to create more impactful and informative graphics that effectively communicate your data stories to readers.
+
+## The Basics
+
+These are the pieces of a good graphic:
+
+-   Headline
+-   Chatter
+-   The main body
+-   Annotations
+-   Labels
+-   Source line
+-   Credit line
+
+The first on that list is the first for a reason. The headline is an incredibly important part of any graphic: it's often the first thing a reader will see. It's got to entice people in, tell them a little bit about what they're going to see, and help tell the story.
+
+The second item is the chatter -- the text underneath that headline. It needs to work with the headline to further the story, drive people toward the point, maybe add some context.
+
+The two bits of text are extremely important. Let's set up a chart and talk about how to do it wrong and how to do it better.
+
+```{r load-tidyverse, exercise=TRUE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggrepel)
+```
+
+```{r load-tidyverse-solution}
+library(tidyverse)
+library(ggrepel)
+```
+
+```{r load-tidyverse-check}
+grade_this_code()
+```
+
+```{r text-load-data, message=FALSE, warning=FALSE}
+districts <- read_csv("https://mattwaite.github.io/datajournalismfiles/districtbubble.csv")
+
+bigschools <- districts |> 
+  filter(college_going_count > 500)
+```
+
+The data and the chart code isn't important for you to follow along. The code is nothing special -- it's taken straight out of the bubble charts lesson. Under the hood, I've loaded up all school districts, their college going count and their composite ACT score.
+
+Let's bring up the bubble chart the big districts labeled as a starting place.
+
+```{r bubble1, exercise=TRUE, exercise.setup = "text-load-data", message=FALSE}
+ggplot() + 
+  geom_point(
+    data=districts, 
+    aes(x=college_going_pct, y=average_composite_score, size=college_going_count),
+    alpha = .3
+    ) + 
+  geom_text_repel(
+    data=bigschools, 
+    aes(x=college_going_pct, y=average_composite_score, label=agency_name)
+    ) + 
+  scale_size_continuous(range=c(1,10))
+```
+```{r bubble1-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_point(
+    data=districts, 
+    aes(x=college_going_pct, y=average_composite_score, size=college_going_count),
+    alpha = .3
+    ) + 
+  geom_text_repel(
+    data=bigschools, 
+    aes(x=college_going_pct, y=average_composite_score, label=agency_name)
+    ) + 
+  scale_size_continuous(range=c(1,10))
+```
+```{r bubble1-check}
+grade_this_code()
+```
+
+This chart is missing major parts -- required for any chart.
+
+To fix this, we add labels -- `labs`. Each graphic -- regardless of type --needs a title, subtitle, caption, x and y. Your title is your headline. The subtitle is called chatter -- a sentence under the headline that explains a little about the graphic. The caption is where you'll put the source of your data and the credit line -- your name. x and y should be in each `labs`, but sometimes what x and y are is obvious and you can leave them blank. For example: A bar chart with states on the y axis doesn't need to label them as States. It's obvious by the rest of the chart.
+
+First, let's start with some headline basics:
+
+-   Your headline should be about what the chart is about, **not what makes up the chart**. What story is the chart telling? What made it interesting to you? Don't tell me what the stats are, tell me what it says.
+-   Your headline should be specific. **Generic headlines are boring and ignored**.
+-   Your headline should, most often, have a verb. It's not a 100 percent requirement, but a headline without a verb means you're trying to be cute and ...
+-   Your headline shouldn't be overly cute. Trying to get away with slang, a very Of The Moment cultural reference that will be forgotten soon, or some inside joke is asking for trouble.
+-   Your headline should provoke a reaction.
+
+### Exercise 1: Adding a headline, some chatter and some better labels
+
+Let's add some text to our labs here. For your x and y labels, spell out and properly space and capitalize the initial characters of the column names. For a headline, use `Who is sending kids to college?` and for a subtitle, use this: State data shows smaller school districts send a larger share to college.
+
+```{r bubble2, exercise=TRUE, exercise.setup = "text-load-data", message=FALSE}
+ggplot() + 
+  geom_point(
+    data=districts, 
+    aes(x=college_going_pct, y=average_composite_score, size=college_going_count),
+    alpha = .3
+    ) + 
+  geom_text_repel(
+    data=bigschools, 
+    aes(x=college_going_pct, y=average_composite_score, label=agency_name)
+    ) + 
+  scale_size_continuous(range=c(1,10)) + 
+  labs(
+    x="____", 
+    y="____", 
+    title="____", 
+    subtitle="____", 
+    caption="Source: Nebraska Department of Education | By Your Name"
+    )
+```
+
+```{r bubble2-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_point(
+    data=districts, 
+    aes(x=college_going_pct, y=average_composite_score, size=college_going_count),
+    alpha = .3
+    ) + 
+  geom_text_repel(
+    data=bigschools, 
+    aes(x=college_going_pct, y=average_composite_score, label=agency_name)
+    ) + 
+  scale_size_continuous(range=c(1,10)) + 
+  labs(
+    x="College Going Percent", 
+    y="Average Composite Score", 
+    title="Who is sending kids to college?", 
+    subtitle="State data shows smaller school districts send a larger share to college.", 
+    caption="Source: Nebraska Department of Education | By Your Name"
+    )
+```
+```{r bubble2-check}
+grade_this_code()
+```
+
+The headline here works because it asks a provocative question (especially for parents). The chatter reveals what's in the chart without pointing at it -- show don't tell. Our x and y labels are clearer and let the reader know what's going on. 
+
+## Annotations
+
+Another important part of a chart -- but not every chart -- is annotation. Sometimes, you need to label something in a chart to help the reader out. It can be a point or series of points. Or it can be regions of a chart. Let's return to our bubble chart.
+
+Annotations also help us draw attention to things, or help the reader understand what they're looking at.
+
+We're going to add some lines to our chart that represent the average ACT score and average college going percent. To get that, we first have to calculate that. It's simple -- just a summarize and two means.
+
+### Exercise 2: The means
+
+If you don't remember what these columns are, look at your chart code above. They're the x and y in the bubble chart.
+
+```{r bubble3, exercise=TRUE, exercise.setup = "text-load-data", message=FALSE}
+districts |> 
+  summarize(
+    average_college_going_pct = mean(____),
+    average_act_composite_score = mean(____)
+  )
+```
+
+```{r bubble3-solution, exercise.reveal_solution = FALSE}
+districts |> 
+  summarize(
+    average_college_going_pct = mean(college_going_pct),
+    average_act_composite_score = mean(average_composite_score)
+  )
+```
+
+```{r bubble3-check}
+grade_this_code()
+```
+
+To add lines for the average college going percent and average composite score, we're going to use `geom_hline` and `geom_vline` which mean horizontal line and vertical line. The averages will create lines to divide the chart into four corners. On one side -- lots of kids going to college, good scores. On the other, bad scores and not a lot of kids going to college. The geoms just require an intercept -- xintercept for geom_vline and yintercept for the geom_hline. We get the values for those from the averages we just made.
+
+To label them, I'm going to use geom_text and I'm just going to put numbers in the x and the y to move them where I need them. I can get those numbers by looking at the x and y axis of my chart and guessing. After that, it's increasing or decreasing the number, depending on which direction I want to move it around.
+
+### Exercise 3: Adding lines and labels
+
+Note here -- I'm only labeling two sections of the chart. There is such a thing as too much. We want to tell the story here with the most efficient use of elements -- text, color, shape.
+
+```{r bubble4, exercise=TRUE, exercise.setup = "text-load-data", message=FALSE}
+ggplot() + 
+  geom_point(
+    data=districts, 
+    aes(x=college_going_pct, y=average_composite_score, size=college_going_count),
+    alpha = .3
+    ) + 
+  geom_text_repel(
+    data=bigschools, 
+    aes(x=college_going_pct, y=average_composite_score, label=agency_name)
+    ) + 
+  geom_vline(xintercept = ____) + 
+  geom_hline(yintercept = ____) +
+  geom_text(aes(x=80, y=25, label="Higher scores, lots going to college"), color="blue") +
+  geom_text(aes(x=60, y=17, label="Lower scores, not many going to college"), color="blue") +
+  scale_size_continuous(range=c(1,10)) + 
+  labs(
+    x="College Going Percent", 
+    y="Average Composite Score", 
+    title="Who is sending kids to college?", 
+    subtitle="According to state data, smaller school districts send a larger percentage of students to college than larger districts.", 
+    caption="Source: Nebraska Department of Education | By Your Name"
+    ) 
+```
+
+```{r bubble4-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_point(
+    data=districts, 
+    aes(x=college_going_pct, y=average_composite_score, size=college_going_count),
+    alpha = .3
+    ) + 
+  geom_text_repel(
+    data=bigschools, 
+    aes(x=college_going_pct, y=average_composite_score, label=agency_name)
+    ) + 
+  geom_vline(xintercept = 76.89802) + 
+  geom_hline(yintercept = 18.90495) +
+  geom_text(aes(x=80, y=25, label="Higher scores, lots going to college"), color="blue") +
+  geom_text(aes(x=60, y=17, label="Lower scores, not many going to college"), color="blue") +
+  scale_size_continuous(range=c(1,10)) + 
+  labs(
+    x="College Going Percent", 
+    y="Average Composite Score", 
+    title="Who is sending kids to college?", 
+    subtitle="According to state data, smaller school districts send a larger percentage of students to college than larger districts.", 
+    caption="Source: Nebraska Department of Education | By Your Name"
+    ) 
+```
+
+```{r bubble4-check}
+grade_this_code()
+```
+
+## The Recap
+
+Throughout this lesson, you've learned how to enhance your data visualizations with key text elements. You've practiced writing headlines that grab attention and convey the main story, crafting subtitles that provide context, and adding clear labels to guide readers through your chart. You've also explored how to use annotations to highlight key insights and divide your chart into meaningful sections. Remember, effective data journalism isn't just about the numbers—it's about using text strategically to tell a compelling story. As you continue to create visualizations, always consider how you can use headlines, labels, and annotations to make your charts more accessible and impactful for your audience.
+
+## Terms to Know
+
+- Headline: The main title of a chart that should convey the key message or story of the visualization.
+- Chatter (Subtitle): A brief explanatory text below the headline that provides context or additional information about the chart.
+- Annotation: Text or graphical elements added to a chart to highlight or explain specific data points or trends.
+- Caption: Text below a chart that provides information about the data source and creator.
+- `labs()`: A ggplot2 function used to add various text elements to a chart, including title, subtitle, and axis labels.
+- `geom_text()`: A ggplot2 function used to add text directly to a plot at specified coordinates.
+- `geom_text_repel()`: A function from the ggrepel package that adds text labels to a plot while avoiding overlaps.
+- `geom_hline()`: A ggplot2 function used to add a horizontal line to a plot, often used for showing averages or thresholds.
+- `geom_vline()`: A ggplot2 function used to add a vertical line to a plot, often used for showing averages or thresholds.

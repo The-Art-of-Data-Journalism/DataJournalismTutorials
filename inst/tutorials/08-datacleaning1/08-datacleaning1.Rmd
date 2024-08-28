@@ -1,0 +1,236 @@
+---
+title: "Data Journalism Lesson 8: Data Smells"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  Stop a wrong story before it starts.
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(tidyverse)
+library(glue)
+library(lubridate)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+```
+
+## The Goal
+
+In this lesson, you'll learn about the critical concept of "data smells" - common issues and inconsistencies that can arise in datasets. By the end of this tutorial, you'll understand how to conduct an initial assessment of a dataset to identify potential problems like missing data, wrong data types, gaps in data, and internal inconsistencies. You'll practice using R functions like glimpse(), group_by(), and tally() to explore your data systematically. This skill is essential for data journalists to ensure the accuracy and reliability of their analyses before drawing any conclusions.
+
+## The Basics
+
+Any time you are given a dataset from anyone, you should immediately be suspicious. Is this data what I think it is? Does it include what I expect? Is there anything I need to know about it? Will it produce the information I expect?
+
+One of the first things you should do is give it the smell test.
+
+Failure to give data the smell test [can lead you to miss stories and get your butt kicked on a competitive story](https://source.opennews.org/en-US/learning/handling-data-about-race-and-ethnicity/).
+
+Let's look at our campus crime data again.
+
+With data analysis, often a first step is called Exploratory Data Analysis or EDA. EDA has been around for a long time -- John Tukey started pushing the idea in 1970 and wrote the text that would lay the groundwork for generations of data analysts in 1977 (I have a copy in my office!). But EDA treats data in an almost neutral way - it's almost naive. Data smells treats data with skepticism and distrust. With data smells, we're trying to find common mistakes in data because we have to know if they are there. [For more on data smells, read the GitHub wiki post that started it all](https://github.com/nikeiubel/data-smells/wiki/Ensuring-Accuracy-in-Data-Journalism). The common mistakes we're looking for are:
+
+-   Missing data
+-   Gaps in data
+-   Wrong type of data
+-   Outliers
+-   Sharp curves
+-   Conflicting information within a dataset
+-   Conflicting information across datasets
+-   Wrongly derived data
+-   Internal inconsistency
+-   External inconsistency
+-   Wrong spatial data
+-   Unusable data, including non-standard abbreviations, ambiguous data, extraneous data, inconsistent data
+
+Not all of these data smells are detectable in code. You may have to ask people about the data. You may have to compare it to another dataset yourself. Does the agency that uses the data produce reports from the data? Does your analysis match those reports? That will expose wrongly derived data, or wrong units, or mistakes you made with inclusion or exclusion.
+
+But with several of these data smells, we can do them first, before we do anything else.
+
+Let's work on some examples using the UNLPD reports data. You can download the data here if you want to use it in your own notebook -- and this is the same data we've used before, so if you already downloaded it, you don't need to do it again. **For purposes of this exercise, you don't need to do this. The data is included here if you want to try this in your own notebook.**
+
+```{r echo=FALSE, class.output="bg-info", results="asis",  message=FALSE,  warning=FALSE}
+library(downloadthis)
+library(glue)
+
+dllink <- download_link(
+  link = "http://mattwaite.github.io/datajournalismfiles/crimelogs.csv",
+  button_label = "Download csv file",
+  button_type = "danger",
+  has_icon = TRUE,
+  icon = "fa fa-save",
+  self_contained = FALSE
+)
+
+glue("<pre><p><strong>For this walkthrough:</strong></p><p>{dllink}</p></pre>")
+```
+
+First we'll need the tidyverse and lubridate. Your first step is always loading libraries and you'll need to run this step in nearly every single thing you do.
+
+```{r load-tidyverse, exercise=TRUE}
+library(tidyverse)
+library(lubridate)
+```
+```{r load-tidyverse-solution}
+library(tidyverse)
+library(lubridate)
+```
+```{r load-tidyverse-check}
+grade_this_code()
+```
+Now import the data.
+
+```{r smells-load-data, message=FALSE, warning=FALSE}
+crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
+```
+```{r smells-load-data-exercise, exercise = TRUE}
+crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
+```
+```{r smells-load-data-exercise-solution}
+crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
+```
+```{r smells-load-data-exercise-check}
+grade_this_code()
+```
+
+## Wrong Type
+
+First, let's look at **Wrong Type Of Data**. We can sniff that out by looking at the output of `glimpse`
+
+### Exercise 1: Using glimpse for more than column names
+
+```{r glimpse-data, exercise=TRUE, exercise.setup = "smells-load-data"}
+glimpse(____)
+```
+```{r glimpse-data-solution, exercise.reveal_solution = FALSE}
+glimpse(crimes)
+```
+```{r glimpse-data-check}
+grade_this_code()
+```
+
+First things first: What type of data are all of the columns being imported as? An incident code is obviously text. But what about a case number? What about the dates? Are those character fields?
+
+Bit of a trick question -- if you're not going to do math on it, don't import it as a number. Dates we've dealt with before. But just know, when you use `readr`, it's making guesses based on the first few rows. Sometimes, you'll get data that's a mix -- ID numbers that start as numbers and include text later. 
+
+The cheap way to fix this is to change the guess_max parameter of `readr` to just use more than a few rows to guess the column types. It'll go a little slower, but often it fix the problem of mixed data types. For example, this would include the first 5,000 rows in the guessing.
+
+```
+crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv", guess_max = 5000)
+```
+
+## Missing Data
+
+The second smell we can find in code is **missing data**. We can do that through a series of Group By and Count steps. In aggregates, we explicitly used group by and summarize. Here, because this is exploratory, I'm going to show you a shortcut called `tally()`. Tally ... does just that: tallies up how many are in your groups.
+
+Let's first look at locations.
+
+### Exercise 2: Missing data part 1
+
+```{r tally-data, exercise=TRUE, exercise.setup = "smells-load-data"}
+crimes |> 
+  group_by(____) |> 
+  ____()
+```
+```{r tally-data-solution, exercise.reveal_solution = FALSE}
+crimes |> 
+  group_by(location) |> 
+  tally()
+```
+```{r tally-data-check}
+grade_this_code()
+```
+What we're looking for here are blanks: Crimes without a location. Typically, those will appear first or last in most analysis platforms. In the tidyverse, NA or null values will be last. See that last big number on the pagination bar at the bottom of your results? Click that and find the very last row of data. There is no location on campus called NA. That means there's crimes that occurred ... in an unknown place.  
+
+What about crime type?
+
+### Exercise 3: Missing data part 2
+
+```{r tally3-data, exercise=TRUE, exercise.setup = "smells-load-data"}
+crimes |> 
+  group_by(____) |> 
+  ____()
+```
+```{r tally3-data-solution, exercise.reveal_solution = FALSE}
+crimes |> 
+  group_by(incident_code) |> 
+  tally()
+```
+```{r tally3-data-check}
+grade_this_code()
+```
+
+Any at the very end?
+
+None here, so that's good. It means our incidents will always have a type, and nearly always have a location. 
+
+## Gaps in data
+
+Let's now look at **gaps in data**. It's been my experience that gaps in data often have to do with time, so let's first look at incident dates, so we can see if there's any big jumps in data. You'd expect the numbers to change, but not by huge amounts. Huge change would indicate, more often than not, that the data is missing. Let's start with Date. If we're going to work with dates, we should have `lubridate` handy for `floor_date`.
+
+### Exercise 4: Gaps
+
+```{r gap-data, exercise=TRUE, exercise.setup = "smells-load-data"}
+crimes |> 
+  group_by(floor_date((mdy_hm(____)), "month")) |> 
+  tally()
+```
+```{r gap-data-solution, exercise.reveal_solution = FALSE}
+crimes |> 
+  group_by(floor_date((mdy_hm(reported)), "month")) |> 
+  tally()
+```
+```{r gap-data-check}
+grade_this_code()
+```
+
+First thing to notice: our data has only 55 incidents in Janauary of 2018. That's because, if you were to look, it's only a partial month. Can that explain the small numbers in June and July? In this case no -- students have gone home. There's less for campus police to do. So can we include those months in any analysis of "campus crime"? It's not a simple answer. It depends on how you structure the question and what you're trying to show. 
+
+## Internal inconsistency
+
+Any time you are going to focus on something, you should check it for consistency inside the data set. So let's pretend you want to look at *where* the most incidents occur on campus. To do this, you will need internally consistent addresses. Do you have that? 
+
+### Exercise 5: Are they the same?
+
+```{r consistent-data, exercise=TRUE, exercise.setup = "smells-load-data"}
+crimes |> 
+  group_by(____) |> 
+  ____()
+```
+```{r consistent-data-solution, exercise.reveal_solution = FALSE}
+crimes |> 
+  group_by(location) |> 
+  tally()
+```
+```{r consistent-data-check}
+grade_this_code()
+```
+
+Look at the first 10 rows of data here -- particularly 6-10. Do you notice anything? For data to be exact, each row must be the same. Are the same addresses here *itentical to each other?* Or do you see the same address inconsistently reported?
+
+Can you accurately report on the number of indicents at each address with data like that? Not yet you can (more on that soon!).
+
+And that's what Data Smells are designed to do: stop you from going down a bad path.
+
+## The Recap
+
+Throughout this lesson, you've learned how to apply the concept of "data smells" to critically examine a dataset. You've practiced using glimpse() to check for wrong data types, group_by() and tally() to identify missing data and gaps, and explored ways to spot internal inconsistencies in your data. Remember, these initial checks are crucial steps in any data analysis project. They help you understand the limitations of your data and prevent you from drawing incorrect conclusions. As you continue your journey in data journalism, always approach new datasets with healthy skepticism and use these techniques to validate your data before proceeding with more in-depth analysis.
+
+## Terms to Know
+
+- Data Smells: Common issues or inconsistencies in datasets that may indicate potential problems.
+- Exploratory Data Analysis (EDA): An approach to analyzing datasets to summarize their main characteristics, often using visual methods.
+- Wrong Type of Data: When data is imported or stored in an inappropriate format (e.g., dates stored as text).
+- Missing Data: Values that are absent from the dataset, often represented as NA in R.
+- Gaps in Data: Unexpected breaks or discontinuities in a dataset, often in time-series data.
+- Internal Inconsistency: When the same information is represented differently within a dataset (e.g., inconsistent spelling of locations).
+- `tally()`: A function in R that counts the number of observations in each group when used with group_by().
+- `guess_max`: A parameter in read_csv() that determines how many rows are used to guess column types.
+- `floor_date()`: A function from the lubridate package that rounds dates down to a specified unit of time (e.g., month, year).
