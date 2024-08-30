@@ -239,7 +239,7 @@ You get an error. `non-numeric argument to binary operator` is a rather computer
 glue("Let's do something more real and figure out what demographers call the natural population change in {biggest$CTYNAME}. The natural popultion change is simple -- you take how many people were born and subtract how many people died. If more people were born than died, you get natural population growth. If you get the opposite, you get natural population decline.\n\nTo do this, we're going to create some variables -- one called born, one called died. In {biggest$CTYNAME}, {biggest$BIRTHS2023} were born in 2023, and {biggest$DEATHS2023} died. Assign those numbers to born and died and then use born and died to calculate the natural population change.") 
 ```
 
-Couple of things to pay attention to here: Born is not born, as Died is not DIED is not DiEd and so on. Capitalization matters. The variables you are creating are `born` and `died`. Second: Commas in your numbers will break your code. It's 12345 not 12,345.
+Couple of things to pay attention to here: Born is not born, as Died is not DIED is not DiEd and so on. Capitalization matters. The variables you are creating are `born` and `died`. Second: Commas in your numbers will break your code. Use 12345 not 12,345.
 
 
 ```{r variables-one, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
