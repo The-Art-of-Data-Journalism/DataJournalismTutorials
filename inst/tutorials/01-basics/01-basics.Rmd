@@ -102,6 +102,8 @@ This introductory lesson aims to familiarize you with the fundamental concepts o
 
 ## What is Data Journalism?
 
+Not to sound overly grandiose, but data journalism is much like our theoretical understanding of the universe itself: Changing and expanding all the time. It is art and science. It is a skill and a philosophy. And it can't be easily summarized in a single section of a textbook, so we're not going to do that. We'll take it in chunks, and maybe we'll get somewhere by the end. 
+
 A simple way to think about data journalism is to think about it as using data as a source. 
 
 "It can be a really powerful and comprehensive source that can give sweeping answers to questions that people can't," said Ben Welsh, the news applications editor at Reuters. "But to get the answers to those questions, we've got to learn how to ask in this more structured language of computer programming and data tables.
