@@ -102,9 +102,17 @@ This introductory lesson aims to familiarize you with the fundamental concepts o
 
 ## What is Data Journalism?
 
-A simple way to think about data journalism is to think about it as using data as a source. What you're about to learn in this series of tutorials is how to ask questions of data, the same way you would ask a source. The difference? The questions you ask in data journalism have to follow a very specific form, which for most people is unlike anything you've ever done before. 
+A simple way to think about data journalism is to think about it as using data as a source. 
 
-But that's not a worry. Ask any data journalist about how they learned, and they'll all tell you they started from square one. Mary Jo Webster, the data editor at the Star Tribune in Minneapolis, has been a journalist in the Twin Cities for more than 20 years. When she started as a professional, she had no data skills.
+"It can be a really powerful and comprehensive source that can give sweeping answers to questions that people can't," said Ben Welsh, the news applications editor at Reuters. "But to get the answers to those questions, we've got to learn how to ask in this more structured language of computer programming and data tables.
+
+"And those methods really aren't that complicated."
+
+What you're about to learn in this series of tutorials is how to ask questions of data, the same way you would ask a source, using the structured language Ben describes. It's a very specific form, which for most people is unlike anything you've ever done before. 
+
+But that's not a worry. 
+
+Ask any data journalist about how they learned, and they'll all tell you they started from square one. Mary Jo Webster, the data editor at the Star Tribune in Minneapolis, has been a journalist in the Twin Cities for more than 20 years. When she started as a professional, she had no data skills.
 
 "I didn't even know spreadsheets existed when I was a beginner reporter," she said. "And I was covering the police beat, and I had to write about the city budget, and the police department's budget looked like it was going up a lot. And so I had done the percentage change calculation year over year and saw that it was very high. Then I wanted to be able to say, how does that compare to all the other departments in the city?"
 
