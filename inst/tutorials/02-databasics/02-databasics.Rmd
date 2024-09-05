@@ -212,7 +212,7 @@ The `read_csv` bits are pretty obvious, except for one thing. What happens in th
   <p class="mb-0">The name of the file goes inside <code>read_csv</code> in quotes.</p>
 </div>
 
-Your first task is to import the data. For this exercise, you need to simply run this, filling in your state name where the blank is in all lowercase letters:
+Your first task is to import the data. For this exercise, you need to simply run this, filling in your state name where the blank is in all lowercase letters and replacing any spaces with a dash. Examples: `nebraska` and `new-mexico`. 
 
 ```{r read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
 census <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/____.csv")
