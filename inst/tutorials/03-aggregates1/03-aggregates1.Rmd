@@ -360,6 +360,11 @@ glue("Now there's a ton to look at here. But what does it mean? If you haven't l
 
 That first row might be interesting, it might not be. A few rows down, you might find a smaller county with a lot of five-star homes for its size. Or the opposite -- a smaller county with a lot of low-rated homes. Every state has economic and cultural reasons for just about everything that goes on there. Apply what you know about your state to that list, and stories will start popping into your head. 
 
+<div class="alert alert-warning"> 
+<h4 class="alert-heading">Common Mistake</h4> 
+<p class="mb-0">Remember earlier when I said we'd rarely ever group by a number? Didn't we just do that? Yes, but ... Remember a number is only a number if you would do math on it. Is a Five-Star Rating system a number? Yes! And No! We will do math on it, but it's also a label too. A critical skill in data journalism is using logic and common sense, not rigid rules that something will <i>always</i> be this way or that.</p>
+</div>
+
 ## If all you need is a count ... 
 
 Grouping and counting is such a common thing that there's multiple shortcuts to it in R. In the tidyverse specifically, there's a shortcut called `tally()` that just counts things up in groups. If all you need is a count, it's a timesaver. If, as you'll learn in the next tutorial, you need more than just a count, `tally()` is the wrong call. 

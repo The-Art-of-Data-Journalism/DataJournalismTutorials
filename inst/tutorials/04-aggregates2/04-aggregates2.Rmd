@@ -1,0 +1,295 @@
+---
+title: "Data Journalism Lesson 4: Aggregates, part 2"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  Learn how to take lots of little things and make numbers out of bigger things.
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(tidyverse)
+library(glue)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+```
+```{r load-data, message=FALSE, warning=FALSE}
+state <- Sys.getenv("tutorial.state")
+
+stateName <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/states.csv") |> filter(Postal == state) 
+
+stateName <- stateName |> 
+  mutate(dataurl = case_when(
+    Postal == "AL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "AK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "AZ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "AR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "CA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "CO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "CT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "DE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "FL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "GA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "HI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "ID" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "IL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "IN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "IA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "KS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "KY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "LA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "ME" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "MD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "MA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "MI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "MN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "MS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "MO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "MT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "NE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "NV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "NH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "NJ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "NM" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "NY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "NC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "ND" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "OH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "OK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "OR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "PA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "RI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "SC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "SD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "TN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "TX" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "UT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "VT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "VA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "WA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "WV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "WI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "WY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    TRUE ~ "https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/nebraska.csv"  # Default case if none match
+  ))
+
+homes <- read_csv(stateName$dataurl)
+
+countyLanguage <- case_when(
+  state == "AK" ~ c("county equivalent", "county equivalents"),
+  state == "CT" ~ c("planning region", "planning regions"),
+  state == "LA" ~ c("parish", "parishes"),
+  state == "VA" ~ c("county or city", "counties or cities"),
+  TRUE ~ c("county", "counties")
+)
+
+nrows <- nrow(homes)
+ncolumns <- ncol(homes)
+
+most <- homes |>
+  group_by(county_parish) |>
+  summarise(
+    total_homes = n(),
+    total_beds = sum(number_of_certified_beds)
+  ) |> 
+  arrange(desc(total_beds)) |> 
+  ungroup() |> 
+  slice(1)
+
+highest <- homes |>
+  group_by(county_parish) |>
+  summarise(
+    total_homes = n(),
+    total_beds = sum(number_of_certified_beds),
+    average_rating = mean(overall_rating)
+  ) |> 
+  arrange(desc(average_rating)) |> 
+  ungroup() |> 
+  slice(1)
+
+```
+## The Goal
+
+In this lesson, you will learn about aggregates ... again. Just like the last tutorial, you'll understand how to group data together and perform calculations on those groups using R and the dplyr package. But this time, instead of counting, we're going to create different, but just as simple, numbers from our data. Things like averages or medians. These skills are essential for summarizing large datasets and uncovering patterns in your data.
+
+## What is Data Journalism?
+
+Ben Welsh, the News Applications Editor at Reuters, has been in the game a long time. He learned data journalism as a student, as a reporter and later a graphics and data editor. He was part of the movement of data journalism to expand from reporters who know data to reporters who know code and build websites. 
+
+The one thing data journalists across the country know him for is his First Notebook class, which is packed every year at NICAR. There's a waiting list to get in most years. People travel, often on their own dime, to sit in a conference room of a hotel in a city somewhere for 8-hours to learn how to write code that does basic data analysis. Why? Because he's good at it, that's why. 
+
+For Ben, a news application or a data-driven investigation have a logic to them.
+
+"I often think about (them) as kind of pipelines, that are in a sequential order trying to take, or in assembly lines, that are trying to take the raw materials of data that we're gathering from the world or wherever else, and we're refining it and cleaning it and preparing it and simplifying it and summarizing it so that we can create the manufactured good," he said. "A refined piece of information that's ready for people to buy, to consume, and it's something that they want, right? 
+
+"And those information factors, those pipelines that do that data delivery, are nothing but a collection of these very basic fundamental tools that you're trying to teach, which is how do I get data in and read it out? How do I turn it around and change its shape and summarize and aggregate it into something that's separate?"
+
+Sensing a pattern yet? You should. They're everywhere in these tutorials. But one that should become very clear in what follows is that simple things like grouping things together and calculating up a number is very easy and very powerful. 
+
+## The Basics
+
+Hopefully, starting today, lots of what you are doing will start to feel like a pattern. We're going to start the exact same way as last time, and every time after this. First, we need to load the libraries we need. 
+
+```{r load-tidyverse, exercise=TRUE}
+library(tidyverse)
+```
+```{r load-tidyverse-solution}
+library(tidyverse)
+```
+```{r load-tidyverse-check}
+grade_this_code()
+```
+
+**Again, if that's not the first line of your notebook, you're probably doing it wrong.**
+
+And, if your next bit of code isn't loading in your data, you're most likely doing it wrong here as well. A simple analogy -- we want to build a house. What do you need? First, tools. Second, building materials. Libraries are tools, data are the building materials. 
+
+Just like the previous tutorial, to load the data you just need to put your state name where the blank is, all lowercase letters and dashes for spaces.
+
+```{r read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
+homes <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/____.csv")
+```
+
+```{r read-check}
+grade_this({
+  if (identical(nrow(.result), nrows)) {
+    pass("Great work! You imported your state's nursing homes")
+  }
+  fail()
+})
+```
+
+### Exercise 1: Using head to see your data ... again 
+
+We're going to need to see our data again, so we refresh our memory of what it looks like and what the column names are. This should start to feel a little familiar. 
+
+**Put the name of the variable we created above between the parenthesis** to show the headers and **the first six rows of data**. 
+
+```{r head-data, exercise=TRUE, exercise.setup = "load-data"}
+head(____)
+```
+```{r head-data-solution, exercise.reveal_solution = FALSE}
+head(homes)
+```
+```{r head-data-check}
+grade_this_code()
+```
+<div id="head-data-hint">
+**Hint:** The thing you need is to the left of a <- in a block above.
+</div>
+
+Things to note here -- we're going to look at some numbers for each county. So you'll need the column name that has the county or parish name in it, the number of beds, the overall rating and the rating given to their health inspection record. Keep those handy.
+
+### Exercise 2: Group by and count ... and more
+
+In the last tutorial, we grouped and counted. We should do that again -- it's useful to know how many homes are in a county when you're calculating other numbers. But this time, we're going to not just count the homes, we're going to total up the number of beds in a county. This sounds like a silly number if you've never had to think about it, and until the pandemic, most people never thought about how many nursing home beds there were in a county. But one group of people who were particularly hit hard by the early days of the pandemic were nursing home residents. It might seem kind of pointless to do this today, but you just never know when you are going to need this.
+
+And the critical idea here is the **difference between a count and a sum**. You learned how to count before you went to school -- 1, 2, 3, 4. But if I said what is the sum of those numbers, you wouldn't say 4. 1+2+3+4 = 10. It seems silly, but you'd be surprised how many people get too far into worrying about code and forget this distinction. 
+
+<div class="alert alert-warning"> 
+<h4 class="alert-heading">Common Mistake</h4> 
+<p class="mb-0">A sum is not a count. And an editor will never, ever say to you "make a sum of" something. They'll use words like "total up" or ask a question starting with "how many". Pay attention to how other people talk about the action of creating numbers -- a key skill is connecting their words to the code you need to write.</p>
+</div>
+
+Good news: making a sum is very easy. In the last tutorial, you make a count of homes with this: `total = n()`. Breaking that down, `total` is just a name. You could rename that `iwatchtoomuchtiktokandmybrainisturningtomush` and it would still work. Your column name would be silly, and meaningless, and confusing to the next person who read your code. But it would work. The real magic -- the thing that creates the number, is the `n()` part. `n` in that case is a function -- the only single letter function you'll use -- and the `()` part is where input would go if you used any. 
+
+The truth is, most functions take input. The input you'll put in there is -- 99 percent of the time -- a column name. 
+
+Let's keep our total from before, but this time we're going to add a sum. `sum()` is a function too, but this one has to have input -- what number are you adding up? That's a column name. It's the column name of the total beds in a home. Then, we'll arrange it by which county has the most beds.
+
+**You fill in where there are blanks with what needs to be there.** What you fill in are the hints from above.
+
+```{r group-by, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
+____ |>
+  group_by(____) |>
+  summarise(
+    total_homes = n(),
+    total_beds = sum(____)
+  ) |> 
+  arrange(desc(____))
+```
+```{r group-by-solution, exercise.reveal_solution = FALSE}
+homes |>
+  group_by(county_parish) |>
+  summarise(
+    total_homes = n(),
+    total_beds = sum(number_of_certified_beds)
+  ) |> 
+  arrange(desc(total_beds))
+```
+```{r group-by-check}
+grade_this_code()
+```
+<div id="group-by-hint">
+**Hint:** The name of your data is the same as what you used in `head()` and `glimpse()`. Then, look carefully at the first row of the output of head. What you need is in bold at the top. You need column names. And rememeber that arrange comes from inside summarize, not from the output of head.
+</div>
+
+```{r review, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("In {most$county_parish} {countyLanguage[1]}, {stateName$State}, there's {most$total_homes} nursing homes with {most$total_beds} beds available. When the pandemic hit, this alone would have been a big part of a story about how nursing homes are vulnerable and people are dying. I, for one, am glad those days are behind us.") 
+```
+
+But what have we done again? Is the same county with the most homes also the one with the most beds? Have we made a population map again? We have. Time to start moving away from that. 
+
+### Exercise 3: A mean is an average
+
+Two things to notice about what we just did: First, when we needed another number, we just added a comma after our first line in summarize and **just added another number.** It's really no more difficult than that. Second: note the pattern. `nameofcolumn = function(input)`. Give your number a name, equal sign, pick a math function to create that number, then tell it what column of numbers you're using. It's just that simple.
+
+```{r meansetup, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("To prove it, let's find out which {countyLanguage[1]} has the best-rated homes by overall rating in {stateName$State}.") 
+```
+
+To do that, we're just going to add another line to what we've already done. The important thing to learn this time is that R is a language written by either outright mathematicians or huge fans of the subject. You will never, ever hear a normal person call an average a mean, but in mathematics, that's what an average is. A mean. Any time there is a math word for something that normal people don't use, there's a very, very good chance that the function is called that math word, not the normal people word. 
+
+You will never, ever hear an editor say "What about the mean rating?" But they will ask you about the average. The sooner you connect the dots on those two things, the better off you'll be. 
+
+Remember: We're trying to find the *average* of the overall rating. And if you use average, you're not reading carefully enough. Let's arrange it by the average rating when we're done creating that average.
+
+```{r group-by-2, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
+____ |>
+  group_by(____) |>
+  summarise(
+    total_homes = n(),
+    total_beds = sum(____),
+    average_rating = ____(____)
+  ) |> 
+  arrange(desc(____))
+```
+```{r group-by-2-solution, exercise.reveal_solution = FALSE}
+homes |>
+  group_by(county_parish) |>
+  summarise(
+    total_homes = n(),
+    total_beds = sum(number_of_certified_beds),
+    average_rating = mean(overall_rating)
+  ) |> 
+  arrange(desc(average_rating))
+```
+```{r group-by-2-check}
+grade_this_code()
+```
+
+```{r meanresult, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("The {countyLanguage[1]} with the highest rated nursing homes in {stateName$State} is {highest$county_parish} with a score of {highest$average_rating}. One weakness of this approach: What happens if you have one home in a {countyLanguage[1]} with a 5-star rating? That {countyLanguage[1]} will obviously have the highest average. This is why we left the count in there. It offers context for us to evaluate our findings. We'll learn later how to deal with this by removing counts below a certain threshold.") 
+```
+
+Now, we could keep doing this with more numbers -- and later, other numbers will become useful. For instance, we could calculate a median with `median()`. What's the difference between a mean and a median? Both measure the middle of a group of numbers. You've calculated averages since you were a kid -- add up all the numbers, then divide it by the number of numbers. The problem with averages? They can be distored by extremes. Let's pretend there's 20 students in a class, and every single student in the class has a net worth of \$15,000. So the average is, obviously, \$15,000. If we added in Elon Musk to the class, who as of this writing had a net worth of \$241 billion, the average net worth in the class is now \$11.5 billion. Do you think any student in that class feels like they are average? Not hardly, but they are very, very, very happy if that is now their net worth.
+
+Enter, the median. The median is where half the numbers are above, half are below. It does not matter how high the top number is or how low the bottom number is. The median is the number right in the middle. Or, in our fictional class, it's still $15,000. The number wasn't influenced by the gargantuan extreme that Elon Musk represents. 
+
+## The Recap
+
+In data analysis, `group_by` and `summarize` are two of the most basic, but most common functions. With these functions, you can take national data and make it local. You can calculate new numbers that shine new light on an issue, in ways readers can easily understand. In just two lessons, you've learned a *huge* amount of basic data analysis. You'll use this pattern *a lot*. What remains is creative application of what you've learned.
+
+## Terms to Know
+
+- **mean()**: A function that calculates the arithmetic average of a set of numbers.
+- **median()**: A function that finds the middle value in a sorted set of numbers.
+- **sum()**: A function that adds up all the values in a specified column.
+- **arrange()**: A function used to order rows in a dataset based on values in specified columns.
+- **desc()**: A function used within arrange() to specify descending order for sorting.
