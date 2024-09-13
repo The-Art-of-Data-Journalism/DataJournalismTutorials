@@ -1,0 +1,445 @@
+---
+title: "Data Journalism Lesson 5: Filters"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  Learn how to narrow in on what's important and remove what isn't.
+--- 
+
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(tidyverse)
+library(glue)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+```
+```{r load-data, message=FALSE, warning=FALSE}
+state <- Sys.getenv("tutorial.state")
+
+stateName <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/states.csv") |> filter(Postal == state) 
+
+stateName <- stateName |> 
+  mutate(dataurl = case_when(
+    Postal == "AL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "AK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "AZ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "AR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "CA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "CO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "CT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "DE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "FL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "GA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "HI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "ID" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "IL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "IN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "IA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "KS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "KY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "LA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "ME" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NJ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NM" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "ND" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "OH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "OK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "OR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "PA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "RI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "SC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "SD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "TN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "TX" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "UT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "VT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "VA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "WA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "WV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "WI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "WY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    TRUE ~ "https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/nebraska.csv"  # Default case if none match
+  ))
+
+investments <- read_csv(stateName$dataurl)
+
+countyLanguage <- case_when(
+  state == "AK" ~ c("county equivalent", "county equivalents"),
+  state == "CT" ~ c("planning region", "planning regions"),
+  state == "LA" ~ c("parish", "parishes"),
+  state == "VA" ~ c("county or city", "counties or cities"),
+  TRUE ~ c("county", "counties")
+)
+
+nrows <- nrow(investments)
+ncolumns <- ncol(investments)
+
+total <- investments |> summarize(total_amount = sum(investment_dollars))
+
+totalformatted <- format(total$total_amount, big.mark=",", scientific=FALSE)
+
+houses <- investments |> filter(program_area == "Single Family Housing") |> summarize(entities = n(), total_dollars = sum(investment_dollars), total_investments = sum(number_of_investments))
+
+areas <- c("Single Family Housing", "Multifamily Housing", "Community Facilties")
+
+mostcounty <- investments |> filter(program_area %in% areas ) |> 
+  group_by(county) |> 
+  summarize(
+    total_investment_dollars = sum(investment_dollars)
+  ) |> 
+  arrange(desc(total_investment_dollars)) |> 
+  ungroup() |> 
+  slice(1)
+```
+## The Goal
+
+In this lesson, you'll learn about filtering data - a crucial skill for focusing your analysis on specific subsets of information. By the end of this tutorial, you'll understand how to use the filter() function in R to narrow down your dataset based on various criteria. You'll practice filtering with exact matches, partial matches using grepl(), and filtering with lists. You'll also learn how to combine multiple filters and use select() to simplify your data view. These skills will enable you to efficiently extract the most relevant information from large datasets, a key ability in data journalism.
+
+## What is Data Journalism?
+
+Chad Day's career has taken him from covering the night cops beat in Little Rock Arkansas to the Chief Elections Analyst for the Associated Press, going from data analysis about crimes in a mid-South city to the most consequential event in American democracy. Between those two things, he was part of team that won a Pulitzer Prize at the Wall Street Journal. 
+
+So I asked him, how often does he work with data and not use group by, summarize, arrange and what this tutorial covers, filtering?
+
+"I think almost never," he said. "I mean, I do it all the time, right? There's never a time where I don't use it, I should say."
+
+Every data journalist I talked to said the same thing. 
+
+There's an old expression in music that all you need is three chords and the truth to make a song. Data journalism is not that far off. I'd make the argument it's more like five chords, but those chords -- group by, summarize, arrange, filter and mutating -- are the foundation to nearly everything. 
+
+```{r whatis, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("What is filtering? It focusing our data down to what we care about, what we're curious about, what we want to know. An example: Safe to say if we're working for a {stateName$State} news organization, we should focus on {stateName$State} data. People care about where they live. They do not care about what's going on a thousand miles away. They *really* care about what's going on their neighborhood, their city, their county and so on. With filtering, we can take a national dataset and focus it on where you live. In fact, behind the scenes, these tutorials have been using filtering all along so instead of somewhere else, you get {stateName$State} data.")
+```
+
+## The Basics
+
+More often than not, we have more data than we want. Sometimes we need to be rid of that data. In `dplyr`, there's two ways to go about this: filtering and selecting.
+
+**Filtering creates a subset of the data based on criteria**. All records where the count is greater than 10. All records that match "Nebraska". Something like that. 
+
+**Selecting simply returns only the fields named**. So if you only want to see School and Attendance, you select those fields. When you look at your data again, you'll have two columns. If you try to use one of your columns that you had before you used select, you'll get an error.  
+
+```{r storysetup, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("Let's work on some examples using a dataset of rural investments made by the US Department of Agriculture. If you aren't from a rural place or state with lot of rural areas, a lot of small towns are shrinking. One of the reasons? A lack of housing in those places. There may be people or businesses that want to move to a small community but there aren't places for them to live. With this data, we can look at what the federal government is doing about that through the Department of Agriculture. 
+     
+What kind of money are we talking? In {stateName$State}, since 2019, the USDA has invested ${totalformatted} in rural business development, housing, energy and other areas.")
+```
+
+First we'll need the tidyverse. Your first step is always loading libraries and you'll need to run this step in nearly every single thing you do.
+
+```{r load-tidyverse, exercise=TRUE}
+library(tidyverse)
+```
+```{r load-tidyverse-solution}
+library(tidyverse)
+```
+```{r load-tidyverse-check}
+grade_this_code()
+```
+
+Now import the data. As with other datasets, drop your state name in the blank -- lowercase letters, dashes for spaces.
+
+```{r read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
+investments <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/____.csv")
+```
+
+```{r read-check}
+grade_this({
+  if (identical(nrow(.result), nrows)) {
+    pass("Great work! You imported investments in your state.")
+  }
+  fail()
+})
+```
+
+```{r story2, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("First things first, let's look investments in building houses in rural {stateName$State}. How do we go from {format(nrows, nsmall=1, big.mark=",")} rows of investments, which includes everything, down to just grants and loans for houses? We do that with `filter()` and some logic that at first will seem a little weird, but you'll get used to pretty quickly.") 
+```
+
+That little weird bit is called a condition. A condition contains three parts: 1. A column name that has the information you're going to use to filter things. 2. A conditional operator. More on that in a second. And 3. The condition you want to use to filter. Is it a word -- like a state name? Or a number? This is where that goes.
+
+The new part here is the conditional operator. Most of the conditional operators you'll understand on sight. A few are a little different than you're used to, but not hard to understand. Here's a table of them. 
+
+| Operator | Explanation |
+|----------|-------------|
+| ==       | equal to |
+| !=       | not equal to |
+| >        | greater than |
+| >=       | greater than or equal to |
+| <        | less than |
+| <=       | less than or equal to |
+
+The tough one to remember is equal to. In conditional statements, equal to is == not =. If you haven't noticed, = is a variable assignment operator, not a conditional statement. So equal is == and NOT equal is !=. You can also combine greater than and equal to. So, for instance, if you want all values that are 10 or greater, you can use >= 10, which is the same thing as > 9. Both will include 10 and everything greater. But one is more clear -- >= 10 -- and one is a trick. Always be clear. 
+
+What we want to do is look at all rows that exactly match "Single Family Homes". 
+
+First, let's use head to give us a peek at the data.
+
+```{r head-data, exercise=TRUE, exercise.setup = "load-data"}
+head(____)
+```
+```{r head-data-solution, exercise.reveal_solution = FALSE}
+head(investments)
+```
+```{r head-data-check}
+grade_this_code()
+```
+
+Now that we can see the column names, the one we're looking for is the `program_area` which is a simple label for what the program is trying to do. What does that mean? For our example, Single Family Housing as a program area can be funded by several different programs, which is the next column after `program_area`. In other words, Single Family Homes can get funding from the Guaranteed Loans program, or the Repair Grants program. Labels like this are often a handy way for data analysts to focus down on a particular subject.
+
+### Exercise 1: Building houses 
+
+There are hints everywhere on how to solve this, but remember the three parts: A column name, a conditional operator, and the thing we want to filter with. We want to see all rows that have Single Family Housing in it.
+
+```{r filtering-housing, exercise=TRUE, exercise.setup = "load-data"}
+____ |> filter(____ == "____")
+```
+```{r filtering-housing-solution, exercise.reveal_solution = FALSE}
+investments |> filter(program_area == "Single Family Housing")
+```
+```{r filtering-housing-check}
+grade_this_code()
+```
+
+```{r story3, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("There's too many rows to show all the data in this window, but the USDA gave {houses$entities} entities money through grants or loans for single family housing investments  in {stateName$State} since 2019. We have to be careful with how we word that, because each row is money going to a single entity. That single entity can subdivide that investment into smaller investments. If we look at the `total_investments` column, the number of investments made in single family housing in {stateName$State} grows to {houses$total_investments}. A key lesson in data journalism -- being very precise with your wording.") 
+```
+
+### Exercise 2: Filter more than one thing, the wordy way
+
+If you look at the rural investments data -- just scroll through -- you'll notice that single family housing isn't the only kind of housing investments the USDA makes in rural areas. They also make thousands of investments in multi-family housing -- apartments, duplexes and the like. 
+
+But how do you write a filter that captures both single family housing and multifamily housing? There's two ways to do this. One is clearer, but involves a bunch more typing. The other is less clear -- at least at first -- and exploits common words between the two columns to work. 
+
+We'll start with the clearer but more verbose way. 
+
+First you need to learn about something called Boolean Logic. That's boo-lee-ann. It's a funny way to say logic with AND, OR and NOT. I've been writing code for more than two decades and have used NOT logic count-with-my-fingers number of times. Thus, we're going to focus on AND and OR. 
+
+In Normal People Talk, we go to the grocery store and say "I would like donuts AND cinnamon rolls." And if you said that, you'd walk out with two sweet treats in your grocery bag. We normal people understand AND to mean BOTH of those things. But in Computer World, AND means BOTH things, but it must be BOTH things to match. So if you say show me all of the grocery items that are donuts AND cinnamon rolls, you'd have to have a product that is a cinnamon roll donut (which sounds amazing). A glazed donut? Out. Because it's not also a cinnamon roll. A frosted cinnamon roll? Out, because it's not also a donut. 
+
+To get both of them, what you really want is OR. Show me all grocery items that are a donut OR a cinnamon roll. That way, you go home with glazed donuts, frosted cinnamon rolls and our mythical cinnamon roll donut. 
+
+In the tidyverse, when you want AND, you use & and when you want OR you use |. We want all investments that are Single Family Housing OR Multifamily Housing. 
+
+```{r filtering-wordy, exercise=TRUE, exercise.setup = "load-data"}
+____ |> filter(program_area == "____" | program_area == "____")
+```
+```{r filtering-wordy-solution, exercise.reveal_solution = FALSE}
+investments |> filter(program_area == "Single Family Housing" | program_area == "Multifamily Housing")
+```
+```{r filtering-wordy-check}
+grade_this_code()
+```
+
+As you can see, you get both program areas now, but see what I mean about wordy? You have to repeat the entire filter condition every time you want to add something. So if we wanted to add another program area into this, we'd add another | and have to repeat that it's a program_area we're looking in and so on. Why do that? 
+
+Because filters are flexible. Our first filter could be on one column of information, but the next one does not have to be. We could look for things in column A, column B and column C all at the same time. We can switch back and forth between OR and AND depending on what we need. Complex filters are a logic puzzle.
+
+### Exercise 3: Filtering, the funky way
+
+Another way we can filter is using just the text in the column. We've been doing EXACT matches, meaning if the USDA misspells Single in one record, our search won't find it. We'll talk more about that problem later in the course. But note something about the two program areas we're looking for -- they both end with the word "Housing". Couldn't we use that to find both without having to do all that boolean business? 
+
+We can!
+
+This time, we're going to use a function in our filter called `grepl`. What does `grepl` do? It searches through strings of text and looks for matches somewhere in that text. These searches can be *extremely* complex, or they can be just as simple as look for the word Housing. We're going to tell `grepl` to look for "Housing", and when it finds it, `grepl` is going to return one of two answers: TRUE if it found it, and FALSE if it didn't. We don't care about FALSE. So before, we wrote a filter condition to say look in `program_area` and find all the rows that exactly match the words "Single Family Housing" and we only go back the TRUE ones. This time, we have to tell our filter that we only want the rows where `grepl` returns TRUE because it found "Housing" somewhere in `program_area`.
+
+```{r filtering-weird, exercise=TRUE, exercise.setup = "load-data"}
+____ |> filter(grepl("____", program_area) == ____)
+```
+```{r filtering-weird-solution, exercise.reveal_solution = FALSE}
+investments |> filter(grepl("Housing", program_area) == TRUE)
+```
+```{r filtering-weird-check}
+grade_this_code()
+```
+
+And, lo and behold, we get the same answer as our easier-to-understand way. Writing code is often a battle between writing code that is clear and easy to understand and writing only enough code to make it all work. Every organization that writes code has their preference. Mine is to be clear. 
+
+### Exercise 4: Filtering with a list
+
+What if the story we want to look at is how the USDA is reshaping communities in rural areas? What if there's three program areas we're interested in? Or four? 
+
+We could just go back to our OR filter and just add two more. But that's starting to get a little much. What if we could give the filter a list of the things we wanted and it would give us that? 
+
+Good news! Totally doable. 
+
+We can create a new variable -- remember variables can represent just about anything -- and create a list. To do that we use the `c` operator, which stands for concatenate. That just means take all the stuff in the parenthesis after the c and bunch it into a list. 
+
+Note here: text is in quotes. If they were numbers, we wouldn't need the quotes. And `c()` gives us a list that we can use. 
+
+With a list, we can use the %in% operator -- a conditional operator we haven't talked about yet. It does what you think it does -- it gives you data that matches things IN the list you give it. 
+
+Remember the three parts of a filter -- the column name the information we're filtering against goes first. Then the operator. Then the thing we are using to narrow the pile.
+
+```{r filtering-list, exercise=TRUE, exercise.setup = "load-data"}
+areas <- c("Single Family Housing", "Multifamily Housing", "Community Facilties")
+
+____ |> filter(____ %in% ____ )
+```
+```{r filtering-list-solution, exercise.reveal_solution = FALSE}
+areas <- c("Single Family Housing", "Multifamily Housing", "Community Facilties")
+
+investments |> filter(program_area %in% areas)
+```
+```{r filtering-list-check}
+grade_this_code()
+```
+
+Okay, so we now have three different program areas. What now? 
+
+What now is we can use what we learned in the previous tutorials and start adding and counting. 
+
+### Exercise 5: How is the USDA impacting communities?
+
+```{r story4, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("Your editor wants to know how much money the USDA has poured into {stateName$State} {countyLanguage[2]} since 2019 through the three programs we just filtered for. The clues are in the way that sentence is written -- counties. We need a county column. How much money? We need a dollar figure column. And how much means we're going to be adding all that money up.")
+```
+
+It's been a while since we looked at our data, and we need some new column names, so let's do that again quick to find what we need:
+
+```{r head-data2, exercise=TRUE, exercise.setup = "load-data"}
+head(investments)
+```
+```{r head-data2-solution, exercise.reveal_solution = FALSE}
+head(investments)
+```
+```{r head-data2-check}
+grade_this_code()
+```
+ 
+Finding the county column should be pretty easy. Scroll right and you'll find the dollar figure column. All we're doing is using `|>` to add group by, summarize and arrange to do what we did last time. 
+
+```{r summing, exercise=TRUE, exercise.setup = "load-data"}
+areas <- c("Single Family Housing", "Multifamily Housing", "Community Facilties")
+
+____ |> filter(____ %in% ____ ) |> 
+  group_by(____) |> 
+  summarize(
+    total_investment_dollars = sum(____)
+  ) |> 
+  arrange(desc(total_investment_dollars))
+```
+```{r summing-solution, exercise.reveal_solution = FALSE}
+areas <- c("Single Family Housing", "Multifamily Housing", "Community Facilties")
+
+investments |> filter(program_area %in% areas ) |> 
+  group_by(county) |> 
+  summarize(
+    total_investment_dollars = sum(investment_dollars)
+  ) |> 
+  arrange(desc(total_investment_dollars))
+```
+```{r summing-check}
+grade_this_code()
+```
+
+```{r story5, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("Looks like {mostcounty$county} {countyLanguage[1]} received the most investment, with ${format(mostcounty$total_investment_dollars, nsmall=1, big.mark=",")} going there since 2019 for housing and community facilities.")
+```
+
+## Selecting data to make it easier to read
+
+Our data here has 21 variables in it. As datasets go, that's not a lot. Some have *thousands* of columns. What if you only want to see two? What if your editor has a severe case of undiagnosed ADHD and showing more than what is absolutely necessary can derail a story meeting. 
+
+`select` to the rescue.
+
+<div class="alert alert-info">
+<h4 class="alert-heading">Key Concept</h4> 
+<p class="mb-0"><code>filter</code> limits the number of <strong>rows</strong>, <code>select</code> limits the number of <strong>columns</strong>.</p>
+</div>
+
+### Exercise 6: Select to simplify 
+
+Using select is easy -- just tell it what columns you want to see, and that is all you will see. What if we just wanted to see the county, the program area and the investment dollars columns? 
+
+```{r selecting-dorms, exercise=TRUE, exercise.setup = "load-data"}
+areas <- c("Single Family Housing", "Multifamily Housing", "Community Facilties")
+
+____ |> 
+  filter(____ %in% ____ ) |>
+  select(____, ____, ____)
+```
+```{r selecting-dorms-solution, exercise.reveal_solution = FALSE}
+areas <- c("Single Family Housing", "Multifamily Housing", "Community Facilties")
+
+investments |> 
+  filter(program_area %in% areas ) |>
+  select(county, program_area, investment_dollars)
+```
+```{r selecting-dorms-check}
+grade_this_code()
+```
+
+If you have truly massive data, `select` has tools to help you select fields that start_with the same things or ends with a certain word. [The documentation will guide you](https://dplyr.tidyverse.org/reference/select.html) if you need those someday. For 90 plus percent of what we do, just naming the fields will be sufficient. 
+
+## Top list
+
+One last little dplyr trick that's nice to have in the toolbox is a shortcut for selecting only the top values for your dataset. Want to make a Top 10 List? Or Top 25? Or Top Whatever You Want? It's easy. 
+
+### Exercise 7: Top N lists
+
+So what are the top counties for community investment? All we're doing here is chaining commands together with what we've already got. We're *filtering* our program areas, we're *grouping* by county, in summarize we're creating a sum. We'll arrange it to get the largest sum to the top. Now we'll introduce the new function: `top_n`. The `top_n` function just takes a number and a weight, abbreviated wt.
+
+This is exactly what we did in Exercise 5, just with a little more. The wt -- which determines who is in the top N -- is usually the same thing you arrange by. 
+
+```{r topn, exercise=TRUE, exercise.setup = "load-data"}
+areas <- c("Single Family Housing", "Multifamily Housing", "Community Facilties")
+
+____ |> filter(____ %in% ____ ) |> 
+  group_by(____) |> 
+  summarize(
+    total_investment_dollars = sum(____)
+  ) |> 
+  arrange(desc(total_investment_dollars)) |> 
+  top_n(10, wt=____)
+```
+```{r topn-solution, exercise.reveal_solution = FALSE}
+areas <- c("Single Family Housing", "Multifamily Housing", "Community Facilties")
+
+investments |> filter(program_area %in% areas ) |> 
+  group_by(county) |> 
+  summarize(
+    total_investment_dollars = sum(investment_dollars)
+  ) |> 
+  arrange(desc(total_investment_dollars)) |> 
+  top_n(10, wt=total_investment_dollars)
+```
+```{r topn-check}
+grade_this_code()
+```
+
+Editors love top 10 lists. Like catnip. 
+
+## The Recap
+
+Throughout this lesson, you've learned how to use filters to focus on specific parts of your dataset. You've practiced filtering with exact matches, using `grepl()` for partial matches, and filtering with lists. You've also learned how to chain multiple filters together and use `select()` to simplify your data view. Remember, filtering is a powerful tool that allows you to zoom in on the most relevant data for your story. As you continue your data journalism journey, you'll find these filtering techniques invaluable for uncovering specific trends and patterns within larger datasets.
+
+## Terms to Know
+
+- `filter()`: A dplyr function used to subset data based on specific conditions.
+- `select()`: A dplyr function used to choose specific columns from a dataset.
+- `grepl()`: A function used for pattern matching in strings, often used with filter() for partial matches.
+- Conditional operators: Symbols used in filtering (e.g., ==, !=, >, <) to compare values.
+- Boolean logic: The use of AND (&) and OR (|) in filtering to combine multiple conditions.
+- `%in%` operator: Used to check if values are present in a list, useful for filtering with multiple options.
+- `c()`: A function used to concatenate values into a vector or list.
+- Chaining: The process of connecting multiple dplyr operations using the pipe operator (|>).
+- `top_n()`: A dplyr function used to select the top N rows based on a specified column.
