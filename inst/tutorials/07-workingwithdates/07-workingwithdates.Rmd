@@ -1,5 +1,5 @@
 ---
-title: "Data Journalism Lesson 6: Working with dates"
+title: "Data Journalism Lesson 7: Working with dates"
 output: 
   learnr::tutorial:
     progressive: true

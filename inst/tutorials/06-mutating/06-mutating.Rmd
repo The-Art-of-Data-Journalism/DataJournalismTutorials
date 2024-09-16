@@ -1,0 +1,287 @@
+---
+title: "Data Journalism Lesson 6: Mutating data"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  Learn how to make new columns of data.
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(glue)
+library(tidyverse)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+```
+```{r load-data, message=FALSE, warning=FALSE}
+state <- Sys.getenv("tutorial.state")
+
+stateName <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/states.csv") |> filter(Postal == state) 
+
+stateName <- stateName |> 
+  mutate(dataurl = case_when(
+    Postal == "AL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "AK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "AZ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "AR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "CA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "CO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "CT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "DE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "FL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "GA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "HI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "ID" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "IL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "IN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "IA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "KS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "KY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "LA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "ME" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "MD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "MA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "MI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "MN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "MS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "MO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "MT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "NE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "NV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "NH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "NJ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "NM" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "NY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "NC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "ND" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "OH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "OK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "OR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "PA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "RI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "SC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "SD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "TN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "TX" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "UT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "VT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "VA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "WA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "WV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "WI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    Postal == "WY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/", str_to_lower(State), ".csv"),
+    TRUE ~ "https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/nebraska.csv"  # Default case if none match
+  ))
+
+counties <- read_csv(stateName$dataurl)
+
+countyLanguage <- case_when(
+  state == "AK" ~ c("county equivalent", "county equivalents"),
+  state == "CT" ~ c("planning region", "planning regions"),
+  state == "LA" ~ c("parish", "parishes"),
+  state == "VA" ~ c("county or city", "counties or cities"),
+  TRUE ~ c("county", "counties")
+)
+
+nrows <- nrow(counties)
+ncolumns <- ncol(counties)
+
+first <- counties |> mutate(
+  percent_change = ((POPESTIMATE2023 - POPESTIMATE2022)/POPESTIMATE2022)*100
+) |> slice(1)
+
+fastest <- counties |> mutate(
+  percent_change = ((POPESTIMATE2023 - POPESTIMATE2022)/POPESTIMATE2022)*100
+) |>
+  arrange(desc(percent_change)) |> slice(1)
+
+biggest <- counties |> mutate(
+  rawchange = POPESTIMATE2023 - POPESTIMATE2022
+) |>
+  arrange(desc(rawchange)) |> slice(1)
+```
+## The Goal
+
+In this lesson, you'll learn about mutating data - a powerful technique for creating new columns based on existing data. By the end of this tutorial, you'll understand how to use the mutate() function in R to perform calculations, such as percent change, on your data. You'll also learn how to combine mutate with other dplyr functions like arrange() to answer specific questions about your dataset. This skill is essential for data journalists who often need to derive new insights from raw data.
+
+## What is Data Journalism?
+
+One of the first lessons I learned about data journalism came from Sarah Cohen, Pulitzer Prize-winning data editor at the Washington Post and New York Times now Knight Chair of Data Journalism at Arizona State University. She said that numbers, in isolation, are often meaningless. One of the key guiding questions that drives data journalism is simply this:
+
+"As compared to what?"
+
+You have a number. Great. What was it last month? Or last year? Or 5/10/20 years ago? Was it up or down? 
+
+If your number is for a geography, how does your geography compare to others? 
+
+How does it compare to the average? Nationally or statewide? 
+
+For a long, long time, this question has sat square in my head as I'm analyzing data. As compared to what? Today, we start building skills to answer that question. 
+
+## The Basics
+
+One of the most common data analysis techniques is to look at change over time. The most common way of comparing change over time is through percent change. The math behind calculating percent change is very simple, and you should know it off the top of your head. The easy way to remember it is:
+
+`(new - old) / old` 
+
+Or new minus old divided by old. Your new number minus the old number, the result of which is divided by the old number. To do that in R, we can use `dplyr` and `mutate` to calculate new metrics in a new field using existing fields of data. 
+
+So first we'll import the tidyverse so we can read in our data and begin to work with it.
+
+```{r load-tidyverse, exercise=TRUE}
+library(tidyverse)
+```
+```{r load-tidyverse-solution}
+library(tidyverse)
+```
+```{r load-tidyverse-check}
+grade_this_code()
+```
+
+Now we'll import a common and simple dataset of county population estimates from the US Census Bureau. Each year, the Census Bureau publishes estimates for states and counties. This one has every county in the US. A common question: who are the winners and losers?  
+
+Your first task is to import the data. For this exercise, you need to fill in your state name, lowercase letters and replace spaces with -:
+
+```{r read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
+counties <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/census-estimates/____.csv")
+```
+
+```{r read-check}
+grade_this({
+  if (identical(nrow(.result), nrows)) {
+    pass("Great work! You imported your state's estimates.")
+  }
+  fail()
+})
+```
+
+Remember, if you want to see the first six rows -- handy to take a peek at your data -- you can use the function `head`.
+
+```{r head-data, exercise=TRUE, exercise.setup = "load-data"}
+head(____)
+```
+```{r head-data-solution}
+head(counties)
+```
+```{r head-data-check}
+grade_this_code()
+```
+
+### Exercise 1: Calculating percent change 
+
+The code to calculate percent change is pretty simple. Remember, with `summarize`, we used `n()` to count things. With `mutate`, we use very similar syntax to calculate a new value -- a new column of data -- using other values in our dataset. So in this case, we're trying to do (new-old)/old, but we're doing it with column names. 
+
+If we look at what we got when we imported the data, you'll see there's a column called POPESTIMATE2023 as the new data, and we'll use POPESTIMATE2022 as the old data. So we're looking at one year. Then, to help us, we'll use arrange again to sort it, so we get the fastest growing county over one year. 
+
+```{r mutate-change, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
+____ |> mutate(
+  percent_change = (____ - ____)/____
+) 
+```
+```{r mutate-change-solution, exercise.reveal_solution = FALSE}
+counties |> mutate(
+  percent_change = (POPESTIMATE2023 - POPESTIMATE2022)/POPESTIMATE2022
+) 
+```
+```{r mutate-change-check}
+grade_this_code()
+```
+
+Look out on the right and you'll see your `percent_change` column. But what do you see right away? Do those numbers look like we expect them to? No. 
+
+### Exercise 2: Converting to a percentage.
+
+Those numbers are a decimal -- a really, really small decimal when you see things like e-03, which means that number is to the -10 power, which means move the decimal that many spaces to the left. We want it expressed as a percentage. So let's fix that by multiplying by 100. 
+
+```{r mutate-change2, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
+____ |> mutate(
+  percent_change = ((____ - ____)/____)*____
+) 
+```
+```{r mutate-change2-solution, exercise.reveal_solution = FALSE}
+counties |> mutate(
+  percent_change = ((POPESTIMATE2023 - POPESTIMATE2022)/POPESTIMATE2022)*100
+) 
+```
+```{r mutate-change2-check}
+grade_this_code()
+```
+
+Better. 
+
+```{r whatis, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("But what order is that in? Note: not by percent change. It's alphabetical. So you've answered the question of which {countyLanguage[1]} appears first in {stateName$State}. News? Not hardly.")
+```
+
+### Exercise 3: Arranging to answer a question
+
+So who had the most growth in that one year? We can find that with arrange, which we learned about previously.
+
+```{r mutate-change-percent, exercise=TRUE, exercise.setup = "load-data", message=FALSE, warning=FALSE}
+counties |> mutate(
+  percent_change = ((POPESTIMATE2023 - POPESTIMATE2022)/POPESTIMATE2022)*100
+) |>
+  arrange(desc(____))
+```
+```{r mutate-change-percent-solution, exercise.reveal_solution = FALSE}
+counties |> mutate(
+  percent_change = ((POPESTIMATE2023 - POPESTIMATE2022)/POPESTIMATE2022)*100
+)  |>
+  arrange(desc(percent_change))
+```
+```{r mutate-change-percent-check}
+grade_this_code()
+```
+
+```{r fastest, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "mutating-load-data", results='asis'}
+glue("Which county is the fastest growing?  {fastest$CTYNAME}, {fastest$STNAME}, which grew {format(fastest$percent_change, digits=1)}% in just one year.")
+``` 
+
+## More mutating
+
+### Exercise 4: Looking at change differently
+
+With this data, we have every county and the population in two years. We've looked at the percent change, which allows us to put Los Angeles County, California -- the most populous in the nation -- and Loving County, Texas -- the least populous -- on the same playing field. But what if we wanted to know which county was growing just at a raw number?
+
+What you're going to learn about data journalism is that often, the simplest way is going to be the best. Simple math means you can explain what you've done easily to anyone. So how do we get a raw number? Subtraction! Let's call this new column rawchange and the rest should be obvious to you.
+
+```{r mutate-change-percent-arrange, exercise=TRUE, exercise.setup = "load-data", message=FALSE, warning=FALSE}
+counties |> mutate(
+  ____ = ____ - ____
+) |>
+  arrange(desc(____))
+```
+```{r mutate-change-percent-arrange-solution, exercise.reveal_solution = FALSE, warning=FALSE}
+counties |> mutate(
+  rawchange = POPESTIMATE2023 - POPESTIMATE2022
+) |>
+  arrange(desc(rawchange))
+```
+```{r mutate-change-percent-arrange-check}
+grade_this_code()
+```
+
+```{r rawchange, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("What county added the most people by raw number? It's {biggest$CTYNAME}, {biggest$STNAME} adding {biggest$rawchange} people in one year. Know where that is? What might explain that growth? Those are reporter questions that make stories.")
+``` 
+
+## The Recap
+
+Throughout this lesson, you've learned how to use the mutate() function to create new columns in your dataset. You've calculated percent change and raw change in population data, demonstrating how to perform simple mathematical operations on existing columns. You've also combined mutate() with arrange() to identify the fastest-growing counties and those with the largest absolute population increases. Remember, mutating data allows you to uncover new insights and tell more complex stories with your data. As you continue your data journalism journey, you'll find that the ability to create new variables is an invaluable tool in your analytical toolkit.
+
+## Terms to Know
+
+- Mutate: A dplyr function used to create new columns or modify existing ones in a dataset.
+- Percent change: A calculation that shows the relative change between two values over time.
+- Raw change: The absolute difference between two values, without considering proportional change.
+- dplyr: A package in R that provides a set of tools for efficiently manipulating datasets.
+- Pipe operator (|>): A symbol used in R to chain together multiple operations on data.
+- Arrange: A dplyr function used to sort data based on one or more columns.
+- desc(): A function used within arrange() to sort data in descending order.
+- Backticks (`): Symbols used in R to enclose column names that start with numbers or contain spaces.
