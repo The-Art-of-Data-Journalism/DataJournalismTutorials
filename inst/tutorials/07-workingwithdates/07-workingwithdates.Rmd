@@ -20,16 +20,104 @@ library(lubridate)
 knitr::opts_chunk$set(echo = FALSE)
 tutorial_options(exercise.completion=FALSE)
 ```
+```{r load-data, message=FALSE, warning=FALSE}
+state <- Sys.getenv("tutorial.state")
 
+stateName <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/states.csv") |> filter(Postal == state) 
+
+stateName <- stateName |> 
+  mutate(dataurl = case_when(
+    Postal == "AL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "AK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "AZ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "AR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "CA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "CO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "CT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "DE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "FL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "GA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "HI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "ID" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "IL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "IN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "IA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "KS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "KY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "LA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "ME" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "MD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "MA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "MI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "MN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "MS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "MO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "MT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "NE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "NV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "NH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "NJ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "NM" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "NY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "NC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "ND" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "OH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "OK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "OR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "PA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "RI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "SC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "SD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "TN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "TX" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "UT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "VT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "VA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "WA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "WV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "WI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "WY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    TRUE ~ "https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/nebraska.csv"  # Default case if none match
+  ))
+
+crashes <- read_csv(stateName$dataurl)
+
+countyLanguage <- case_when(
+  state == "AK" ~ c("county equivalent", "county equivalents"),
+  state == "CT" ~ c("planning region", "planning regions"),
+  state == "LA" ~ c("parish", "parishes"),
+  state == "VA" ~ c("county or city", "counties or cities"),
+  TRUE ~ c("county", "counties")
+)
+
+nrows <- nrow(crashes)
+ncolumns <- ncol(crashes)
+
+totals <- crashes |> 
+  mutate(
+    clean_date = mdy(first_bad_date),
+    floor_year = floor_date(clean_date, "year")
+    ) |> 
+  group_by(floor_year) |> 
+  tally() |> 
+  ungroup() |> 
+  filter(floor_year == as.Date("2024-01-01"))
+```
 ## The Goal
 
 In this lesson, you'll learn how to work with dates in R, a critical skill for data analysis. By the end of this tutorial, you'll understand how to convert character strings into proper date formats using both base R and the lubridate package. You'll practice reformatting dates using as.POSIXct() and lubridate functions, and learn how to use floor_date() to group dates by month. These skills will enable you to perform time-based analyses and answer questions about trends over time in your datasets.
+
+## What is Data Journalism?
+
+More to come here. 
 
 ## The Basics
 
 One of the most frustrating things in data is working with dates. Everyone has a different opinion on how to record them, and every software package on the planet has to sort it out. Dealing with it can be a little ... confusing. And every dataset has something new to throw at you. So consider this an introduction. 
 
-We're going to do this two ways. First I'm going to show you how to use base R to solve a tricky problem. And then we'll use a library called `lubridate` to solve a more common and less tricky problem. And then we'll use a new library to solve most of the common problems before they start. 
+But know this: If your story questions have date-based answers, you're going to 1) need a column that has date information in it and 2) that date information needs to be formatted correctly so your software can read and interpret the date as a date.
+
+We're going to do this two ways in R. First I'm going to show you how to use base R to solve the problem. It is the harder way, but it's also the most flexible and will be the solution when the easy way doesn't work. And then we'll use a library called `lubridate` to solve the same problem. If you use base R or `lubridate` is the classic 80/20 problem. Unscientifically, 80 percent of the date formatting problems you'll run into will be solved with `lubridate`. The remaining 20 percent are where base R will come in.
 
 ## The hard way
 
@@ -47,38 +135,25 @@ library(lubridate)
 grade_this_code()
 ```
 
-We're going to use our dataset of every UNLPD police call. You may not have noticed when you imported it last time, but the dates came in as a character field, not as dates. Why? Because they're not formatted in a way that R can read, so we've got to reformat it. **For purposes of this exercise, you don't need to do this. The data is included here if you want to try this in your own notebook.**
+For this, we're going to look at a dataset from the National Transportation Safety Board, which is a database of all airplane crashes since 2019. The irony here is that this dataset, when you download it from the NTSB, has properly formatted dates. Every dataset I could find that had bad dates was too large to efficiently use in this tutorial. 
 
-```{r echo=FALSE, class.output="bg-info", results="asis",  message=FALSE,  warning=FALSE}
-library(downloadthis)
-library(glue)
+Planes crash -- and small planes crash far more often than big planes. Commercial airline crashes are exceedingly rare -- years can go by in the US between major airline crashes. Every state has a number of small plane crashes every year. If you work as a breaking news reporter, you will very likely have to cover a small plane crash at some point. Having this data, or knowing where it is to get it quickly on deadline, can add depth and context to a breaking news story about a pilot injured in a botched landing. 
 
-dllink <- download_link(
-  link = "http://mattwaite.github.io/datajournalismfiles/crimelogs.csv",
-  button_label = "Download csv file",
-  button_type = "danger",
-  has_icon = TRUE,
-  icon = "fa fa-save",
-  self_contained = FALSE
-)
+Questions you can ask: How many crashes are there in a year? Is this year worse or better than last year? Is there a seasonal element to crashes in your state? I live in the Midwest, where spring winds are no joke and early summer thunderstorms can get pretty wild. Warm winter states might get an influx of older pilots who might need to hang it up. You won't know until you look. 
 
-glue("<pre><p><strong>For this walkthrough:</strong></p><p>{dllink}</p></pre>")
+Let's load up our data as we've been doing all along. Fill in your state, lowercase letters and dashes for any spaces in your state name. 
 
+```{r read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
+crashes <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/____.csv")
 ```
 
-Now we'll read it into a new dataframe. 
-
-```{r load-data, message=FALSE, warning=FALSE}
-calls <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
-```
-```{r load-data-exercise, exercise = TRUE}
-calls <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
-```
-```{r load-data-exercise-solution}
-calls <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
-```
-```{r load-data-exercise-check}
-grade_this_code()
+```{r read-check}
+grade_this({
+  if (identical(nrow(.result), nrows)) {
+    pass("Great work! You imported your state's estimates.")
+  }
+  fail()
+})
 ```
 
 And let's look at it quick using glimpse.
@@ -87,85 +162,85 @@ And let's look at it quick using glimpse.
 glimpse(____)
 ```
 ```{r glimpse-data-solution, exercise.reveal_solution = FALSE}
-glimpse(calls)
+glimpse(crashes)
 ```
 ```{r glimpse-data-check}
 grade_this_code()
 ```
 
-See that reported column? See how it's a character? We have to fix that. There's a lot of ways to fix dates. The base R way is to use formatting. The code is ... a little odd ... but it's useful to know if you get a really odd date format. What you are doing is essentially parsing the date into it's component parts then reassmbling it into a date using formatting. 
+At the bottom of the data, you'll see a column called first_bad_date. See how it's a character format column? We have to fix that. There's a lot of ways to fix dates. The base R way is to use formatting. The code is ... a little odd ... but it's useful to know if you get a really odd date format. What you are doing is essentially parsing the date -- pulling it apart -- into it's components then reassembling it into a date using formatting. In other words, you take your column that needs to be a date, but isn't, and then you pull it apart, tell R this is a day, this is a month, and this is a year and then put it back together in date format. 
 
 ### Exercise 1: Formatting the date
 
-To walk through this, we're going to use `mutate` to create a new column. Why not just overwrite our original column? It's good practice never to delete or overwrite data. What do you have to compare it to and how will you know you did it write if you overwrite it? We'll name that new column clean_reported. It's a habit I picked up where when I clean a column, I name it clean_originalcolumnname. Helps keep track of which is original and which has been modified. 
+To walk through this, we're going to use `mutate` to create a new column. Why not just overwrite our original column? It's good practice never to delete or overwrite data. What do you have to compare it to and how will you know you did it correctly if you overwrite it? We'll name that new column `clean_date`. It's a habit I picked up where when I clean a column, I name it clean_originalcolumnname. Helps keep track of which is original and which has been modified. 
 
-Then, we're going to use the `as.POSIXct` function. That function parses text into dates. The inputs it takes are first, what column are you parsing? Second, what is the `format`? That format can get really complicated, but look at one of the dates and times we have. You have things like `1/19/2023 12:32`. So we can see the format of the date we have. It's the month, with just one number, then the day, then the four digit year. Then you have a space and the hour colon minute. 
+Then, we're going to use the `as.POSIXct` function. That function parses -- splits -- text into dates. It takes two inputs: First, what column are you parsing? Second, what is the `format`? That format can get really complicated, but look at one of the dates and times we have. You have things like `1/19/2023`. So we can see the format of the date we have. It's the month, with just one number, then the day, then the four-digit year. And all of it with slashes between those things.
 
-Posix date formatting has notations for all of those and more. 
+Posix date formatting has notations for all of those and more. You don't need to memorize these -- programmers all over the world have to look these up regularly. But just pay attention to what the possibilities are -- what you could parse knowing these exist -- and take note to find what we need for our purposes. That would be a month, a day and a four-digit year (as opposed to a two-digit year). 
 
 | Code | Meaning                                        |
 |------|------------------------------------------------|
-| %a	   | Abbreviated weekday (Mon, Tue, Wed, etc)       |
-| %A	   | Full weekday (Monday, Tuesday, Wednesday, etc) |
-| %b	   | Abbreviated month (Jan, Feb, Mar, etc.)        |
-| %B	   | Full month                                     |
-| %c	   | Locale-specific date and time                  |
-| %d	   | Decimal date                                   |
-| %H	   | Decimal hours (24 hour)                        |
-| %I	   | Decimal hours (12 hour)                        |
-| %j	   | Decimal day of the year                        |
-| %m	   | Decimal month                                  |
-| %M	   | Decimal minute                                 |
-| %p	   | Locale-specific AM/PM                          |
-| %S	   | Decimal second                                 |
-| %U	   | Decimal week of the year (starting on Sunday)  |
-| %w	   | Decimal Weekday (0=Sunday)                     |
-| %W	   | Decimal week of the year (starting on Monday)  |
-| %x	   | Locale-specific Date	                           |
-| %X	   | Locale-specific Time                           |
-| %y	   | 2-digit year                                   |
-| %Y	   | 4-digit year                                   |
-| %z	   | Offset from GMT                                |
-| %Z	   | Time zone (character)                          |
+| %a	 | Abbreviated weekday (Mon, Tue, Wed, etc)       |
+| %A	 | Full weekday (Monday, Tuesday, Wednesday, etc) |
+| %b	 | Abbreviated month (Jan, Feb, Mar, etc.)        |
+| %B	 | Full month (January, February, etc.)           |
+| %c	 | Locale-specific date and time                  |
+| %d	 | Decimal date                                   |
+| %H	 | Decimal hours (24 hour)                        |
+| %I	 | Decimal hours (12 hour)                        |
+| %j	 | Decimal day of the year                        |
+| %m	 | Decimal month                                  |
+| %M	 | Decimal minute                                 |
+| %p	 | Locale-specific AM/PM                          |
+| %S	 | Decimal second                                 |
+| %U	 | Decimal week of the year (starting on Sunday)  |
+| %w	 | Decimal Weekday (0=Sunday)                     |
+| %W	 | Decimal week of the year (starting on Monday)  |
+| %x	 | Locale-specific Date	                          |
+| %X	 | Locale-specific Time                           |
+| %y	 | 2-digit year                                   |
+| %Y	 | 4-digit year                                   |
+| %z	 | Offset from GMT                                |
+| %Z	 | Time zone (character)                          |
 
-Reminder: You need month, day, four-digit year, hour (24 hour clock) and minute. 
+Reminder: You need month, day, four-digit year. 
 
 ```{r posix, exercise=TRUE, exercise.setup = "load-data"}
-calls |> mutate(
-    clean_reported = as.POSIXct(reported, format="%____/%____/%____ %____:%____")
+crashes |> mutate(
+    clean_date = as.POSIXct(first_bad_date, format="%____/%____/%____")
 )
 ```
 ```{r posix-solution, exercise.reveal_solution = FALSE}
-calls |> mutate(
-    clean_reported = as.POSIXct(reported, format="%m/%d/%Y %H:%M")
+crashes |> mutate(
+    clean_date = as.POSIXct(first_bad_date, format="%m/%d/%Y")
 )
 ```
 ```{r posix-check}
 grade_this_code()
 ```
 
-And just like that, clean-reported is now a special date format that includes times.
+And just like that, `clean_date` is now a date column. That means we can do date math with it -- things like grouping by month or how many days has it been since the last crash. 
 
-You can almost read the code that created it: The format of the date is %Y, which means a four digit year SLASH %m or two digit month SLASH %d or two digit day SPACE %H or two digit hour COLON %M or two digit minute. You can remix that as you need. If you had a date that was `20021212` then you would do `format="%Y%m%d"` and so on. 
+You can almost read the code that created it: The format of the date is %m, which means month SLASH %d or day SLASH %Y which is the four-digit year. You can remix that as you need. If you had a date that was `20021212` then you would do `format="%Y%m%d"`. Have dashes instead of slashes? Just swap those in. Got a date that says `January 1, 2019`? That's `format="%B %d, %Y"`. While this method is a little clunky, it's also really powerful. If you can find the pattern to the date, you can parse it and turn it into a date that R understands.  
 
 ## The easy way
 
-There is a [library called lubridate](https://lubridate.tidyverse.org/reference/index.html) that can parse some common date problems. 
+There is a [library called lubridate](https://lubridate.tidyverse.org/reference/index.html) that can parse common date problems. 
 
-Lubridate can handle this calls data easier with one of it's many functions. The functions parse dates given a basic pattern. In this case, our data is in a very common pattern of **month day year hours minutes**. Lubridate names its functions after the pattern you need. Need year month day, there's a function called `ymd` that will parse what you have with year month and day. And this is all on our reported column.  
+Lubridate can handle this plane crash data easier with one of it's many functions. The functions parse dates given a basic pattern. In this case, our data is in a very common pattern of **month day year**. Lubridate names its functions after the pattern you need. Need year month day, there's a function called `ymd` that will parse what you have with year month and day -- and as a bonus it's smart enough to know that slashes *and* dashes are common separators in dates. 
 
 ### Exercise 2: Lubridate
 
-We have month day year hours minutes. See if you can figure out how it works. 
+We have month day year in `first_bad_date`. See if you can figure out how it works. 
 
 ```{r lubridate, exercise=TRUE, exercise.setup = "load-data"}
-calls |> mutate(
-    clean_reported = _________(_________)
+crashes |> mutate(
+    clean_date = ____(____)
 )
 ```
 ```{r lubridate-solution, exercise.reveal_solution = FALSE}
-calls |> mutate(
-    clean_reported = mdy_hm(reported)
+crashes |> mutate(
+    clean_date = mdy(first_bad_date)
 )
 ```
 ```{r lubridate-check}
@@ -174,37 +249,72 @@ grade_this_code()
 
 That's less code and less weirdness, so that's good. 
 
+### Exercise 3: Try it again
+
+`lubridate` has functions for every combination of months and days and years (and hours and minutes and seconds). In the `second_bad_date` column, you might see a date like this: `30-8-2024`. 
+
+See if you can parse all the dates in `second_bad_date` using a lubridate function. What pattern do you see with that date?
+
+
+```{r lubridate2, exercise=TRUE, exercise.setup = "load-data"}
+crashes |> mutate(
+    clean_date = ____(____)
+)
+```
+```{r lubridate2-solution, exercise.reveal_solution = FALSE}
+crashes |> mutate(
+    clean_date = dmy(second_bad_date)
+)
+```
+```{r lubridate2-check}
+grade_this_code()
+```
+
 ## More with dates
 
-But you're not done with lubridate yet. It has some interesting pieces parts we'll use elsewhere. 
+But you're not done with `lubridate` yet. It has some interesting pieces parts we'll use elsewhere. 
 
-What's a question you might have about calls on campus involving dates? 
-
-How about what month are the most calls? 
+Let's start with the question of how many plane crashes happen each year.  
 
 ### Exercise 3: Floor dates
 
-We could use formatting to create a Month field but that would group all the Aprils together, regardless of if they were in 2022 or 2021. We could create a year and a month together, but that would give us an invalid date object and that would create problems later. Lubridate has something called a floor date that we can use. 
+There's lots of ways in programming to pull text apart and put it back together again. Could we search our date column and find a four-digit year and create a new column out of that and call it year? Sure we could. But `lubridate` has a function in it called a `floor_date` that does this. We can put all the weeks, months, quarters and seasons together with a little trick.
 
-We're going to use mutate to create a floor_month field out of our properly formatted date column. Keep this code handy -- you'll need it for the homework.  
+For example, if we wanted to know how many crashes happened each month, we could use formatting to create a Month field but that would group all the Aprils together, regardless of if they were in 2022 or 2021. We could create a year and a month together, but that would give us an invalid date object and that would create problems later. What `lubridate` does with floor_date is takes all the dates in April and makes the floor date April 1 of that year. Then does it for all the other months. So you get a properly formatted date -- which will be important later when we want to graph this -- and a way to count crashes by month. 
 
-```{r floormonth, exercise=TRUE, exercise.setup = "load-data"}
-calls |> 
+Or year. Which is what we're going to do here. 
+
+To do this, we first have to have a date column R understands. To do that, we're just going to do the same thing we just did in Exercise 1. We're going to make `clean_date` and use a `lubridate` function to reformat `first_bad_date`. Then, in the first next line, we're going to make our `floor_year`. All we need to tell the `floor_date` function is what the name of our real, fixed, properly formatted date column that we just made is named, and what floor we want to set. 
+
+After that, we just need to group by that floor year and count them up. We'll use the `tally` shortcut here. 
+
+```{r flooryear, exercise=TRUE, exercise.setup = "load-data"}
+crashes |> 
   mutate(
-    clean_reported = _________(reported),
-    floor_month = floor_date(_________, "month")
-    ) 
+    clean_date = ____(first_bad_date),
+    floor_year = floor_date(____, "year")
+    ) |> 
+  group_by(floor_year) |> 
+  tally()
 ```
-```{r floormonth-solution, exercise.reveal_solution = FALSE}
-calls |> 
+```{r flooryear-solution, exercise.reveal_solution = FALSE}
+crashes |> 
   mutate(
-    clean_reported = mdy_hm(reported),
-    floor_month = floor_date(clean_reported, "month")
-    ) 
+    clean_date = mdy(first_bad_date),
+    floor_year = floor_date(clean_date, "year")
+    ) |> 
+  group_by(floor_year) |> 
+  tally()
 ```
-```{r floormonth-check}
+```{r flooryear-check}
 grade_this_code()
 ```
+
+```{r results, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("A paragraph you can write about plane crashes: In {stateName$State}, there's been {nrows} airplane accidents investigated by the National Transportation Board since 2019. So far, in 2024, there's been {totals[2]}.")
+```
+
+You could go further, of course. How many deaths? How many injuries? How does this year compare to last? What kind of pace is this year on? Has there been other accidents at this airport since 2019? **These are all questions you can answer, right now, with what you know.**
 
 ## The Recap
 
@@ -214,7 +324,7 @@ Throughout this lesson, you've learned several ways to handle dates in R. You've
 
 - `as.POSIXct()`: A base R function used to convert character strings to date-time objects.
 - `lubridate`: An R package designed to make working with dates and times easier.
-- `mdy_hm()`: A lubridate function that parses dates in the month-day-year hour-minute format.
+- `mdy()`: A lubridate function that parses dates in the month-day-year format.
 - `floor_date()`: A lubridate function that rounds dates down to a specified time unit (e.g., month, year).
 - Date format codes: Special character combinations (like %Y, %m, %d) used to specify date formats in R.
 - Character field: A data type that stores text, including improperly formatted dates.
