@@ -20,22 +20,102 @@ library(lubridate)
 knitr::opts_chunk$set(echo = FALSE)
 tutorial_options(exercise.completion=FALSE)
 ```
+```{r load-data, message=FALSE, warning=FALSE}
+state <- Sys.getenv("tutorial.state")
 
+stateName <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/states.csv") |> filter(Postal == state) 
+
+stateName <- stateName |> 
+  mutate(dataurl = case_when(
+    Postal == "AL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "AK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "AZ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "AR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "CA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "CO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "CT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "DE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "FL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "GA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "HI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "ID" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "IL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "IN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "IA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "KS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "KY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "LA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "ME" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "MD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "MA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "MI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "MN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "MS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "MO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "MT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "NE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "NV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "NH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "NJ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "NM" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "NY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "NC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "ND" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "OH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "OK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "OR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "PA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "RI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "SC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "SD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "TN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "TX" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "UT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "VT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "VA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "WA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "WV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "WI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    Postal == "WY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/", str_to_lower(State), ".csv"),
+    TRUE ~ "https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/nebraska.csv"  # Default case if none match
+  ))
+
+crashes <- read_csv(stateName$dataurl)
+
+countyLanguage <- case_when(
+  state == "AK" ~ c("county equivalent", "county equivalents"),
+  state == "CT" ~ c("planning region", "planning regions"),
+  state == "LA" ~ c("parish", "parishes"),
+  state == "VA" ~ c("county or city", "counties or cities"),
+  TRUE ~ c("county", "counties")
+)
+
+nrows <- nrow(crashes)
+ncolumns <- ncol(crashes)
+```
 ## The Goal
 
 In this lesson, you'll learn about the critical concept of "data smells" - common issues and inconsistencies that can arise in datasets. By the end of this tutorial, you'll understand how to conduct an initial assessment of a dataset to identify potential problems like missing data, wrong data types, gaps in data, and internal inconsistencies. You'll practice using R functions like glimpse(), group_by(), and tally() to explore your data systematically. This skill is essential for data journalists to ensure the accuracy and reliability of their analyses before drawing any conclusions.
 
-## The Basics
+## What is Data Journalism?
+
+Chad Day, the Chief Elections Analyst at the Associated Press, starts every data analysis he does with what amounts to a fight. 
+
+"I think that I always look at the data as it's going to try to trick me. And I have to find all of the tricks that it's going to throw at me," he said. "And then I play to the strengths, right? Because you're going to identify a bunch of weaknesses that are in the data. And you don't want to base your analysis on those weaknesses unless your story is about the weaknesses in the data."
+
+So what does he -- and many other data analysts -- do? You've heard of giving something the smell test, yes? This is the very nerdy equivalent of the smell test. We call them data smells.
+
+"Every single time we use data, we have to do the basic checks. And that means that we run those basic things every single time," Day said. "And it should be part of your muscle memory."
+
+What's a data smell test? 
+
+"Let's use an example," Day said. "It's 50 state data. I make sure that all 50 states are in there, right? I make sure that if there are additional-- like if it's 51 or 52, is DC included?"
 
 Any time you are given a dataset from anyone, you should immediately be suspicious. Is this data what I think it is? Does it include what I expect? Is there anything I need to know about it? Will it produce the information I expect?
 
-One of the first things you should do is give it the smell test.
-
 Failure to give data the smell test [can lead you to miss stories and get your butt kicked on a competitive story](https://source.opennews.org/en-US/learning/handling-data-about-race-and-ethnicity/).
 
-Let's look at our campus crime data again.
-
-With data analysis, often a first step is called Exploratory Data Analysis or EDA. EDA has been around for a long time -- John Tukey started pushing the idea in 1970 and wrote the text that would lay the groundwork for generations of data analysts in 1977 (I have a copy in my office!). But EDA treats data in an almost neutral way - it's almost naive. Data smells treats data with skepticism and distrust. With data smells, we're trying to find common mistakes in data because we have to know if they are there. [For more on data smells, read the GitHub wiki post that started it all](https://github.com/nikeiubel/data-smells/wiki/Ensuring-Accuracy-in-Data-Journalism). The common mistakes we're looking for are:
+Giving your data the smell test isn't new. Exploratory Data Analysis or EDA has been around for a long time -- John Tukey started pushing the idea in 1970 and wrote the text that would lay the groundwork for generations of data analysts in 1977 (I have a copy in my office!). But EDA treats data in an almost neutral way - it's almost naive. Data smells treats data with skepticism and distrust. With data smells, we're trying to find common mistakes in data because we have to know if they are there. [For more on data smells, read the GitHub wiki post that started it all](https://github.com/nikeiubel/data-smells/wiki/Ensuring-Accuracy-in-Data-Journalism). The common mistakes we're looking for are:
 
 -   Missing data
 -   Gaps in data
@@ -52,25 +132,15 @@ With data analysis, often a first step is called Exploratory Data Analysis or ED
 
 Not all of these data smells are detectable in code. You may have to ask people about the data. You may have to compare it to another dataset yourself. Does the agency that uses the data produce reports from the data? Does your analysis match those reports? That will expose wrongly derived data, or wrong units, or mistakes you made with inclusion or exclusion.
 
-But with several of these data smells, we can do them first, before we do anything else.
+But many of them are, and they are easy, knowing what you already know. You just need a little code, a dollop of logic and a healthy skepticism that the data you have is good. 
 
-Let's work on some examples using the UNLPD reports data. You can download the data here if you want to use it in your own notebook -- and this is the same data we've used before, so if you already downloaded it, you don't need to do it again. **For purposes of this exercise, you don't need to do this. The data is included here if you want to try this in your own notebook.**
+## The Basics
 
-```{r echo=FALSE, class.output="bg-info", results="asis",  message=FALSE,  warning=FALSE}
-library(downloadthis)
-library(glue)
+Every dataset has quirks that make certain kinds of analysis annoyingly difficult. For example, the State of Nebraska publishes a dataset of every currently incarcerated person in the state prison system. A question that might come up in news stories -- how many people are currently serving prison time for certain crimes? For example: Meth related crimes. The problem? There's several dozen unique ways that the state has recorded possession of methamphetamine. Different spellings, different abbreviations, meth for short, methamphetamine spelled out, odd ways of abbreviating possession. It would take months of work to fix all the different ways the state has recorded a meth-related crime. And would it be worth doing that work for a single sentence of a story? Not likely.
 
-dllink <- download_link(
-  link = "http://mattwaite.github.io/datajournalismfiles/crimelogs.csv",
-  button_label = "Download csv file",
-  button_type = "danger",
-  has_icon = TRUE,
-  icon = "fa fa-save",
-  self_contained = FALSE
-)
+But some can be fixed quicker. But you won't know what needs fixed -- or even if your data is worth using -- until you give your data the smell test.
 
-glue("<pre><p><strong>For this walkthrough:</strong></p><p>{dllink}</p></pre>")
-```
+Let's work on some examples the NTSB plane crash data, which we used in the last exercise. 
 
 First we'll need the tidyverse and lubridate. Your first step is always loading libraries and you'll need to run this step in nearly every single thing you do.
 
@@ -85,137 +155,117 @@ library(lubridate)
 ```{r load-tidyverse-check}
 grade_this_code()
 ```
+
 Now import the data.
 
-```{r smells-load-data, message=FALSE, warning=FALSE}
-crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
+```{r read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
+crashes <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes/____.csv")
 ```
-```{r smells-load-data-exercise, exercise = TRUE}
-crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
+
+```{r read-check}
+grade_this({
+  if (identical(nrow(.result), nrows)) {
+    pass("Great work! You imported your state's plane crashes.")
+  }
+  fail()
+})
 ```
-```{r smells-load-data-exercise-solution}
-crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
-```
-```{r smells-load-data-exercise-check}
-grade_this_code()
-```
+
+Now, let's take a look at where this data has flaws.
 
 ## Wrong Type
 
-First, let's look at **Wrong Type Of Data**. We can sniff that out by looking at the output of `glimpse`
+First, let's look at the **Wrong Type Of Data** problem. We can sniff that out by looking at the output of `glimpse`
 
 ### Exercise 1: Using glimpse for more than column names
 
-```{r glimpse-data, exercise=TRUE, exercise.setup = "smells-load-data"}
+```{r glimpse-data, exercise=TRUE, exercise.setup = "load-data"}
 glimpse(____)
 ```
 ```{r glimpse-data-solution, exercise.reveal_solution = FALSE}
-glimpse(crimes)
+glimpse(crashes)
 ```
 ```{r glimpse-data-check}
 grade_this_code()
 ```
 
-First things first: What type of data are all of the columns being imported as? An incident code is obviously text. But what about a case number? What about the dates? Are those character fields?
+First things first: What type of data are all of the columns being imported as? It's important to look at columns you know you are going to use. Or look at columns that -- just looking at their name -- suggest they should be a specific type of data.
 
-Bit of a trick question -- if you're not going to do math on it, don't import it as a number. Dates we've dealt with before. But just know, when you use `readr`, it's making guesses based on the first few rows. Sometimes, you'll get data that's a mix -- ID numbers that start as numbers and include text later. 
+In this data, for example, is the `ReportNo` column a number? ReportNo is short for Report Number, so it suggests it should be? But, recall your basics -- if you don't plan to do math on it, then it's not a number. In this case, the column is empty, so the imported data is a `lgl` type -- logical, which is the default when all the data is NA. 
 
-The cheap way to fix this is to change the guess_max parameter of `readr` to just use more than a few rows to guess the column types. It'll go a little slower, but often it fix the problem of mixed data types. For example, this would include the first 5,000 rows in the guessing.
+Another example: `FatalInjuryCount` or `SeriousInjuryCount`. Is a count a number? It sure is. If you wanted to know how many people died in plane crashes in your state, you'd want to sum those counts. You can't sum them if they aren't numbers. Are these counts numbers?
 
-```
-crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv", guess_max = 5000)
-```
+One place we can pretend there's a problem -- look at the `first_bad_date` column. What type is that? Compare it to the `EventDate` column. The `EventDate` column is a dttm column, or date time. That means R knows that column is a date and a time together, and will treat it as such. Our `first_bad_date` column is not a date or dttm column. What is it? Would R recognize that as a date? 
 
 ## Missing Data
 
-The second smell we can find in code is **missing data**. We can do that through a series of Group By and Count steps. In aggregates, we explicitly used group by and summarize. Here, because this is exploratory, I'm going to show you a shortcut called `tally()`. Tally ... does just that: tallies up how many are in your groups.
+The second smell we can find in code is **missing data**. We can do that through a series of Group By and Count steps. In aggregates, we explicitly used group by and summarize. Here, because this is exploratory, we can use the `tally()` shortcut. 
 
-Let's first look at locations.
+Let's first look at the `HighestInjuryLevel` column. Is that column consistently filled out?
 
 ### Exercise 2: Missing data part 1
 
-```{r tally-data, exercise=TRUE, exercise.setup = "smells-load-data"}
-crimes |> 
+```{r tally-data, exercise=TRUE, exercise.setup = "load-data"}
+crashes |> 
   group_by(____) |> 
   ____()
 ```
 ```{r tally-data-solution, exercise.reveal_solution = FALSE}
-crimes |> 
-  group_by(location) |> 
+crashes |> 
+  group_by(HighestInjuryLevel) |> 
   tally()
 ```
 ```{r tally-data-check}
 grade_this_code()
 ```
-What we're looking for here are blanks: Crimes without a location. Typically, those will appear first or last in most analysis platforms. In the tidyverse, NA or null values will be last. See that last big number on the pagination bar at the bottom of your results? Click that and find the very last row of data. There is no location on campus called NA. That means there's crimes that occurred ... in an unknown place.  
 
-What about crime type?
+What we're looking for here are answers that don't make sense. One you're looking for are blanks. Another: NA. In many states, there are crashes that have a `HighestInjuryLevel` of None and also NA. What is the difference? Are they the same thing? Are NA cases where the NTSB just doesn't know? If you go where [I got the data](https://www.ntsb.gov/Pages/AviationQueryV2.aspx), there isn't a good answer. You'd probably have to contact the NTSB to find out what the difference is.
+
+What about `AirportName`?
 
 ### Exercise 3: Missing data part 2
 
-```{r tally3-data, exercise=TRUE, exercise.setup = "smells-load-data"}
-crimes |> 
+```{r tally3-data, exercise=TRUE, exercise.setup = "load-data"}
+crashes |> 
   group_by(____) |> 
   ____()
 ```
 ```{r tally3-data-solution, exercise.reveal_solution = FALSE}
-crimes |> 
-  group_by(incident_code) |> 
+crashes |> 
+  group_by(AirportName) |> 
   tally()
 ```
 ```{r tally3-data-check}
 grade_this_code()
 ```
 
-Any at the very end?
-
-None here, so that's good. It means our incidents will always have a type, and nearly always have a location. 
-
-## Gaps in data
-
-Let's now look at **gaps in data**. It's been my experience that gaps in data often have to do with time, so let's first look at incident dates, so we can see if there's any big jumps in data. You'd expect the numbers to change, but not by huge amounts. Huge change would indicate, more often than not, that the data is missing. Let's start with Date. If we're going to work with dates, we should have `lubridate` handy for `floor_date`.
-
-### Exercise 4: Gaps
-
-```{r gap-data, exercise=TRUE, exercise.setup = "smells-load-data"}
-crimes |> 
-  group_by(floor_date((mdy_hm(____)), "month")) |> 
-  tally()
-```
-```{r gap-data-solution, exercise.reveal_solution = FALSE}
-crimes |> 
-  group_by(floor_date((mdy_hm(reported)), "month")) |> 
-  tally()
-```
-```{r gap-data-check}
-grade_this_code()
-```
-
-First thing to notice: our data has only 55 incidents in Janauary of 2018. That's because, if you were to look, it's only a partial month. Can that explain the small numbers in June and July? In this case no -- students have gone home. There's less for campus police to do. So can we include those months in any analysis of "campus crime"? It's not a simple answer. It depends on how you structure the question and what you're trying to show. 
+What does NA mean here? NA will be the last result in the table. Does it mean the NTSB doesn't know where this happened? Or does it mean the accident didn't happen at an airport? The answer here is that not all plane crashes happen at an airport ... but a lot of them do. So this isn't missing data -- it's blank for a reason.
 
 ## Internal inconsistency
 
-Any time you are going to focus on something, you should check it for consistency inside the data set. So let's pretend you want to look at *where* the most incidents occur on campus. To do this, you will need internally consistent addresses. Do you have that? 
+Any time you are going to focus on something, you should check it for consistency inside the data set. So let's pretend you want to look at *who makes* the airplanes that crash. To be clear -- this is a bad idea. There are only a small number of manufacturers and counting the number that crashed is no different than looking at cars that crash. Does a lot of Fords and Chevys crashing mean they're unsafe? Or does it mean there's a *lot* of Fords and Chevys on the road in the US. 
 
-### Exercise 5: Are they the same?
+But, to illustrate the problem of internal consistency, we're going to do this. We're going to put the spotlight on the `Make` column. 
 
-```{r consistent-data, exercise=TRUE, exercise.setup = "smells-load-data"}
-crimes |> 
+### Exercise 4: Are they the same?
+
+```{r consistent-data, exercise=TRUE, exercise.setup = "load-data"}
+crashes |> 
   group_by(____) |> 
   ____()
 ```
 ```{r consistent-data-solution, exercise.reveal_solution = FALSE}
-crimes |> 
-  group_by(location) |> 
+crashes |> 
+  group_by(Make) |> 
   tally()
 ```
 ```{r consistent-data-check}
 grade_this_code()
 ```
 
-Look at the first 10 rows of data here -- particularly 6-10. Do you notice anything? For data to be exact, each row must be the same. Are the same addresses here *itentical to each other?* Or do you see the same address inconsistently reported?
+Every state is going to be different here, but scroll through the first few pages of data. Do you notice anything? For data to be exact, each row must be the same. And by the same I mean EXACTLY the same. For example: CESSNA and Cessna are not the same. Cirrus and CIRRUS DESIGN GROUP are not the same. Piper, PIPER and PIPER AIRCRAFT INC are very much not the same thing in data world. Now, are they in real life? Yes. You and I can figure that out pretty quickly with just a tiny amount of brainpower. But data analysis requires things to be consistent and identical. And this column of data is not internally consistent.
 
-Can you accurately report on the number of indicents at each address with data like that? Not yet you can (more on that soon!).
+Can you accurately report on the number of accidents involving each manufacturer? Not yet you can (more on that soon!).
 
 And that's what Data Smells are designed to do: stop you from going down a bad path.
 

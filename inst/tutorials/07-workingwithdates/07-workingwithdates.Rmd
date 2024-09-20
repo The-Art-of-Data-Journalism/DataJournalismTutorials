@@ -150,7 +150,7 @@ crashes <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/
 ```{r read-check}
 grade_this({
   if (identical(nrow(.result), nrows)) {
-    pass("Great work! You imported your state's estimates.")
+    pass("Great work! You imported your state's plane crashes.")
   }
   fail()
 })
@@ -255,7 +255,6 @@ That's less code and less weirdness, so that's good.
 
 See if you can parse all the dates in `second_bad_date` using a lubridate function. What pattern do you see with that date?
 
-
 ```{r lubridate2, exercise=TRUE, exercise.setup = "load-data"}
 crashes |> mutate(
     clean_date = ____(____)
@@ -286,7 +285,7 @@ Or year. Which is what we're going to do here.
 
 To do this, we first have to have a date column R understands. To do that, we're just going to do the same thing we just did in Exercise 1. We're going to make `clean_date` and use a `lubridate` function to reformat `first_bad_date`. Then, in the first next line, we're going to make our `floor_year`. All we need to tell the `floor_date` function is what the name of our real, fixed, properly formatted date column that we just made is named, and what floor we want to set. 
 
-After that, we just need to group by that floor year and count them up. We'll use the `tally` shortcut here. 
+After that, we just need to group by that floor year and count them up. We'll use the `tally` shortcut here. The `tally` shortcut is a way to do `summarize(n = n())` with minimal code. `tally()` will give you a column named `n` which has the count of whatever you put in group by. It's nifty, but only useful when you just need a quick count. 
 
 ```{r flooryear, exercise=TRUE, exercise.setup = "load-data"}
 crashes |> 

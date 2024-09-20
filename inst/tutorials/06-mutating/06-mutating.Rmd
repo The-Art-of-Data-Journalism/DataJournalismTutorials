@@ -105,6 +105,11 @@ biggest <- counties |> mutate(
   rawchange = POPESTIMATE2023 - POPESTIMATE2022
 ) |>
   arrange(desc(rawchange)) |> slice(1)
+
+countieswithrawchange <- counties |> mutate(
+  rawchange = POPESTIMATE2023 - POPESTIMATE2022
+) |>
+  arrange(desc(rawchange))
 ```
 ## The Goal
 
@@ -270,6 +275,73 @@ grade_this_code()
 ```{r rawchange, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
 glue("What county added the most people by raw number? It's {biggest$CTYNAME}, {biggest$STNAME} adding {biggest$rawchange} people in one year. Know where that is? What might explain that growth? Those are reporter questions that make stories.")
 ``` 
+
+Now, we've spent a fair amount of time looking at mutating, but we haven't gone over a fundamental part of working with data in a programming language. Quite simply, it's this: **Unless you explicitly tell your code to do something, that thing will not happen. There is nothing automatic.** Don't believe me? You created `change` and `rawchange` using mutate, right? So you should see them in `counties`, right? 
+
+Take a look. 
+
+```{r glimpse-data, exercise=TRUE, exercise.setup = "load-data"}
+glimpse(____)
+```
+```{r glimpse-data-solution}
+glimpse(counties)
+```
+```{r glimpse-data-check}
+grade_this_code()
+```
+
+Your new columns always get added to the end of your dataframe, so look at the last column entries.
+
+Where are your columns? The truth is, they exist only in the windows you ran them. You never told R to save them. And until and unless you do, R will not save them. A good rule of thumb: If you can see it below your code chunk, you haven't saved it. The inverse is also true, which you'll see in a second: If you **don't** see your data below your code chunk, you **did** save it. 
+
+<div class="alert alert-info">
+<h4 class="alert-heading">Key Concept</h4> 
+<p class="mb-0">When you use <- to save your data, you will not see your data appear below your code chunk. If you see your data, you haven't saved it.</p>
+</div>
+
+So how do you save your work? You've been doing it all along, just in different ways.
+
+### Exercise 5: Save to a new dataframe
+
+At the beginning of every tutorial, you have read in data. That read in always comes in the same form: `nameofdata <- read_csv("path-to-data")`. The key element here is the `<-`. That says Save All of This Into This Variable I'm Pointed At. So the results of `read_csv("path-to-data")`? Yeah, take that and stuff it into `nameofdata`.
+
+There is nothing special about this at all. The `<-` just takes what is on the right side and saves it into the left side. So you could run `IAmOnMyPhoneTooMuch <- "I really need to do something about this." and it will run without error. You just saved the words into a variable.
+
+All this means is that you can do the same thing with the results of your code. Let's save the code we wrote to make `rawchange` into a new dataframe called `countieswithrawchange`.
+
+```{r mutate-new-dataframe, exercise=TRUE, exercise.setup = "load-data", message=FALSE, warning=FALSE}
+____ <- counties |> mutate(
+  ____ = ____ - ____
+) |>
+  arrange(desc(____))
+```
+```{r mutate-new-dataframe-solution, exercise.reveal_solution = FALSE, warning=FALSE}
+countieswithrawchange <- counties |> mutate(
+  rawchange = POPESTIMATE2023 - POPESTIMATE2022
+) |>
+  arrange(desc(rawchange))
+```
+```{r mutate-new-dataframe-check}
+grade_this_code()
+```
+
+Some of you, right now, are freaking out a little. Where is my data? Why don't I see it? And that means you either didn't read above or you don't remember it only a few paragraphs later. When you use `<-`, that means save it. It does not mean show it. So your code is doing what you told it to do: save the results to a new dataframe called `countieswithrawchange`. 
+
+Why did I give it a new name and not just use `counties`? A good habit to get into is never overwrite your original data. Make new dataframes each time you change something. Why? Because you might need to go back to the original dataframe to find where you went wrong. And if you're overwriting your original data, that becomes much, much harder. A useful pattern: Change data? Save to a new dataframe. Use new dataframe. Repeat as needed.
+
+You can see that it worked by using glimpse on your new dataframe (or, when you're in R Studio and working in a notebook, look at it in the environment tab).
+
+```{r glimpse2-data, exercise=TRUE, exercise.setup = "load-data"}
+glimpse(countieswithrawchange)
+```
+```{r glimpse2-data-solution}
+glimpse(countieswithrawchange)
+```
+```{r glimpse2-data-check}
+grade_this_code()
+```
+
+See that last column name? There's `rawchange`. That means if you want to use it in the future, you have to use `countieswithrawchange` instead of `counties`. 
 
 ## The Recap
 
