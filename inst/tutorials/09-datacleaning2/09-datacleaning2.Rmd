@@ -19,15 +19,97 @@ library(janitor)
 knitr::opts_chunk$set(echo = FALSE)
 tutorial_options(exercise.completion=FALSE)
 ```
+```{r load-data, message=FALSE, warning=FALSE}
+state <- Sys.getenv("tutorial.state")
+
+stateName <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/states.csv") |> filter(Postal == state) 
+
+stateName <- stateName |> 
+  mutate(dataurl = case_when(
+    Postal == "AL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "AK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "AZ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "AR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "CA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "CO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "CT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "DE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "FL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "GA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "HI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "ID" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "IL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "IN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "IA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "KS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "KY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "LA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "ME" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "MD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "MA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "MI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "MN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "MS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "MO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "MT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "NE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "NV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "NH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "NJ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "NM" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "NY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "NC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "ND" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "OH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "OK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "OR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "PA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "RI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "SC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "SD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "TN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "TX" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "UT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "VT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "VA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "WA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "WV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "WI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    Postal == "WY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/", str_to_lower(State), ".csv"),
+    TRUE ~ "https://the-art-of-data-journalism.github.io/tutorial-data/government-census/nebraska.csv"  # Default case if none match
+  ))
+
+governments <- read_csv(stateName$dataurl)
+
+countyLanguage <- case_when(
+  state == "AK" ~ c("county equivalent", "county equivalents"),
+  state == "CT" ~ c("planning region", "planning regions"),
+  state == "LA" ~ c("parish", "parishes"),
+  state == "VA" ~ c("county or city", "counties or cities"),
+  TRUE ~ c("county", "counties")
+)
+
+nrows <- nrow(governments)
+ncolumns <- ncol(governments)
+
+clean_governments <- governments |> 
+  clean_names() |> 
+  remove_empty(which = c("cols", "rows"))
+```
+
 ## The Goal
 
 In this lesson, you'll learn how to use the janitor package to clean and standardize your data more efficiently. By the end of this tutorial, you'll understand how to clean column names, remove empty rows and columns, identify duplicates, and explore data consistency using janitor functions. These skills will help you prepare messy datasets for analysis more quickly and reliably, saving you time and reducing errors in your data journalism work.
+
+## What is Data Journalism?
+
+More to come here.
 
 ## The Basics
 
 The bane of every data analyst's existence is data cleaning. 
 
-Every developer, every data system, every agency, the all have opinions about how data gets collected. Some decisions make sense from the outside. Some decisions are based entirely on internal politics: who is creating the data, how they are creating it, why they are creating it. Is it automated? Is it manual? Are data normalized? Are there free form fields where users can just type into or does the system restrict them to choices? 
+Every developer, every data system, every agency, they all have opinions about how data gets collected. Some decisions make sense from the outside. Some decisions are based entirely on internal politics: who is creating the data, how they are creating it, why they are creating it. Is it automated? Is it manual? Are data normalized -- meaning all the spellings are the same? Are there free form fields where users can just type into or does the system restrict them to choices? 
 
 Your question -- what you want to do with the data -- is almost never part of that equation. 
 
@@ -35,29 +117,11 @@ So cleaning data is the process of fixing issues in your data so you can answer 
 
 But let's start simple. There are certain things that need we can start with that will make our lives easier. We'll slowly make it harder as we dig deeper.
 
-One of the first places we can start with cleaning data is cleaning the headers. Every system has their own way of recording headers, and every developer has their own thoughts of what a good idea is within it. R is most happy when headers are one word, lower case, without special characters. If you've noticed `tidyverse`  output with backticks around headers like Incident Date, it's because of the space. Headers that start with numbers or are just a number -- 2002 -- also get backticks in the `tidyverse`. 
+One of the first places we can start with cleaning data is cleaning the headers. Every system has their own way of recording headers, and every developer has their own thoughts of what a good idea is within it. R is most happy when headers are one word, lower case, without special characters. Without telling you, I've been fixing these headers behind the scenes before you get the data. No more. Today, you're going to notice that the `tidyverse` has output columns that have spaces or start with numbers or have special characters in them with backticks around headers. So a column name like Incident Date, is going to look like \`Incident Date\` because of the space. Headers that start with numbers or are just a number -- 2002 -- also get backticks in the `tidyverse`. 
 
 There is an external library in R called `janitor` that makes fixing headers trivially simple. You should already have it, but if you don't, you can install it by running `install.packages("janitor")` in your console. 
 
-Let's work on some examples using the roster of current inmates in Nebraska prisons as of Sunday, Feb. 12. You can download the data here if you want to use it in your own notebook. **For purposes of this exercise, you don't need to do this. The data is included here if you want to try this in your own notebook.**
-
-```{r echo=FALSE, class.output="bg-info", results="asis",  message=FALSE,  warning=FALSE}
-library(downloadthis)
-library(glue)
-
-dllink <- download_link(
-  link = "http://mattwaite.github.io/datajournalismfiles/inmateDownloadActive.csv",
-  button_label = "Download csv file",
-  button_type = "danger",
-  has_icon = TRUE,
-  icon = "fa fa-save",
-  self_contained = FALSE
-)
-
-glue("<pre><p><strong>For this walkthrough:</strong></p><p>{dllink}</p></pre>")
-```
-
-First things first, as always: we load the libraries we need.
+First things first, as always: we load the libraries we need. 
 
 ```{r load-tidyverse, exercise=TRUE}
 library(tidyverse)
@@ -71,38 +135,48 @@ library(janitor)
 grade_this_code()
 ```
 
-Now we load our data. There's some issues with this data that requires you to add a `guess_max` to this to ensure the columns load as they should. 
+Now we load our data. I'm writing this chapter during the last few months of the 2024 Presidential Election, though it seems like elections never stop these days. A common thing journalists do during elections? Fact check things that come up during the campaigns. A common trope in elections are claims that government has become too big, too bloated, too expensive. Your first thought, as a reporter, should be simply: Has it? A way to check? The United State Census Bureau. The same people who count people and estimate populations between counts do a ton of other enumerations in and around American society. One is the annual survey of governments, where the Census Bureau asks every government -- state, county, city, school district -- how many people they employ and what their payroll is. It's a fantastic dataset for comparing your community to others like it, in your state and in the nation. Got a mayoral candidate claiming the city has tripled the number of people working there and is out of control? You can check that. 
 
-```{r janitor-load-data, message=FALSE, warning=FALSE}
-inmates <- read_csv("http://mattwaite.github.io/datajournalismfiles/inmateDownloadActive.csv", guess_max = 5000)
+We get this data the same way we have all along -- fill in your state, all lowercase letters, dashes for spaces. 
 
-clean_headers_inmates <- inmates |> 
-  clean_names() |> 
-  remove_empty(which = c("cols", "rows"))
+```{r read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
+governments <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/government-census/____.csv")
 ```
-```{r janitor-load-data-exercise, exercise = TRUE}
-inmates <- read_csv("http://mattwaite.github.io/datajournalismfiles/inmateDownloadActive.csv", guess_max = 5000)
-```
-```{r janitor-load-data-exercise-solution}
-inmates <- read_csv("http://mattwaite.github.io/datajournalismfiles/inmateDownloadActive.csv", guess_max = 5000)
-```
-```{r janitor-load-data-exercise-check}
-grade_this_code()
+
+```{r read-check}
+grade_this({
+  if (identical(nrow(.result), nrows)) {
+    pass("Great work! You imported your state's census of governments.")
+  }
+  fail()
+})
 ```
 
 ## Cleaning headers
 
-From the output of `readr`, you can see all kinds of problems from the get go. Three columns repeat -- first name, middle name and name extension. And many field names have spaces or other not-allowed characters. Not to mention: All of them are in ALL CAPS.
+You can get a sense of the problems with the headers in this data with a quick glimpse -- get it? Glimpse?
 
-Janitor makes this easy to fix. How easy? This easy. How easy? Janitor has a function called `clean_names()`. That's it. 
+```{r glimpse-data, exercise=TRUE, exercise.setup = "load-data"}
+glimpse(____)
+```
+```{r glimpse-data-solution, exercise.reveal_solution = FALSE}
+glimpse(governments)
+```
+```{r glimpse-data-check}
+grade_this_code()
+```
+
+The second column name tells you a lot of what the problems are. First, notice the backticks. That's the key next to the 1 key on your keyboard. That is not an apostrophe. But you've got a mix of capitals and lowercase and spaces. If you wanted to use this column in a filter, it would look like this: `governments |> filter(\`Type of Government\` == "State")` That's a lot of extra things to go wrong -- did you capitalize correctly, did you use backticks, is that a capial O or lowercase o in of? It would be better if we could simplify this and reduce the number of places where we could go wrong.
+
+Janitor makes this easy to fix. How easy? This easy. Janitor has a function called `clean_names()`. That's it. 
 
 ### Exercise 1: Cleaning up column names
 
-```{r cleannames-data, exercise=TRUE, exercise.setup = "janitor-load-data"}
-inmates |> _________
+```{r cleannames-data, exercise=TRUE, exercise.setup = "load-data"}
+governments |> _________
 ```
 ```{r cleannames-data-solution, exercise.reveal_solution = FALSE}
-inmates |> clean_names()
+governments |> clean_names()
 ```
 ```{r cleannames-data-check}
 grade_this_code()
@@ -114,15 +188,15 @@ Just like that, all lower case, all one word, no backticks necessary to confuse 
 
 Another thing janitor does well is to make it easy to drop empty columns and rows. Sometimes columns are in the data and there's nothing in them. Nada. Blank. Rarer, but still possible: Rows of blank data. We could use `select` and `filter` but janitor reduces the labor involved there.
 
-If you look at the output of `readr`, you'll see 7,838 observations of 35 variables. Janitor has a function called `remove_empty()` where you have to specify which of `rows` or `cols` you want to remove. If they're empty, why have them at all?
+Because this is data from the Census Bureau, an agency who exists to create data, we have a minimum of weirdness to deal with. But a good plan when you begin working with data is to inspect if after you import it and then apply `janitor` functions to clean it up. `janitor` has a function called `remove_empty()` where you have to specify which of `rows` or `cols` you want to remove. If they're empty, why have them at all? This won't remove anything, but this is how you would if you needed to:
 
-```{r remove-data, exercise=TRUE, exercise.setup = "janitor-load-data"}
-inmates |> 
+```{r remove-data, exercise=TRUE, exercise.setup = "load-data"}
+governments |> 
   clean_names() |> 
   remove_empty(which = c("c____", "r____"))
 ```
 ```{r remove-data-solution, exercise.reveal_solution = FALSE}
-inmates |> 
+governments |> 
   clean_names() |> 
   remove_empty(which = c("cols", "rows"))
 ```
@@ -130,17 +204,15 @@ inmates |>
 grade_this_code()
 ```
 
-And by using `remove_empty()`, how many columns and rows do we get rid of that were empty anyway? Hard to see the number of rows in these tutorials -- you lost none. But look at columns there on the bottom of the output.
+Let's save what we've done so we can use it for the rest of the exercise into a new dataframe called `clean_governments`.
 
-Let's save what we've done so we can use it for the rest of the exercise into a new dataframe called `clean_headers_inmates`.
-
-```{r save-data, exercise=TRUE, exercise.setup = "janitor-load-data"}
-clean_headers_inmates <- inmates |> 
+```{r save-data, exercise=TRUE, exercise.setup = "load-data"}
+clean_governments <- governments |> 
   clean_names() |> 
   remove_empty(which = c("cols", "rows"))
 ```
 ```{r save-data-solution, exercise.reveal_solution = FALSE}
-clean_headers_inmates <- inmates |> 
+clean_governments <- governments |> 
   clean_names() |> 
   remove_empty(which = c("cols", "rows"))
 ```
@@ -148,117 +220,56 @@ clean_headers_inmates <- inmates |>
 grade_this_code()
 ```
 
-## Duplicates
-
-One of the most difficult problems to fix in data is duplicates in the data. They can creep in with bad joins, bad data entry practices, mistakes -- all kinds of reasons. One trick is determining if a duplicate is indeed a duplicate. 
-
-So the question is, do we have any inmates repeated? Anyone in prison twice? 
-
-### Exercise 3: Dupes
-
-Here we'll use a function called `get_dupes`. And we'll use the inmate's last name, first name and date of birth. The likelihood that someone has the same name and date of birth is very small, so if there are no duplicates, we should get zero records returned. 
-
-```{r dupes-data, exercise=TRUE, exercise.setup = "janitor-load-data"}
-clean_headers_inmates |> 
-  _________(committed_last_name, first_name_3, date_of_birth)
-```
-```{r dupes-data-solution, exercise.reveal_solution = FALSE}
-clean_headers_inmates |> 
-  get_dupes(committed_last_name, first_name_3, date_of_birth)
-```
-```{r dupes-data-check}
-grade_this_code()
-```
-
-This data appears to have no duplicates. That's good. 
-
 ## Inconsistency
 
 Janitor also has some handy tools for our data smells. One is called `tabyl`, which creates a table of unique records in a single field. All you need to do is feed the column name to `tabyl` and it'll do the rest.
 
-### Exercise 4: Data smells with tabyl
+### Exercise 3: Data smells with tabyl
 
-So does the Department of Corrections record gender consistently? `tabyl` will tell us and will tell us a little bit about the data.
+So does the Census Bureau record the names of governments consistently? `tabyl` will tell us and will tell us a little bit about the data. Remember: we've cleaned the headers, so it's now `name_of_government`
 
-```{r tabyl1-data, exercise=TRUE, exercise.setup = "janitor-load-data"}
-clean_headers_inmates |> tabyl(____)
+```{r tabyl1-data, exercise=TRUE, exercise.setup = "load-data"}
+clean_governments |> tabyl(____)
 ```
 ```{r tabyl1-data-solution, exercise.reveal_solution = FALSE}
-clean_headers_inmates |> tabyl(gender)
+clean_governments |> tabyl(name_of_government)
 ```
 ```{r tabyl1-data-check}
 grade_this_code()
 ```
 
-Clearly, the Department of Corrections doesn't buy into more modern sentiments about gender, but they are at least consistent. Every inmate has a gender -- no NAs -- and note that 90 percent of inmates are men. 
+What you are looking for here are mistakes. For a made up example: Let's pretend you had a town named Adams. Do you see Adams and then ADAMS? There's a chance that's a mistake. There's also a chance one is a county and one is a city. There's a chance you might have two different levels of government called that. Data smells are just a warning -- they aren't a guarantee of problems.
 
-How about race? 
+### Exercise 4: Combining what we know
 
-### Exercise 5: More consistency?
+What if you had a legislative candidate complaining about how expensive running the jails had become? We can add a `filter` before we run `tabyl` to give specific data the smell test. To find jails (and prisons), we want to filter the `government_function` column for Corrections. Then, we can run tabyl on the name of the government to see what we get with that. 
 
-To find the race column, you'll need to quick glimpse your data.
-
-```{r glimpse-data, exercise=TRUE, exercise.setup = "janitor-load-data"}
-glimpse(clean_headers_inmates)
-```
-```{r glimpse-data-solution, exercise.reveal_solution = FALSE}
-glimpse(clean_headers_inmates)
-```
-```{r glimpse-data-check}
-grade_this_code()
-```
-Got the column name?
-```{r tabyl2-data, exercise=TRUE, exercise.setup = "janitor-load-data"}
-clean_headers_inmates |> tabyl(_________)
+```{r tabyl2-data, exercise=TRUE, exercise.setup = "load-data"}
+clean_governments |> 
+  filter(____ == "____") |> 
+  tabyl(____)
 ```
 ```{r tabyl2-data-solution, exercise.reveal_solution = FALSE}
-clean_headers_inmates |> tabyl(race_desc)
+clean_governments |> 
+  filter(government_function == "Corrections") |> 
+  tabyl(name_of_government)
 ```
 ```{r tabyl2-data-check}
 grade_this_code()
 ```
 
-Nine people do not have a race -- and according to the Census Bureau, Hispanic is not a race, it's an ethnicity -- but otherwise, it looks solid enough to do some analysis. There's very little in the way of inconsistency. 
-
-How about what facilities they are in? 
-
-```{r tabyl3-data, exercise=TRUE, exercise.setup = "janitor-load-data"}
-clean_headers_inmates |> tabyl(____)
-```
-```{r tabyl3-data-solution, exercise.reveal_solution = FALSE}
-clean_headers_inmates |> tabyl(facility)
-```
-```{r tabyl3-data-check}
-grade_this_code()
-```
-
-Not sure how I feel about 11 inmates not having a facility. That's probably worth investigating.
-
-But sometimes, NAs are not bad data. Sometimes they're just NA. Let's look at `inst_release_type` or how inmates were released. 
-
-```{r tabyl4-data, exercise=TRUE, exercise.setup = "janitor-load-data"}
-clean_headers_inmates |> tabyl(inst_release_type)
-```
-```{r tabyl4-data-solution, exercise.reveal_solution = FALSE}
-clean_headers_inmates |> tabyl(inst_release_type)
-```
-```{r tabyl4-data-check}
-grade_this_code()
-```
-By far the largest group here is NA. Why is that? They haven't been released yet. They're still in prison.
+Depending on how your state is set up, you might see one row for your state corrections organization -- probably under your state's name -- and one row for each county or parish jail. If you see an `n` column with a number other than 1, that's an immediate question you'll need to answer before you start doing data analysis. 
 
 ## The Recap
 
-Throughout this lesson, you've learned several key data cleaning techniques using the janitor package. You've practiced cleaning column names with clean_names(), removing empty rows and columns with remove_empty(), identifying duplicates with get_dupes(), and exploring data consistency with tabyl(). Remember, data cleaning is an essential step in any data analysis project, and the tools you've learned here will help you tackle common data issues more efficiently. As you work with different datasets, you'll find these janitor functions invaluable for quickly standardizing and exploring your data before diving into deeper analysis.
+Throughout this lesson, you've learned several key data cleaning techniques using the janitor package. You've practiced cleaning column names with clean_names(), removing empty rows and columns with remove_empty(), and exploring data consistency with tabyl(). Remember, data cleaning is an essential step in any data analysis project, and the tools you've learned here will help you tackle common data issues more efficiently. As you work with different datasets, you'll find these janitor functions invaluable for quickly standardizing and exploring your data before diving into deeper analysis.
 
 ## Terms to Know
 
 - `janitor`: An R package designed to simplify data cleaning tasks.
 clean_names(): A janitor function that standardizes column names to lowercase, removes spaces and special characters.
 remove_empty(): A janitor function that removes empty rows, columns, or both from a dataset.
-get_dupes(): A janitor function that identifies duplicate records based on specified columns.
 tabyl(): A janitor function that creates a frequency table of unique values in a column.
 Data cleaning: The process of identifying and correcting errors or inconsistencies in datasets.
 Duplicates: Multiple identical records in a dataset that may skew analysis results.
 Data consistency: The uniformity and reliability of data across a dataset.
-NA (Not Available): A special value in R representing missing or undefined data.
