@@ -20,11 +20,44 @@ library(glue)
 knitr::opts_chunk$set(echo = FALSE)
 tutorial_options(exercise.completion=FALSE)
 ```
+```{r load-data, message=FALSE, warning=FALSE}
+crashes <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes-cleaning/crashes-for-cleaning.csv")
+
+totalcities <-crashes |> 
+  group_by(City, State) |> 
+  tally()
+
+cleancities <- crashes |> 
+  mutate(clean_city = str_to_title(City)) |>
+  group_by(clean_city, State) |> 
+  tally()
+
+titlechange <- nrow(totalcities) - nrow(cleancities)
+
+keycrashes <- crashes |>
+  mutate(
+    clean_city = key_collision_merge(City)
+    ) |>
+  group_by(clean_city, State) |>
+  tally() |>
+  nrow()
+
+keychange <- nrow(cleancities) - keycrashes
+
+totalkeychanges <- crashes |>
+  mutate(
+    clean_city = key_collision_merge(City)
+    ) |>
+  filter(City != clean_city) |> 
+  group_by(City, clean_city) |>
+  tally() |> 
+  nrow()
+```
 ## The Goal
 
-In this lesson, you'll learn about advanced data cleaning techniques using OpenRefine and the R package refinr. By the end of this tutorial, you'll understand how to use clustering algorithms to identify and merge similar text entries, both through the OpenRefine application and programmatically in R. You'll practice using different merging methods like key collision, n-gram merging, and soundex, and learn to critically evaluate the results of automated cleaning processes. This skill is crucial for data journalists who often work with messy, real-world datasets that require careful standardization before analysis.
+In this lesson, you'll learn about advanced data cleaning techniques using text-cleaning techniques and the R package refinr. By the end of this tutorial, you'll understand how to use some text manipulation functions to merge similar text entries. You'll practice using different techniques and learn to critically evaluate the results. This skill is crucial for data journalists who often work with messy, real-world datasets that require careful standardization before analysis.
 
-## The Basics
+## What is Data Journalism?
 
 Gather 'round kids and let me tell you a tale about your author. In college, your author got involved in a project where he mapped crime in the city, looking specifically in the neighborhoods surrounding campus. This was in the mid 1990s. Computers were under powered. Tools were pretty primitive. I was given a database of nearly 50,000 calls for service. 
 
@@ -36,317 +69,222 @@ It meant the Lincoln Police Department came up with dozens of ways to say a sing
 
 It took me four months to clean up more than 30,000 unique addresses and map them. 
 
-Enter OpenRefine. 
+I did most of it by hand -- pulling up records in Excel and hand editing them. It was miserable.
 
-OpenRefine is a series of tools -- algorithms -- that find small differences in text and helps you fix them quickly. How OpenRefine finds those small differences is through something called clustering. Clustering is where, through algorithms, it finds small meaningless differences between two rows of data -- "Omaha" vs "omaha", for example -- and surmises that they are the same thing.  
+What you're going to learn today are things I wish I knew then. Once you know the basics, outside of this tutorial you should look into learning how to use OpenRefine. OpenRefine is a series of tools -- algorithms -- that find small differences in text and helps you fix them quickly. How OpenRefine finds those small differences is through something called clustering. Clustering is where, through algorithms, it finds small meaningless differences between two rows of data -- "Omaha" vs "omaha", for example -- and surmises that they are the same thing.  
 
 I tell you this because if I had OpenRefine, it would have taken me a week, not four months. Every time I talk about OpenRefine, I remember this, and I get mad. 
 
-We're going to explore two ways into OpenRefine: Through R, and through OpenRefine itself.
+## The Basics
 
-## Manually cleaning data with OpenRefine
+Data cleaning is a series of logic puzzles. The logic is very simple: I have a goal. Most often that goal is to have all the like things together. The problem is always that someone did something to prevent that. The logic game you are playing is doing things to your text until all the like things match. No matter what it is you need done to the text, someone, somewhere has screwed that up before and a programmer wrote a function to fix it.
 
-**NOTE: You need to follow these steps for the assignment in Canvas if you haven't looked there yet.**
+Let's dig into some of them, using a version of the plane crash data we've worked with before. This time it's a special cut of the data -- it's national data, but a limited number of columns. It just makes it easier on everyone to have a smaller dataset. 
 
-OpenRefine is free software. [You should download and install it](https://openrefine.org/). Using a library like Refinr in a notebook is great for quick things on smaller datasets that you can check to make sure it's not up to any mischief. More on that later. For bigger datasets, OpenRefine is the way to go. And it has a lot more tools than Refinr does (by design, but still).
+We're going to start, like every tutorial, with libraries. In this one, we're going to use two new libraries -- stringr and refinr. You should already have them, but if you don't, you can always install packages by going to the console and running `install.packages("package name here")`. The `refinr` package uses some of the same tools as OpenRefine, but with less supervision than OpenRefine does, which limits what you can do with it. But we'll get into that later. 
 
-After you install it, run it. OpenRefine works in the browser, and the app spins up a small web server visible only on your computer to interact with it. A browser will pop up automatically. 
-
-You first need data. Let's use a dataset of charges Nebraska prison inmates are currently serving time for. You can download that here:
-
-```{r echo=FALSE, class.output="bg-info", results="asis",  message=FALSE,  warning=FALSE}
-library(downloadthis)
-library(glue)
-
-dllink <- download_link(
-  link = "https://mattwaite.github.io/datajournalismfiles/inmateDownloadActiveRecord2.csv",
-  button_label = "Download csv file",
-  button_type = "danger",
-  has_icon = TRUE,
-  icon = "fa fa-save",
-  self_contained = FALSE
-)
-
-glue("<pre><p><strong>For this walkthrough:</strong></p><p>{dllink}</p></pre>")
-```
-
-Now you have to import your data into a project. 
-
-```{r, echo=FALSE}
-knitr::include_graphics(rep("images/open1.png"))
-```
-
-After your data is loaded into the app, you'll get a screen to look over what the data looks like. On the top right corner, you'll see a button to create the project.
-
-```{r, echo=FALSE}
-knitr::include_graphics(rep("images/open2.png"))
-```
-
-The real power in OpenRefine is in faceting. In our case, we're specifically going to use text faceting. Next to the OFFENSE ARREST DESC header, click the down arrow, then facet, then text facet.
-
-```{r, echo=FALSE}
-knitr::include_graphics(rep("images/open3.png"))
-```
-
-After that, a new box will appear on the left. It tells us how many unique offenses are there: 4,127. And, there's a button on the right of the box that says Cluster. Click that.
-
-```{r, echo=FALSE}
-knitr::include_graphics(rep("images/open4.png"))
-```
-
-The default clustering algorithm used is key collision, using the fingerprint function. The key collision merge function takes each string and extracts the key parts of it. It then puts every key in a bin based on the keys matching. [The documentation has descriptions](https://openrefine.org/docs/technical-reference/clustering-in-depth) of the functions if you're curious.
-
-At the top, you'll see which method was used, and how many clusters that algorithm identified. Then, below that, you can see what those clusters are. Then, using human judgement, you can say if you agree with the cluster. If you do, click the merge checkbox. When it merges, the new result will be what it says in New Cell Value. Most often, that's the row with the most common result. 
-
-```{r, echo=FALSE}
-knitr::include_graphics(rep("images/open6.png"))
-```
-
-Now begins the fun part: You have to look at all 261 clusters found and decide if they are indeed valid. The key collision method is very good, and very conservative. You'll find that most, if not all of them, are usually valid.
-
-When you're done, click Merge Selected and Re-Cluster.
-
-If any new clusters come up, evaluate them. Repeat until either no clusters come up or the clusters that do come up are ones you reject.
-
-Now. Try a new method. Rinse and repeat. You'll keep doing this, and if the dataset is reasonably clean, you'll find the end.
-
-If it's not, it'll go on forever. 
-
-```{r, echo=FALSE}
-knitr::include_graphics(rep("images/open7.png"))
-```
-```{r, echo=FALSE}
-knitr::include_graphics(rep("images/open8.png"))
-```
-
-A question for all data analysts -- if the dataset is bad enough, can it ever be cleaned?
-
-There's no good answer. You have to find it yourself.
-
-## Refinr, OpenRefine in R
-
-Enter `refinr`, a package that contains the same clustering algorithms as OpenRefine but all within R. Go ahead and install it if you haven't already by opening the console and running `install.packages("refinr")`. Then we can load libraries as we do.
+For now, we're going to solve some easy problems using tools that work with text. 
 
 ```{r load-tidyverse, exercise=TRUE}
 library(tidyverse)
-library(janitor)
+library(stringr)
 library(refinr)
 ```
 ```{r load-tidyverse-solution}
 library(tidyverse)
-library(janitor)
+library(stringr)
 library(refinr)
 ```
 ```{r load-tidyverse-check}
 grade_this_code()
 ```
 
-Let's load a simple dataset where I know there's a simple problem. It's a dataset of mountain lion sightings from the Nebraska Game and Parks Commission. The data is getting old -- it's not newsworthy anymore -- but it illustrates this just fine.
+Now we need data. Because this is national data, there's no state name to fill in. You can just run this code chunk.
 
-```{r refinr-load-data, message=FALSE, warning=FALSE}
-mountainlions <- read_csv("http://mattwaite.github.io/datajournalismfiles/mountainlions.csv")
-
-charges <- read_csv("http://mattwaite.github.io/datajournalismfiles/inmateDownloadActiveRecord2.csv") |> clean_names()
+```{r load-data-exercise, exercise = TRUE}
+crashes <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes-cleaning/crashes-for-cleaning.csv")
 ```
-```{r refinr-load-data-exercise, exercise = TRUE}
-mountainlions <- read_csv("http://mattwaite.github.io/datajournalismfiles/mountainlions.csv")
+```{r load-data-exercise-solution}
+crashes <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/plane-crashes-cleaning/crashes-for-cleaning.csv")
 ```
-```{r refinr-load-data-exercise-solution}
-mountainlions <- read_csv("http://mattwaite.github.io/datajournalismfiles/mountainlions.csv")
-```
-```{r refinr-load-data-exercise-check}
+```{r load-data-exercise-check}
 grade_this_code()
 ```
 
+This is the same data from the National Transportation Safety Board of airplane crash investigations since 2019. 
+
 Let's take a quick look at it.
 
-```{r head-data, exercise=TRUE, exercise.setup = "refinr-load-data"}
+```{r head-data, exercise=TRUE, exercise.setup = "load-data"}
 head(____)
 ```
 ```{r head-data-solution, exercise.reveal_solution = FALSE}
-head(mountainlions)
+head(crashes)
 ```
 ```{r head-data-check}
 grade_this_code()
 ```
 
-The issue in this dataset, if you look carefully, is that there's two Sheridan counties -- a Sheridan and a sheridan. We can spot that with a quick group_by and tally.
+We're specifically going to look at city names. In Data Smells, we learned that we need to look carefully at the data we're going to be relying on. How good of a job has the NTSB done in writing in city names in their database? Quick way? Let's do a simple group by and tally.
 
-```{r group-data, exercise=TRUE, exercise.setup = "refinr-load-data"}
-mountainlions |> 
-  group_by(COUNTY) |> 
+```{r group-data, exercise=TRUE, exercise.setup = "load-data"}
+crashes |> 
+  group_by(City, State) |> 
   tally()
 ```
 ```{r group-data-solution, exercise.reveal_solution = FALSE}
-mountainlions |> 
-  group_by(COUNTY) |> 
+crashes |> 
+  group_by(City, State) |> 
   tally()
 ```
 ```{r group-data-check}
 grade_this_code()
 ```
 
-### Exercise 1: Key collisions
+```{r results, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("Doing this, you get {nrow(totalcities)} unique combinations of City and State. Does that mean there's that many different places where plane crashes happened? Without leaving the first page -- the first few results -- should show you the first problem. Notice how the first few rows of cities are all capitalized? Notice one of them is Atlanta, Georgia, home of the busiest airport in the world? What do you want to bet there's a not-all-caps version of Atlanta, Georgia in the data? Don't take that bet. Of course there is.")
+```
 
-The first merging technique we'll try is the `key_collision_merge`. The key collision merge function takes each string and extracts the key parts of it. It then puts every key in a bin based on the keys matching. So in this case, it finds sheridan and Sheridan and recognizes that the keys match, and since Sheridan is more common, it uses that one. 
+### Exercise 1: Casing
 
-One rule you should follow: **do not overwrite your original fields**. Always work on a copy. If you overwrite your original field, how will you know if it did the right thing? How can you compare it to your original data? To follow this, I'm going to mutate a new field called CleanCounty and put the results of key collision merge there. 
+How do we fix this? Well, you could go through and hand edit the first few cities for every letter of the alphabet, but one thing to keep in mind is that a programmer has already had to deal with this and wrote a function. 
 
-Then, to show it worked, I'll do the same group and tally. 
+The `stringr` library has a *lot* of functions in it. But among the more useful are the functions that change text to a specific case. For example, want all upppercase letters? There's `str_to_upper()` that does that. And if you guessed there's `str_to_lower()` that does the opposite, good on you, mate. You're right. 
 
-```{r key-collision, exercise=TRUE, exercise.setup = "refinr-load-data"}
-mountainlions |> 
-  mutate(____ = ______________(COUNTY)) |>
-  group_by(CleanCounty) |> 
+Neither of those solves our problem. What we need is `str_to_title()` which converts things to title case -- aka the first letter is capitalized. Now, is this a perfect solution? Not if you have a city called McDonalds or something like that. MCDONALDS will get turned into Mcdonalds, not McDonalds, using `str_to_title`. But chances are, you have very few of those. And if you have a few, you can fix the vast majority with `str_to_title` and then clean up the few remaining later.
+
+How do we use `str_to_title()`? As a rule, we don't want to overwrite original data, so we're going to use mutate to create a new column and populate it with our new data. So let's make clean_city and use `str_to_title()` making sure to tell that function what column we're changing to title case. Hint: ATLANTA is our problem. What column did that come from?
+
+```{r titlecase, exercise=TRUE, exercise.setup = "load-data"}
+crashes |> 
+  mutate(____ = ____(____)) |>
+  group_by(clean_city, State) |> 
   tally()
 ```
-```{r key-collision-solution, exercise.reveal_solution = FALSE}
-mountainlions |> 
-  mutate(CleanCounty = key_collision_merge(COUNTY)) |>
-  group_by(CleanCounty) |> 
+```{r titlecase-solution, exercise.reveal_solution = FALSE}
+crashes |> 
+  mutate(clean_city = str_to_title(City)) |>
+  group_by(clean_city, State) |> 
   tally()
 ```
-```{r key-collision-check}
+```{r titlecase-check}
 grade_this_code()
 ```
 
-And just like that, instead of 35 and 2 in two different Sheridan counties, we have 37 in one Sheridan County.
-
-## More complex issues
-
-Behind the scenes, I've loaded up the same dataset you used in OpenRefine of the charges prison inmates are serving time on. I've also used `janitor`'s clean_names function to give us usable headers and I put it in a dataframe called `crimes`.
-
-```{r head2-data, exercise=TRUE, exercise.setup = "refinr-load-data"}
-head(charges)
+```{r results2, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("Doing this, you now get {nrow(cleancities)} unique combinations of City and State. That means we changed the case on cities, then grouped and tallied them and {titlechange} cities melded into their properly-cased home.")
 ```
-```{r head2-data-solution, exercise.reveal_solution = FALSE}
-head(charges)
+
+### Exercise 2: Misspellings, one at a time
+
+If the data gods are smiling upon you, you'll have no spelling errors in your data. It is a good day when they do smile on you, but today is not that day. You can go diving in and find this if you want, or you can trust me that the NTSB misspelled Albuquerque, New Mexico. No shame -- I had to look it up -- but one time in this data, it's Alburquerque, not Albuquerque. 
+
+If you only have one of those, it's pretty easy to fix with a search and replace. How do you do that in R? With a function called `gsub`, which takes a pretty simple and logical input: What are you looking for? That's first. What do you want to replace it with? That's second. Where can `gsub` find this pattern? Which column? That's third. 
+
+We're going to keep editing `clean_city` until we get what we need. Doing that means we can just chain our new fix onto the previous one. Remember: we're looking for Alburquerque and we want to replace it with Albuquerque. And what column are we going to find that misspelling? It's a bit of a trick question -- remember we're trying to work on a new column called `clean_city` that is the home of all of our changes.
+
+```{r gsub, exercise=TRUE, exercise.setup = "load-data"}
+crashes |> 
+  mutate(____ = ____(____)) |>
+  mutate(clean_city = ____("____", "____", ____)) |> 
+  group_by(clean_city) |> 
+  tally()
 ```
-```{r head2-data-check}
+```{r gsub-solution, exercise.reveal_solution = FALSE}
+crashes |> 
+  mutate(clean_city = str_to_title(City)) |>
+  mutate(clean_city = gsub("Alburquerque", "Albuquerque", clean_city)) |> 
+  group_by(clean_city) |> 
+  tally()
+```
+```{r gsub-check}
 grade_this_code()
 ```
 
-We're going to tackle the same problem we tried in OpenRefine, but with Refinr. This is both to show you how easy it is, and as a warning. Just because it's easy, doesn't mean it's correct. 
+And just like that, our count goes down by one because we fixed Alburquerque ... er, Albuquerque.
 
-As you saw before, there's more than 4,000 unique charges, and many of the are obvious duplicates. Let's get a quick row count so we know how we're doing.
+Note: You can copy that gsub line and just keep adding as many as you have typos. For example: In Nebraska, there's a city named Fremont that is spelled by the NTSB "Freemont" that you could fix by just copying that line, pasting it in below and swapping out the city names. Rinse and repeat as necessary, if you follow the wisdom of a shampoo bottle.
 
-```{r rowcount, exercise=TRUE, exercise.setup = "refinr-load-data"}
-charges |> 
-  group_by(offense_arrest_desc) |> 
-  tally() |> 
-  nrow()
-```
-```{r rowcount-solution, exercise.reveal_solution = FALSE}
-charges |> 
-  group_by(offense_arrest_desc) |> 
-  tally() |> 
-  nrow()
-```
-```{r rowcount-check}
-grade_this_code()
-```
+## Refinr, OpenRefine in R
 
-### Exercise 2: Key collisions 2, electric boogaloo
+OpenRefine, as we've discussed, uses clustering algorithms to find things -- OpenRefine calls them facets -- that really are the same thing, but there's some very slight difference between them. In OpenRefine, you have to look at them and approve them, which is a strength that can be very time consuming. 
 
-If you don't get the reference, take a break from your homework for a minute and [watch the greatest dance fight in the history of film](https://www.youtube.com/watch?v=bsaA903oxvc). 
+With the `refinr` package, developers have brought some of those clustering algorithms to R. The upside: very fast and can solve more complex problems than just casing and individual spelling fixes. The downside: you do not get to approve each change, so you can't use your human judgement to decide if Freemont is really Fremont. The algorithm just makes the change.
 
-So how does `key_collision_merge` do with the offense_arrest_desc? First we'll mutate it into a new column, then group by and tally it up.  
+That limits the applicability of this. Basically, you need to know the problems and you need to know what the solutions look like so you can evaluate them afterwards. 
 
-```{r rowcount2, exercise=TRUE, exercise.setup = "refinr-load-data"}
-charges |>
+<div class="alert alert-danger">
+<h4 class="alert-heading">Warning</h4> 
+<p class="mb-0">Never trust an algorithm to get it 100 percent right. You are responsible for everything you publish. Always check the output.</p>
+</div>
+
+The algorithm we're going to use is called `key_collision_merge`. What it does is it looks at what you've given it -- the data -- and creates a different version of each thing in your column containing only the most important parts called the key. Then, it merges those keys together, even if they might be slightly different. 
+
+It's my experience that `key_collision_merge` is the most conservative of the clustering algorithms in this world of data cleaning. It's right far more than it's wrong -- not even close. Some algorithsm you can work with are *really* stretching to match things together. Not so with `key_collision_merge`. 
+
+First, we're going to implement it, then we're going to check it. 
+
+So how do you implement it? Almost exactly the same way we implemented the other two text cleaning techniques in this tutorial. We mutate a new column called clean_city and give it the function. The function works the same way we use other functions -- all `key_collision_merge` needs to know is what column we're giving it to work with. 
+
+### Exercise 3: Implement key_collision_merge
+
+```{r keycollision, exercise=TRUE, exercise.setup = "load-data"}
+crashes |>
   mutate(
-    clean_charges = key_collision_merge(______________)
+    clean_city = key_collision_merge(____)
     ) |>
-  group_by(clean_charges) |>
-  tally() |>
-  nrow()
+  group_by(clean_city, State) |>
+  tally()
 ```
-```{r rowcount2-solution, exercise.reveal_solution = FALSE}
-charges |>
+```{r keycollision-solution, exercise.reveal_solution = FALSE}
+crashes |>
   mutate(
-    clean_charges = key_collision_merge(offense_arrest_desc)
+    clean_city = key_collision_merge(City)
     ) |>
-  group_by(clean_charges) |>
-  tally() |>
-  nrow()
+  group_by(clean_city, State) |>
+  tally()
 ```
-```{r rowcount2-check}
+```{r keycollision-check}
 grade_this_code()
 ```
 
-Cuts down the duplicates by more than 600. 
-
-### Exercise 3: n grams
-
-But since the charges are often multiple words, we should try using `n_gram_merge`, which looks a multiple words. 
-
-Here's an example using sensible defaults for weighting -- unfortunately [the documentation](https://github.com/ChrisMuir/refinr) doesn't do much to explain what they are.
-
-```{r rowcount3, exercise=TRUE, exercise.setup = "refinr-load-data"}
-charges |> 
-  mutate(
-    clean_charges = n_gram_merge(
-      offense_arrest_desc, 
-      weight = c(d = 0.2, i = 0.2, s = 1, t = 1))
-    ) |> 
-  group_by(_________) |> 
-  tally() |>
-  nrow()
+```{r results3, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("With `key_collision_merge`, we get {keycrashes} unique combinations of `clean_city` and State. Earlier, when we just changed the case, we got {nrow(cleancities)} unique combinations. So we've ... improved? ... by {keychange}. But have we?")
 ```
-```{r rowcount3-solution, exercise.reveal_solution = FALSE}
-charges |> 
+
+### Exercise 4: Checking your work
+
+The way to check your work is to look at where `key_collision_merge` made changes and compare them. We can do that with a simple does not equal filter. We'll know `key_collision_merge` made a change when City doesn't equal clean_city. We can see how many times it made that decision with a group by and tally.
+
+```{r keycollision2, exercise=TRUE, exercise.setup = "load-data"}
+crashes |>
   mutate(
-    clean_charges = n_gram_merge(
-      offense_arrest_desc, 
-      weight = c(d = 0.2, i = 0.2, s = 1, t = 1))
-    ) |> 
-  group_by(clean_charges) |> 
-  tally() |>
-  nrow()
+    clean_city = key_collision_merge(____)
+    ) |>
+  filter(____ != ____) |> 
+  group_by(City, clean_city) |>
+  tally()
 ```
-```{r rowcount3-check}
+```{r keycollision2-solution, exercise.reveal_solution = FALSE}
+crashes |>
+  mutate(
+    clean_city = key_collision_merge(City)
+    ) |>
+  filter(City != clean_city) |> 
+  group_by(City, clean_city) |>
+  tally()
+```
+```{r keycollision2-check}
 grade_this_code()
 ```
 
-Cuts it down by more than 1000. 
-
-### Exercise 4: soundex
-
-That seems pretty good. Here's a different method, using a method that turns words into phonetic spellings called soundex. 
-
-```{r rowcount4, exercise=TRUE, exercise.setup = "refinr-load-data"}
-charges |> 
-  mutate(
-    clean_charges = n_gram_merge(
-      offense_arrest_desc, 
-      method = "____", useBytes = TRUE
-      )) |> 
-  group_by(clean_charges) |> 
-  tally() |>
-  nrow()
-```
-```{r rowcount4-solution, exercise.reveal_solution = FALSE}
-charges |> 
-  mutate(
-    clean_charges = n_gram_merge(
-      offense_arrest_desc, 
-      method = "soundex", useBytes = TRUE
-      )) |> 
-  group_by(clean_charges) |> 
-  tally() |>
-  nrow()
-```
-```{r rowcount4-check}
-grade_this_code()
+```{r results4, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("If you count up the rows, `key_collision_merge` made {totalkeychanges} changes, but scroll through them. Would you have made the same change? Note how many times `key_collision_merge` chose the all caps version of a city. Or if you scroll down, the bane of any city matching exercise are cities that start with Saint. Is it Saint? St. with the period? St without the period? If you look, `key_collision_merge` isn't consistent with this. So how might you fix that?")
 ```
 
-Cut it down by almost 1600!
+The truth is all text-cleaning jobs are unique. Every dataset has their own problems and you have to solve them. Think of this skill like learning how to play music. I've shown you a few chords. Every text-cleaning job is just playing the chords in a different order, a different combination to solve the problem. And there's a lot more chords out there to play. 
 
-*BUT.*
-
-Are they right?
-
-We have no idea. If you look carefully, you'll see a lot of success here. But if you look at rows with charges that have numbers in them. Numbers throw soundex off pretty substantially. In some cases, a charge of "theft by taking \$0-500" is in the original column. The clean version? "Theft by taking \$5000". That's a big difference, and a bad miss. 
+How do you fix this city matching problem better? Combining the chords. I'd fix the case first, then change all the instances of "St " -- that's Saint SPACE -- and replace them with "St. ", Saint PERIOD SPACE. That gives `key_collision_merge` less to fuss about. In fact, if you do those two things before giving it to `key_collision_merge`, the total changes drops to 7. All of them involving apostrophes or dashes. 
 
 So can we trust automated data cleaning? 
 
@@ -358,14 +296,11 @@ In short, only use Refinr where the use case is simple and the changes of a mist
 
 ## The Recap
 
-Throughout this lesson, you've explored powerful tools for cleaning and standardizing messy data. You've learned how to use OpenRefine's graphical interface to manually review and merge similar text entries, and how to achieve similar results programmatically using the refinr package in R. You've practiced different merging techniques and seen how they can dramatically reduce the number of unique entries in a dataset. However, you've also learned the critical importance of verifying the results of automated cleaning processes, as illustrated by the potential errors in soundex merging. Remember, while these tools can greatly speed up your data cleaning workflow, they should be used judiciously and always with careful human oversight to ensure the accuracy and integrity of your data.
+Throughout this lesson, you've explored powerful tools for cleaning and standardizing messy data. You've learned how to use `stringr` and `gsub` to make changes to text throughout a dataset, and how to achieve similar results programmatically using the `refinr` package in R. You've practiced different merging techniques and seen how they can dramatically reduce the number of unique entries in a dataset. However, you've also learned the critical importance of verifying the results of automated cleaning processes. Remember, while these tools can greatly speed up your data cleaning workflow, they should be used judiciously and always with careful human oversight to ensure the accuracy and integrity of your data.
 
 ## Terms to Know
 
 - OpenRefine: A standalone application for data cleaning that uses clustering algorithms to identify similar text entries.
 - Clustering: A technique used to group similar data points together based on certain criteria or algorithms.
-- Key collision merge: A method that extracts key parts of strings to identify and merge similar entries.
-- Faceting: A feature in OpenRefine that allows you to see a summary of all values in a column and filter or edit them.
+- `key_collision_merge`: A method that extracts key parts of strings to identify and merge similar entries.
 - `refinr`: An R package that implements OpenRefine's clustering algorithms for use within R scripts.
-- n-gram merge: A method that looks at multiple words or character sequences to identify similar entries.
-- Soundex: A phonetic algorithm for indexing names by sound, as pronounced in English.
