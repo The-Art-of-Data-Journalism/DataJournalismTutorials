@@ -14,7 +14,7 @@ description: >
 library(learnr)
 library(gradethis)
 library(tidyverse)
-library(janitor)
+library(stringr)
 library(refinr)
 library(glue)
 knitr::opts_chunk$set(echo = FALSE)
