@@ -1,5 +1,5 @@
 ---
-title: "Data Journalism Lesson 10: OpenRefine"
+title: "Data Journalism Lesson 10: Cleaning text"
 output: 
   learnr::tutorial:
     progressive: true
