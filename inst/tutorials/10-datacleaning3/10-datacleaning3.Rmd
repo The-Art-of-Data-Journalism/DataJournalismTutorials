@@ -8,7 +8,7 @@ output:
     ace_theme: github
 runtime: shiny_prerendered
 description: >
-  Clean up your data with OpenRefine.
+  Clean up your data with text cleaning.
 ---
 ```{r setup, include=FALSE}
 library(learnr)
