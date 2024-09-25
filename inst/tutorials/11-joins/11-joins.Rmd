@@ -167,7 +167,21 @@ In this lesson, you'll learn how to join datasets, a crucial skill for data jour
 
 ## What is Data Journalism? 
 
-More to come here.
+When asked about how long it took him to learn about joins, Chad Day of the AP gives a bit of a chuckle.
+
+"I learned a lot more from all of the mistakes," he said. 
+
+What are joins? Think of it this way -- you have two tables. One table, from the Census Bureau, has demographic data about counties in your state. The other, from your state's elections office, has information about registered voters in counties in your state. Both have data that you need to do your story. But because both have county names in them, you should be able to combine them together so you have one table with both demographic information and registered voters. A join is how you can merge those two tables together. 
+
+It's a simple concept that is never that simple. 
+
+"You would think that you had something in one data set that would match up with something in another data set," Day said. "And then you would find that there's no leading zeros. Or you would find that one has leading zeros, one doesn't. Or you would find that you want a one-to-one join. You want just to have the same count of records in this side that you have on this side. And you end up with seven or eight times that because you didn't realize that they were duplicates or all of this kind of stuff that's in the data."
+
+Easy joins are datasets that come from the same program within the same agency of government. The hard ones are when you have data from two different agencies -- maybe one state, one local. Maybe one federal, one state. That's when you find out everyone has opinions about how to store information. Capitalization, leading zeros, trailing spaces, even if you include the word "County" or "Parish" after the name. It all matters.
+
+Joins are going to put to the test how well you learned your data smells and how well you can think logically. 
+
+"If you don't do the proper preparation and all of the actual counting and basic-type sorting and filtering and all the basic stuff ahead of time, then joins are going to show all of the warts and problems with the way that you're thinking about the data," Day said.
 
 ## The Basics
 
@@ -175,7 +189,7 @@ Often, as data journalists, we're looking at data stored in multiple tables. In 
 
 At the center of that database is a table -- a dataframe, if you will. In that table? Students. Each row is a student. It contains all the information about a student that doesn't change -- name, date of birth, student ID number, etc. That student ID number is a key -- it's how each table is going to be related back to the student.
 
-Ever checked out a library book at the campus library? When they scanned your library card, a database recorded what book you checked out and used your Student ID number to relate back to the student table, where your name is. Somewhere, there's a table of all the classes you took. Is your name, date of birth, home address and all that information attached to *every* class you took? No. But your student ID number is, and that's so it can be related back. That same class table is also related to the table of tuition bills, and I *guarantee* that one is connected to your name. 
+Ever checked out a book at the campus library? When they scanned your card, a database recorded what book you checked out and used your Student ID number to relate back to the student table, where your name is. Somewhere, there's a table of all the classes you took. Is your name, date of birth, home address and all that information attached to *every* class you took? No. But your student ID number is, and that's so it can be related back. That same class table is also related to the table of tuition bills, and I *guarantee* that one is connected to your name. 
 
 Relational databases are very useful and are literally everywhere in the digital world. What made them so appealing back in the 1970s and 80s when they took off -- you weren't storing any more data than you needed. Back in the day, storage was **expensive**. Storing a single iPhone photo would cost hundreds of thousands of dollars in the 1970s. The storage you have on your iPhone would make you 1 percenter level rich if you went back in time.
 
