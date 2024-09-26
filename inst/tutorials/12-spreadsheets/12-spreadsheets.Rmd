@@ -1,0 +1,55 @@
+---
+title: "Data Journalism Lesson 12: Working with spreadsheets"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  The spreadsheet is dead. Long live the spreadsheet.
+---
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(glue)
+library(tidyverse)
+library(readxl)
+library(googlesheets4)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+```
+```{r load-data, message=FALSE, warning=FALSE}
+emitters <- read_excel("data/ghgp_data_2022.xlsx")
+```
+
+## The Goal
+
+In this lesson, you'll learn how to pull spreadsheets into dataframes, a common challenge in data journalism. The spreadsheet is still by far the most common data analysis tool, in spite of all of its limitations. By the end of this tutorial, you'll understand two methods for converting spreadsheets into dataframes using the two most common spreadsheet platforms: Excel and Google Sheets. You'll also practice cleaning and organizing the extracted data.
+
+## What is Data Journalism?
+
+Ask just about any data journalist what tool they started with and you'll almost universally get the same answer: The spreadsheet. For the old timers, spreadsheets were like magic back when computers were relatively new and the idea of using data to do journalism was a form of punk rock -- rebellious almost. 
+
+More to come here.
+
+## The Basics
+
+
+
+
+## The Recap
+
+Throughout this lesson, you've learned valuable techniques for harvesting data from PDFs. You've practiced using Adobe's online converter and Adobe Acrobat to transform PDF tables into spreadsheets. You've also gained experience in cleaning and formatting the extracted data using Google Sheets, including unmerging cells, deleting unnecessary rows and columns, and exporting to CSV format. Remember, while PDFs can be challenging, these skills allow you to access important information that might otherwise be difficult to analyze. As you continue your data journalism journey, you'll find these techniques invaluable for working with government records and other PDF-based data sources.
+
+## Terms to Know
+
+- PDF (Portable Document Format): A file format used to present documents, including text formatting and images, independent of software, hardware, or operating systems.
+- CSV (Comma-Separated Values): A simple file format used to store tabular data, where each line of the file is a data record and each record consists of fields separated by commas.
+- Adobe Creative Suite: A collection of applications for graphic design, video editing, web development, and photography made by Adobe Inc.
+- CometDocs: An online service that converts various file formats, including PDFs to spreadsheets.
+- Merge cells: A spreadsheet function that combines two or more adjacent cells into a single cell.
+- Unmerge cells: The process of separating previously merged cells back into individual cells.
+- Google Sheets: A web-based spreadsheet program offered by Google as part of its free, web-based Google Docs Editors suite.
+- Microsoft Excel: A spreadsheet program developed by Microsoft for Windows, macOS, Android, and iOS.
