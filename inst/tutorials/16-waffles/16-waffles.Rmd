@@ -1,5 +1,5 @@
 ---
-title: "Data Journalism Lesson 14: Waffle charts"
+title: "Data Journalism Lesson 16: Waffle charts"
 output: 
   learnr::tutorial:
     progressive: true

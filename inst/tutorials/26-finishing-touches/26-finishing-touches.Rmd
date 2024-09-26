@@ -1,5 +1,5 @@
 ---
-title: "Data Journalism Lesson 23: Finishing touches"
+title: "Data Journalism Lesson 26: Finishing touches"
 output: 
   learnr::tutorial:
     progressive: true

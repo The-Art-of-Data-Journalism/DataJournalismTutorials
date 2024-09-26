@@ -1,5 +1,5 @@
 ---
-title: "Data Journalism Lesson 16: Dumbbell charts"
+title: "Data Journalism Lesson 19: Dumbbell charts"
 output: 
   learnr::tutorial:
     progressive: true

@@ -1,5 +1,5 @@
 ---
-title: "Data Journalism Lesson 18: Scatterplots"
+title: "Data Journalism Lesson 20: Scatterplots"
 output: 
   learnr::tutorial:
     progressive: true

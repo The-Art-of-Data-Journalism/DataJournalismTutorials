@@ -1,5 +1,5 @@
 ---
-title: "Data Journalism Lesson 22: Color"
+title: "Data Journalism Lesson 25: Color"
 output: 
   learnr::tutorial:
     progressive: true
