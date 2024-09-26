@@ -16,12 +16,21 @@ library(gradethis)
 library(glue)
 library(tidyverse)
 library(readxl)
-library(googlesheets4)
+library(janitor)
 knitr::opts_chunk$set(echo = FALSE)
 tutorial_options(exercise.completion=FALSE)
 ```
 ```{r load-data, message=FALSE, warning=FALSE}
+state <- Sys.getenv("tutorial.state")
+
+stateName <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/states.csv") |> filter(Postal == state) 
+
 emitters <- read_excel("data/ghgp_data_2022.xlsx")
+
+clean_emitters <- read_excel("data/ghgp_data_2022.xlsx", skip = 3, guess_max = 5000) |> 
+  clean_names()
+
+state_emitters <- clean_emitters |> filter(state == stateName$Postal) |> nrow()
 ```
 
 ## The Goal
@@ -36,20 +45,174 @@ More to come here.
 
 ## The Basics
 
+Spreadsheets are everywhere in business and government. They're relatively easy to use -- you can learn 80-90 percent of what you need to learn in a day -- and extremely flexible for something organized into rows and columns. As spreadsheets have evolved, developers have added ways to add color and type and even special kinds of rows and columns that wouldn't be possible in R. That has given a lot of spreadsheet users delusions of grandeur, who now want to create pretty spreadsheets instead of useful spreadsheets. 
 
+It's very likely in your time as a data journalist you'll have to use spreadsheets. If you've ever been to a NICAR conference, you'll note there's dozens of spreadsheet classes teaching skills going on all the time. The reason this textbook doesn't involve spreadsheets, outside of this lesson, is because they're out of step with modern data science and modern journalism. 
 
+Modern data science/data journalism requires transparency. What does that mean? Notebooks, with code and data, publicly available so anyone can look at what you did and decide for themselves if you did a good job or not. 
+
+Can you do that with a spreadsheet? My argument is no. There's no way to audit your work, there's no way to reliably show how you did what you did step by step. A good faith argument is that it can be done, it's just very hard. If you miss a step, your analysis will appear wrong to someone coming behind. 
+
+So how can you apply modern data science/data journalism principles in a world still awash in spreadsheets? You can pull that spreadsheet into R. 
+
+How do you do that? Well, depending on the sheet, it might be *very* easy. But if they've tried to make it pretty, it can get a little worse. 
+
+One near-universal truth you should keep in mind as you get better at programming: If you have a problem, someone else probably had it first and they very likely made a library that solves that problem. Do you think there are developers in the world who wanted to pull a spreadsheet into R? Indeed there has been. 
+
+The library we're going to work with today is `readxl` and you don't have to be a genius to figure out what this library does. We're going to load all of our libraries first and then contend with the data. One other library we're going to need -- janitor. Think of janitor as the library that's going to have to clean up all this spreadsheet glitter someone thought would make it sparkle.
+
+```{r load-tidyverse, exercise=TRUE}
+library(tidyverse)
+library(readxl)
+library(janitor)
+```
+```{r load-tidyverse-solution}
+library(tidyverse)
+library(readxl)
+library(janitor)
+```
+```{r load-tidyverse-check}
+grade_this_code()
+```
+
+The dataset we're going to work with is from a US Environmental Protection Agency program called the [Greenhouse Gas Reporting Program](https://www.epa.gov/ghgreporting/data-sets). The program collects greenhouse gas emissions from "large emitting facilities, suppliers of fossil fuels and industrial gases that result in GHG emissions when used, and facilities that inject carbon dioxide underground." These facilities are all over the country, are interesting data to look at when reporting on climate change at a local and state level and ... comes in an Excel spreadsheet. 
+
+Fun behind-the-scenes quirk: every dataset you've used so far has come from a URL setup to house your state's data. Because an Excel spreadsheet is not a native format to the internet, I can't use that same trick here. So bundled with your tutorials is the data from the EPA. What does that mean? It means your read step is simpler because you're reading it from your own computer. But if you wanted to download it, the same file you have on your computer is also [here](https://the-art-of-data-journalism.github.io/tutorial-data/greenhouse-gas-emitters/ghgp_data_2022.xlsx)
+
+If you were to download the file and open it, you'd see an immediate problem: The first row of the spreadsheet is not the header row. In every dataset we've used so far, the first row is the header row, because that's what `read_csv` expects. It knows that most datasets have a header row, and it's first, so it takes that row and makes it the header. The second row in the csv is the first row of data. Here's what your spreadsheet looks like:
+
+[](images/spreadsheet1.png){width="100%"}
+
+See how the first three rows are notes? What do we do about that? 
+
+First, we're going to use a function in `readxl` that should look and act *very* familiar: It's `read_excel`. It does what you think it does.
+
+```{r load-data-exercise, exercise = TRUE, exercise.reveal_solution = FALSE}
+emitters <- read_excel("data/ghgp_data_2022.xlsx")
+```
+```{r load-data-exercise-solution}
+emitters <- read_excel("data/ghgp_data_2022.xlsx")
+```
+```{r load-data-exercise-check}
+grade_this_code()
+```
+
+That ... doesn't look familiar at all.
+
+What does `emitters` look like?
+
+```{r head-data, exercise=TRUE, exercise.setup = "load-data"}
+head(____)
+```
+```{r head-data-solution, exercise.reveal_solution = FALSE}
+head(emitters)
+```
+```{r head-data-check}
+grade_this_code()
+```
+
+It's a mess. First of all, our headers are all named ...2 ...3 ...4 and so on. You can see what looks more like a header row in row 3, which would actually be row 4 of the Excel sheet since `read_excel` used row 1 as a header row.
+
+All along, we've been using `read_csv` with the defaults -- first row is the header, guess what each column is based on the first few hundred rows, no special processing instructions. This is what it looks like when those things aren't the case. 
+
+What we need to be able to tell `read_excel` is that it should just ignore those first three rows.
+
+Handy enough: `read_excel` and `read_csv` both have a `skip` parameter. You can tell it to skip a certain number of rows. Our header row is in row 4, so we need to skip how many rows?
+
+```{r load-data2-exercise, exercise = TRUE, exercise.reveal_solution = FALSE}
+emitters <- read_excel("data/ghgp_data_2022.xlsx", ____ = ____)
+```
+```{r load-data2-exercise-solution}
+emitters <- read_excel("data/ghgp_data_2022.xlsx", skip = 3)
+```
+```{r load-data2-exercise-check}
+grade_this_code()
+```
+
+Now we're getting something else we haven't seen -- import errors. What that is saying is based on the first 1,000 rows, `read_excel` is expecting one type of data, but it's getting a different kind. That might mean the first 1,000 rows were numbers, but now there's text in the column and that's creating problems. It might mean the first 1,000 rows had good dates and now they've gone bad. The point is, the guesses are wrong. 
+
+Sometimes this is a major problem, sometimes this can be solved by just giving it more rows to guess with. Good news: both `read_excel` and `read_csv` have a `guess_max` parameter where you can give it however many rows you want it to use to guess. The default is 1,000. Our data has almost 7,000 rows. How about we try giving it 5,000 rows to guess with?
+
+```{r load-data3-exercise, exercise = TRUE, exercise.reveal_solution = FALSE}
+emitters <- read_excel("data/ghgp_data_2022.xlsx", skip = ____, guess_max = ____)
+```
+```{r load-data3-exercise-solution}
+emitters <- read_excel("data/ghgp_data_2022.xlsx", skip = 3, guess_max = 5000)
+```
+```{r load-data3-exercise-check}
+grade_this_code()
+```
+
+Just like that, guessing errors are gone. 
+
+One last thing we can do that we haven't done before -- there is nothing stopping you from chaining on other commands to your read step. In fact, you could do everything we've done so far in one single block, going from `read_csv` > `group_by` > `summarize` > `arrange` and get output. It makes sense to separate your steps so you can diagnose problems where they are happening, but it's all very feasible to do everything in one giant code blob.
+
+Sometimes, adding a little more to your read step will make your life a lot easier later. You probably haven't noticed because we haven't really looked, but some of the column names in this data are really gnarly from the standpoint of the `tidyverse`'s rules about naming columns. For example, one column is called "Total reported direct emissions" which has four spaces in it that are no good. Another is "CO2 emissions (non-biogenic)", which adds parens to our column name. 
+
+Good thing you learned about `clean_names()` in Chapter 9. That would come in really handy here.
+
+```{r load-data4-exercise, exercise = TRUE, exercise.reveal_solution = FALSE}
+emitters <- read_excel("data/ghgp_data_2022.xlsx", skip = ____, guess_max = ____) |> 
+  ____()
+```
+```{r load-data4-exercise-solution}
+emitters <- read_excel("data/ghgp_data_2022.xlsx", skip = 3, guess_max = 5000) |> 
+  clean_names()
+```
+```{r load-data4-exercise-check}
+grade_this_code()
+```
+
+Let's take a look at what our data looks like now:
+
+```{r head2-data, exercise=TRUE, exercise.setup = "load-data"}
+head(clean_emitters)
+```
+```{r head2-data-solution, exercise.reveal_solution = FALSE}
+head(clean_emitters)
+```
+```{r head2-data-check}
+grade_this_code()
+```
+
+```{r results, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("Looks a lot like what we're used to, yes? You've now got a dataset you can run queries on, like asking how many of these are in {stateName$State}. There are {state_emitters}, if you're curious.")
+```
+
+One thing to know: Spreadsheets *can* contain more than one sheet in them. This one actually contains 11 of them -- most of them subsets of the data, but some are completely different formats and structures. `read_excel` by default just grabs sheet 1, unless you tell it to. To do so, you'd just add `sheet=2` inside `read_excel` to get sheet 2 or whatever sheet number you want, counting from left to right. 
+
+## Pulling data from Google Sheets.
+
+Part of the reason why Excel spreadsheets are everywhere is because it's the spreadsheet program that's stood the test of time. Microsoft first launched it in 1985 to compete with another product that no longer exists. Excel won.
+
+But in the internet Era, another spreadsheet platform is giving Excel a run for its money. Most current college students won't remember a time without Google Sheets, launched in 2006, and for most of them, because of Chromebooks in high school, Sheets was the first spreadsheet platform they'd ever seen.
+
+That is comes in at the low low price of free means a growing number of providers are using it to release data, particularly at the state and local levels.
+
+Because of limitations in the tutorial data and how Google handles authorizations, I can't directly demonstrate it here, but there's a library called `googlesheets4` that handles reading Google sheets into a dataframe. The good news for you: The same people who made `readr` and `readxl` made `googlesheet4`. And they very purposefully made everything look the same. 
+
+So `readr` has `read_csv` and `readxl` has `read_excel`. If you guessed `googlesheets4` might have a `read_sheet` without even looking at the documentation, you're 100 percent right. It also has the exact same parameter bits that those two things have. The only thing changing here? Instead of a file name, we're giving it the link to a public sheet.
+
+If that same greenhouse gas emitters data was online as a Google sheet, you could get it and clean it like this:
+
+```
+sheets_emitters <- read_sheet("URLGOESHERE", skip = 3, guess_max = 5000) |> 
+  clean_names()
+```
+If we could run this, you'd get the same result as our Excel version, ready to analyze.
 
 ## The Recap
 
-Throughout this lesson, you've learned valuable techniques for harvesting data from PDFs. You've practiced using Adobe's online converter and Adobe Acrobat to transform PDF tables into spreadsheets. You've also gained experience in cleaning and formatting the extracted data using Google Sheets, including unmerging cells, deleting unnecessary rows and columns, and exporting to CSV format. Remember, while PDFs can be challenging, these skills allow you to access important information that might otherwise be difficult to analyze. As you continue your data journalism journey, you'll find these techniques invaluable for working with government records and other PDF-based data sources.
+Throughout this lesson, you've mastered essential techniques for working with spreadsheet data in R. You've learned to use read_excel() to import Excel files, handling challenges like skipping rows and guessing data types. You've also explored how to clean column names using the janitor package and how to access data from Google Sheets using the googlesheets4 library. Remember, while spreadsheets are ubiquitous in data journalism, importing them into R allows for more transparent, reproducible analysis.
 
 ## Terms to Know
 
-- PDF (Portable Document Format): A file format used to present documents, including text formatting and images, independent of software, hardware, or operating systems.
-- CSV (Comma-Separated Values): A simple file format used to store tabular data, where each line of the file is a data record and each record consists of fields separated by commas.
-- Adobe Creative Suite: A collection of applications for graphic design, video editing, web development, and photography made by Adobe Inc.
-- CometDocs: An online service that converts various file formats, including PDFs to spreadsheets.
-- Merge cells: A spreadsheet function that combines two or more adjacent cells into a single cell.
-- Unmerge cells: The process of separating previously merged cells back into individual cells.
-- Google Sheets: A web-based spreadsheet program offered by Google as part of its free, web-based Google Docs Editors suite.
-- Microsoft Excel: A spreadsheet program developed by Microsoft for Windows, macOS, Android, and iOS.
+- `readxl`: An R package designed to import Excel files into R dataframes.
+- `read_excel()`: A function in the `readxl` package used to read Excel files into R.
+- `skip`: A parameter in `read_excel()` that allows you to ignore a specified number of rows at the beginning of a spreadsheet.
+- `guess_max`: A parameter in read functions that determines how many rows are used to guess column types.
+- `clean_names()`: A function from the `janitor` package that standardizes column names for easier data manipulation.
+- `googlesheets4`: An R package that enables reading and writing Google Sheets directly from R.
+- `read_sheet()`: A function in the `googlesheets4` package used to import Google Sheets into R.
+- Excel: A spreadsheet program developed by Microsoft, widely used for data storage and analysis.
+- Google Sheets: A web-based spreadsheet program offered by Google, part of the Google Docs suite.
