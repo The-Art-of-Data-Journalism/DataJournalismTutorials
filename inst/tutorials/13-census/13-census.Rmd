@@ -1,0 +1,295 @@
+---
+title: "Data Journalism Lesson 13: Getting Census data from an API"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  The easiest way to get Census data is through tidycensus.
+---
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(glue)
+library(tidyverse)
+library(tidycensus)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+```
+```{r load-data, message=FALSE, warning=FALSE}
+state <- Sys.getenv("tutorial.state")
+
+stateName <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/states.csv") |> filter(Postal == state) 
+
+estimates23 <- get_estimates(geography="county", vintage = 2023, state=state)
+estimates22 <- get_estimates(geography="county", vintage = 2022, state=state)
+
+nrows <- nrow(estimates23)
+
+acs <- load_variables(2022, "acs5", cache = TRUE)
+
+pop23 <- estimates23 |> 
+  filter(variable == "POPESTIMATE") |> 
+  select(NAME, year, value)
+
+pop22 <- estimates22 |> 
+  filter(variable == "POPESTIMATE") |> 
+  select(NAME, year, value)
+
+popest <- bind_rows(pop23, pop22)
+
+acs <- load_variables(2022, "acs5", cache = TRUE)
+
+origin <- get_acs(geography = "county", 
+              variables = c("B03001_001", "B03001_002", "B03001_003"),  
+              state = state, 
+              year = 2022)
+
+originrows <- nrow(origin)
+```
+## The Goal
+
+In this lesson, you'll learn how to access and work with U.S. Census data using the tidycensus package in R. By the end of this tutorial, you'll understand how to retrieve population estimates from the Census API, manipulate the data into a usable format, and begin exploring the vast array of information available in the American Community Survey. You'll practice important data wrangling skills like filtering, binding rows, and pivoting data, while gaining insight into the structure and complexity of Census datasets. This knowledge will equip you to incorporate authoritative demographic data into your data journalism projects efficiently.
+
+## What is Data Journalism?
+
+## The Basics
+
+There is truly an astonishing amount of data collected by the US Census Bureau. First, there's the Census that most people know -- the every 10 year census. That's the one mandated by the Constitution where the government attempts to count every person in the US. It's a mind-boggling feat to even try, and billions get spent on it. That data is used first for determining how many representatives each state gets in Congress. From there, the Census gets used to divide up billions of dollars of federal spending. 
+
+Then, starting in 2005, the Census Bureau launched the American Community Survey. Think of it like a rolling census, where in stead of every 10 years, new data is being gathered all the time. The difference? The ACS is a survey -- a random sample of the population -- not a head count. Even in the every 10 year Census, every person only had to answer the same six questions about race, age and housing. A smaller number -- a sample -- got a more detailed set of questions. With the ACS, those detailed questions about everything from race and ethnicity to education and employment and commuting to work are updated constantly. It's a massive amount of demographic information. 
+
+The Census Bureau has *dozens* of other programs that gather up data. Programs like the Small Area Health Insurance Estimates program, which estimates how many people in each county have health insurance. They survey jails, manufacturers, public pension programs, government finances and business formations **and I haven't even left the first page of the listing of Census programs. There's three more to go.**  
+
+Unfortunately, the Census is exceedingly complicated to work with. It takes time to practice with it and there is a huge amount of terminology and nuance that are far beyond this tutorial. The good news is, the Census has an API -- an application programming interface. What that means is we can get some data directly through the Census Bureau via calls over the internet using code we write. 
+
+Let's demonstrate. 
+
+We're going to use a library called `tidycensus` which makes calls to the Census API in a very tidy way, and gives you back tidy data. That means we don't have to go through the process of importing the data from a file, cleaning it up and making it a dataframe. I can't tell you how amazing this is, speaking from experience. My first experience with the Census was for the 2000 data. I was part of a team at the Tampa Bay Times that had to pull the data in, chop it up for reporters working on specific stories and send that data out to them and graphic artists to make charts and maps out of it. What we're going to do today took **hours** on that day in 2001 when the data officially dropped. Just getting the data took hours. You're going to do it in seconds. 
+
+First, we'll need libraries. The two we need are the `tidyverse` as always and `tidycensus`. 
+
+```{r load-tidyverse, exercise=TRUE}
+library(tidyverse)
+library(tidycensus)
+```
+```{r load-tidyverse-solution}
+library(tidyverse)
+library(tidycensus)
+```
+```{r load-tidyverse-check}
+grade_this_code()
+```
+
+Now, normally, we'd run some kind of `read_csv` bit here. But in essence, using a library that pulls data from an API like `tidycensus` is replacing that step. It's a little more complicated, but once you learn a little, it gets easier.
+
+First, let's replicate something we've done already in these tutorials -- calculate the latest population estimate changes. `tidycensus` focuses on population numbers, so the major programs in it are the decennial census, the American Community Survey and the annual population estimates program.
+
+### Exercise 1: Get data
+
+Under the [`tidycensus` documentation](https://walker-data.com/tidycensus/reference/index.html), you'll find a function called `get_estimates()` which does what we need. All we need to do is tell it what year we want and what state we're focusing on. But, that means to calculate the change in population between 2023 and 2022, we have to do this twice, once for each year. 
+
+For now, we'll get the 2023 data. And, for this, use the postal abbreviation for your state.
+
+```{r read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
+estimates23 <- get_estimates(geography="county", vintage = 2023, state="____")
+```
+
+```{r read-check}
+grade_this({
+  if (identical(nrow(.result), nrows)) {
+    pass("Great work! You imported population estimates for your state.")
+  }
+  fail()
+})
+```
+
+Behind the scenes, I've created estimates22 for you, which is identical to estimates23 except its ... a different year. The problem we now have is we have two dataframes instead of one, and way too much data. Let's look at our data first so we can see the problem before we fix it. Let's just run head on the 2023 estimates dataframe. 
+
+```{r head-data, exercise=TRUE, exercise.setup = "load-data"}
+head(____)
+```
+```{r head-data-solution, exercise.reveal_solution = FALSE}
+head(estimates23)
+```
+```{r head-data-check}
+grade_this_code()
+```
+
+See the variable column? The variable column contains all of columns we had in our census estimates data we worked with before, but instead of columns they're **rows**. 
+
+### Exercise 2: Trimming the number of columns and rows
+
+We don't want all of those, we just want the population estimates, which is listed as `POPESTIMATE` in the `variable` column. Then, to make our lives easier, we're going to select just three columns -- the county name, the year the data is from and the value, which is the population estimate after our filter.
+
+```{r filter-data, exercise=TRUE, exercise.setup = "load-data"}
+pop23 <- estimates23 |> 
+  filter(____ == "____") |> 
+  select(NAME, year, value)
+
+pop22 <- estimates22 |> 
+  filter(____ == "____") |> 
+  select(NAME, year, value)
+```
+```{r filter-data-solution, exercise.reveal_solution = FALSE}
+pop23 <- estimates23 |> 
+  filter(variable == "POPESTIMATE") |> 
+  select(NAME, year, value)
+
+pop22 <- estimates22 |> 
+  filter(variable == "POPESTIMATE") |> 
+  select(NAME, year, value)
+```
+```{r filter-data-check}
+grade_this_code()
+```
+
+Now we have two dataframes of three columns: `pop23`, and `pop22`. We could join them using the county name, but the problem then is we have two different years and the column names for the estimate are the same. We won't know which year is which without some careful connecting-the-dots in our code. 
+
+### Exercise 3: Binding
+
+There's another way to do this that's a useful skill to have -- we can *bind* these two tables together. What does that mean? It means we can stack them on top of each other. We can do this because the column names are identical. There is a function called `bind_rows` that does this, and all we have to tell the function is what two tables we're binding together that we just created in the last step. 
+
+```{r bind-data, exercise=TRUE, exercise.setup = "load-data"}
+popest <- bind_rows(____, ____)
+```
+```{r bind-data-solution, exercise.reveal_solution = FALSE}
+popest <- bind_rows(pop23, pop22)
+```
+```{r bind-data-check}
+grade_this_code()
+```
+
+Our next problem? We have data that's stacked, not side by side. To calculate the percent change in population, you need the 2023 population - the 2022 population / the 2022 population -- new - old / old. To do that, they have to be **columns**. You have **rows**. So how do we flip our data on it's side, so to speak, and turn each row for a county into two columns for a county? 
+
+Good news: This is a pretty common problem to have. And because it's a pretty common problem, there's a function that does this. 
+
+The concept here is called the shape of your data. Data where each row is a unique combination of county and year, you have what is called **long** data. Because each county and year combo is another row, making you scroll further and further down to get to the end. If each row is a county and every year you have data for is a column, you have **wide** data, meaning you have to scroll to the right to find the end. 
+
+There are two functions that convert your data into the other kind of data: `pivot_wider`, which makes long data wide, and `pivot_longer`, which makes wide data long. Since we have long data, we want to make it wide, so we can do math on it. That means we need `pivot_wider`. 
+
+`pivot_wider` is the easier of the two, in my opinion. It just needs two bits of information to know how to transform your data: What column in your current data is going to make new column names, called `names_from`, and what column in your data now has the number for that year, called `values_from`? 
+
+You can envision what you want your finished data to look like in your head. 
+
+What you have now is this: 
+
+|NAME |year|value|
+|-----|----|-----|
+|Smith|2023|123  |
+|Smith|2022|99   |
+|Jones|2023|345  |
+|Jones|2022|678  |
+
+And what you want is this: 
+
+|County|2023|2022|
+|------|----|----|
+|Smith |123 |99  |
+|Jones |345 |678 |
+
+### Exercise 4: Pivoting
+
+Where do you get the years that becomes the names? The `year` column. That's where the names come from. Where do those numbers come from? The values? The `value` column. 
+
+```{r pivot-data, exercise=TRUE, exercise.setup = "load-data"}
+popest |> 
+  pivot_wider(names_from = ____, values_from = ____)
+```
+```{r pivot-data-solution, exercise.reveal_solution = FALSE}
+popest |> 
+  pivot_wider(names_from = year, values_from = value)
+```
+```{r pivot-data-check}
+grade_this_code()
+```
+
+And now you're ready to add the percent change math, just like we did in previous exercises. 
+
+## Working with the ACS
+
+The decennial census and the American Community Survey data are considerably more difficult to work with. The data isn't particularly complex, there's just *lots* of it. And it takes some research to figure out what exactly you want to look at. `tidycensus` has some functions to help us with this, but even then it's not so easy to narrow in. Learning how to work with Census data takes time, but as a data journalist, Census numbers are one dataset you'll use over and over and over again. Why? So you can normalize things. You're always going to be looking at population-based rates of things, so you need to know what the population is in a place. The investment of time is worth it. 
+
+But to give you an idea of how hefty this data is, let's look at the ACS. We're going to use a function called `load_variables()` to tell us just what's in the ACS. But even that's not simple. The ACS is broken down into products -- 1 year, 3 year and 5 year. The more years, the smaller levels of geography you can get some information for. So, for instance, with 1-year ACS data, state's and counties are a given but small areas like neighborhoods aren't available. With 5-year data, those neighborhood sized areas become possible because the sample size has built up over 5 years. 
+
+Let's use the 5-year ACS from 2022, the most recent year 5-year ACS data is available for, as our example here. `tidycensus` shortens that to "acs5
+
+```{r variable-data, exercise=TRUE, exercise.setup = "load-data"}
+acs <- load_variables(2022, "____", cache = TRUE)
+```
+```{r variable-data-solution, exercise.reveal_solution = FALSE}
+acs <- load_variables(2022, "acs5", cache = TRUE)
+```
+```{r variable-data-check}
+grade_this_code()
+```
+
+Now let's look at it.
+
+```{r view-data, exercise=TRUE, exercise.setup = "load-data"}
+acs
+```
+```{r view-data-solution, exercise.reveal_solution = FALSE}
+acs
+```
+```{r view-data-check}
+grade_this_code()
+```
+
+
+In this tutorial, you can only see the first 1000 rows. There's more than 28,000 variables in the ACS. How can you possibly find what you need? In a notebook, you can search the table. But what do you even search for? Where do you even start?
+
+### Exercise 5: How do I find anything?
+
+To give you a little taste, I've created a dataframe of variables behind the scenes called `acs` and we're going to filter the `concept` column by Race.
+
+```{r variable2-data, exercise=TRUE, exercise.setup = "load-data"}
+acs |> filter(____ == "____")
+```
+```{r variable2-data-solution, exercise.reveal_solution = FALSE}
+acs |> filter(concept == "Race")
+```
+```{r variable2-data-check}
+grade_this_code()
+```
+
+There are 10 here (scroll to the right to see the label). You can see them all. How can there only be 10 race variables? In reality, there's more than 1,400 of them. Race by sex by age by Hispanic origin by place of birth by means of commuting to work. There are enumerations of all of these things. These 10 you see here? Just simple population by race. Useful, yes, but only the tip of the iceberg in ACS. 
+
+How would you get data from the ACS? It's somewhat similar to getting the estimates. The difference is specifying which level of geography and which variables you want. For geography, you have state, county, tract, and multiple others. For variables, you can do several at once with a list. Let's get the current number of people in each county and how many are of Hispanic origin.
+
+```{r origin, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
+origin <- get_acs(geography = "____", 
+              variables = c("B03001_001", "B03001_002", "B03001_003"), 
+              state = "____", 
+              year = 2022)
+```
+
+```{r origin-check}
+grade_this({
+  if (identical(nrow(.result), originrows)) {
+    pass("Great work! You imported estimates of Hispanic populations in your state.")
+  }
+  fail()
+})
+```
+
+Now, you have the same problems you have with the estimates -- long data when you probably need wide -- but you know how to handle that now. Off you go. 
+
+## The Recap
+
+Throughout this lesson, you've gained valuable skills for working with Census data in R. You've learned to use the tidycensus package to access population estimates, manipulate the data into a format suitable for analysis, and navigate the extensive variables available in the American Community Survey. You've practiced important data manipulation techniques like filtering, binding rows, and pivoting data from long to wide format. While this lesson has only scratched the surface of what's possible with Census data, you now have a solid foundation for further exploration. Remember, working with Census data can be complex, but the ability to access and analyze this rich demographic information is an invaluable asset for any data journalist.
+
+## Terms to Know
+
+- Census API: An Application Programming Interface that allows direct access to U.S. Census Bureau data through code-based queries.
+- `tidycensus`: An R package that simplifies the process of retrieving and working with U.S. Census Bureau data.
+- American Community Survey (ACS): A continuous survey conducted by the U.S. Census Bureau that provides detailed demographic information between decennial censuses.
+- `get_estimates()`: A `tidycensus` function used to retrieve population estimates from the Census Bureau.
+- `bind_rows()`: A `dplyr` function used to combine multiple data frames by stacking them vertically.
+- `pivot_wider()`: A `tidyr` function used to transform data from long format to wide format.
+- Long data: A data format where each row represents a unique combination of identifying variables, often resulting in multiple rows per subject.
+- Wide data: A data format where each row represents a unique subject, with multiple variables spread across columns.
+- `load_variables()`: A `tidycensus` function that retrieves information about available variables in Census datasets.
