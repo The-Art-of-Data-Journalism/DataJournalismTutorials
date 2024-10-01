@@ -258,7 +258,11 @@ grade_this_code()
 
 There are 10 here (scroll to the right to see the label). You can see them all. How can there only be 10 race variables? In reality, there's more than 1,400 of them. Race by sex by age by Hispanic origin by place of birth by means of commuting to work. There are enumerations of all of these things. These 10 you see here? Just simple population by race. Useful, yes, but only the tip of the iceberg in ACS. 
 
-How would you get data from the ACS? It's somewhat similar to getting the estimates. The difference is specifying which level of geography and which variables you want. For geography, you have state, county, tract, and multiple others. For variables, you can do several at once with a list. Let's get the current number of people in each county and how many are of Hispanic origin.
+How would you get data from the ACS? It's somewhat similar to getting the estimates. The difference is specifying which level of geography and which variables you want. For geography, you have state, county, tract, and multiple others. For variables, you can do several at once with a list. Let's get the current number of people in each county and how many are of Hispanic origin. 
+
+### Exercise 6: Getting ACS data
+
+One of the most common data problems in American government is the confusion over where Hispanic origin belongs in demographic data. The Census Bureau separates race and ethnicity. Under Census Bureau classifications, people pick what race they identify with, and then check if they are of Hispanic origin or not. So people can, for example, be Black and Hispanic -- as many Afro-Caribbean people are. The question of Hispanic origin in the ACS is in variables starting with B03001. And we're looking for data at the county level in your state. It's the same as before -- use the postal code for your state.  
 
 ```{r origin, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
 origin <- get_acs(geography = "____", 
