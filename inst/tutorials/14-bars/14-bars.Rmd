@@ -8,141 +8,365 @@ output:
     ace_theme: github
 runtime: shiny_prerendered
 description: >
-  Making quick graphics for reporting.
+  The first step of visualizing data.
 ---
 ```{r setup, include=FALSE}
 library(learnr)
 library(gradethis)
 library(tidyverse)
-library(lubridate)
+library(tidycensus)
 library(glue)
 knitr::opts_chunk$set(echo = FALSE)
 tutorial_options(exercise.completion=FALSE)
 ```
+```{r load-data, message=FALSE, warning=FALSE}
+state <- Sys.getenv("tutorial.state")
 
+stateName <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/states.csv") |> filter(Postal == state) 
+
+stateName <- stateName |> 
+  mutate(dataurl = case_when(
+    Postal == "AL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "AK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "AZ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "AR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "CA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "CO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "CT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "DE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "FL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "GA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "HI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "ID" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "IL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "IN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "IA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "KS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "KY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "LA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "ME" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NJ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NM" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "ND" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "OH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "OK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "OR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "PA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "RI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "SC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "SD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "TN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "TX" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "UT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "VT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "VA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "WA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "WV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "WI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "WY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    TRUE ~ "https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/nebraska.csv"  # Default case if none match
+  ))
+
+investments <- read_csv(stateName$dataurl)
+
+investmentsrows <- nrow(investments)
+
+countyLanguage <- case_when(
+  state == "AK" ~ c("county equivalent", "county equivalents"),
+  state == "CT" ~ c("planning region", "planning regions"),
+  state == "LA" ~ c("parish", "parishes"),
+  state == "VA" ~ c("county or city", "counties or cities"),
+  TRUE ~ c("county", "counties")
+)
+
+totalinvestments <- investments |> 
+  group_by(county, county_fips) |> 
+  summarize(
+    total_investments = sum(number_of_investments),
+    total_dollars = sum(investment_dollars)
+  )
+
+estimates23 <- get_estimates(geography="county", vintage = 2023, state=state) |> 
+  filter(variable == "POPESTIMATE")
+
+estimatesrows <- nrow(estimates23)
+
+top15 <- totalinvestments |> 
+  ungroup() |> 
+  inner_join(estimates23, by=c("county_fips" = "GEOID")) |> 
+  mutate(
+    investment_dollars_per_person = (total_dollars/value)
+  ) |> 
+  arrange(
+    desc(investment_dollars_per_person)
+  ) |> 
+  top_n(15, wt=investment_dollars_per_person)
+
+
+```
 ## The Goal
 
-In this lesson, you'll learn how to create basic bar charts using ggplot2, a powerful data visualization package in R. By the end of this tutorial, you'll understand how to prepare data for visualization, create a simple bar chart, reorder bars for better readability, and flip coordinates to improve label visibility. You'll practice these skills using real-world data from UNLPD crime reports, gaining practical experience in visualizing data for reporting purposes.
+In this lesson, you'll learn how to create basic bar charts using ggplot2, a powerful data visualization package in R. By the end of this tutorial, you'll understand how to prepare data for visualization, create a simple bar chart, reorder bars for better readability, and flip coordinates to improve label visibility. You'll practice these skills using real-world data from the USDA and the Census Bureau, gaining practical experience in visualizing data for reporting purposes.
+
+## Why visualize data?
+
+Darla Cameron, now the Chief Product Officer at the Texas Tribune, has worked in visual journalism for more than 15 years with stops in Florida, Washington DC and now Texas. She's been at ground zero for an awakening in journalism that started in the 80s, got turbocharged by the internet and now seems like it was always so: journalism can be presented graphically. And for some stories, it's vastly better to do it with graphics. 
+
+"Visual journalism is important because humans communicate visually. That's how we learn to read. That's how we learn to read our parents' faces when we're babies," Cameron said. "We are really good at understanding visual cues and visual context. So as visual journalists, we have this superpower because we can leverage that,
+this thing that's so innate inside people's brains, and we can tell them a story with that. It's amazing. It's so cool."
+
+With this tutorial, you're going to start down the path of turning data into visuals. In my opinion, data journalism and data visualization are two disciplines that blur together so substantially that you shouldn't learn one without learning the other. Learning what makes a better narrative versus a better graphic is a critical skill, one that will make you more valuable in any enterprise that tries to tell stories with data. 
+
+Or, as Cameron puts it, being able to communicate visually gives you a superpower.
+
+"How do you know that somebody's going to read a long narrative?" she said. "You don't. So that's why we need to be thinking about visuals in terms of how we communicate information. And I think it gives, it's like a superpower -- that you can tap into the part of people's brains that can understand information better when they learn it visually. We're visual thinkers. It's so innate."
+
+We're going to start today with bar charts. They're very basic -- some would even say boring -- but very effective. The most important part for you to learn, going forward, is not the code. The code, once you learn the pattern, is very easy and very repetitive. It's not the most important part. The most important part is what does this form of visualization communicate: What does it show? What kind of difference is it good at highlighting? What does it invite a reader to do with it? How much exploration does it encourage? And what kind? Each form of visualization -- the shapes, the colors, the choices -- emphasizes a different thing. Knowing what is good at what is *the* critical skill of the next dozen tutorials.
 
 ## The Basics
 
-Visualizing data is becoming a much greater part of journalism. Large news organizations are creating graphics desks that create complex visuals with data to inform the public about important events. 
+Data visualization has become such an important skill in many different industries that a whole constellation of tools has appeared trying to make building graphics out of your data easy. Some are good, some are terrible, some cost money, some are free. Each attempts to solve a problem in the other, which often creates others. In short, there is no such thing as a perfect data visualization tool. The easier they are, the sooner you outgrow them. The more features they have, the harder they are to learn, say nothing of mastering. You want a tool that allows you to make graphics quickly, but gives you flexibility enough to customize your way into something you would publish. 
 
-To do it well is a course on it's own. And not every story needs a feat of programming and art. Sometimes, you can help yourself and your story by just creating a quick chart. 
+Good news: one of the best libraries for visualizing data is in the `tidyverse` and it threads that needle of making charts with very little code, but if you know how to customize your charts, you can make graphics that would run in any publication in the world.
 
-Good news: one of the best libraries for visualizing data is in the tidyverse and it's pretty simple to make simple charts quickly with just a little bit of code.
-
-Let's revisit some data we've used in the past and turn it into charts.
+Let's revisit some data we've used in the past and turn it into bar charts. First, we need libraries. We're going to start by looking at community investments made by the USDA -- the same dataset we used in Chapter 5. Later, we're going to need some Census data, so to get that, we'll need `tidycensus` as well as the `tidyverse`. 
 
 ```{r load-tidyverse, exercise=TRUE}
 library(tidyverse)
+library(tidycensus)
 ```
 ```{r load-tidyverse-solution}
 library(tidyverse)
+library(tidycensus)
 ```
 ```{r load-tidyverse-check}
 grade_this_code()
 ```
 
-Let's work on some examples using the UNLPD reports data. You can download the data here if you want to use it in your own notebook -- and this is the same data we've used before, so if you already downloaded it, you don't need to do it again. **For purposes of this exercise, you don't need to do this. The data is included here if you want to try this in your own notebook.**
+Now let's get the investments data. As before, you just need to add your state name, all lowercase letters, dashes for spaces. 
 
-```{r echo=FALSE, class.output="bg-info", results="asis",  message=FALSE,  warning=FALSE}
-library(downloadthis)
-library(glue)
-
-dllink <- download_link(
-  link = "https://mattwaite.github.io/datajournalismfiles/crimelogs.csv",
-  button_label = "Download csv file",
-  button_type = "danger",
-  has_icon = TRUE,
-  icon = "fa fa-save",
-  self_contained = FALSE
-)
-
-glue("<pre><p><strong>For this walkthrough:</strong></p><p>{dllink}</p></pre>")
-
+```{r usda-read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
+investments <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/____.csv")
 ```
 
-Now import the data.
+```{r usda-read-check}
+grade_this({
+  if (identical(nrow(.result), investmentsrows)) {
+    pass("Great work! You imported investments in your state.")
+  }
+  fail()
+})
+```
 
-```{r chart-load-data, message=FALSE, warning=FALSE}
-crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
+The universal truth of making graphics from data is that the work you do before you make the graphic will always take longer and be the bigger challenge than actually making the graphic. Often, I can spend hours on the data and minutes on the graphic. The problems you're going to have are going to come before you start making shapes. 
 
-top10 <- crimes |> 
-  group_by(incident_code) |>
-  summarize(
-    count = n()
-  ) |>
-  ungroup() |>
-  top_n(10, wt=count)
+```{r storysetup, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("With that warning in place, let's play pretend. One day, the USDA announces they're pouring a newsworthy amount of money into your {countyLanguage[1]}. Millions of dollars. We looked at housing loans and grants in Chapter 5, so let's use that for our example. The USDA announced a multi-million dollar investment where you live to build housing. It's news. You and your editor sit down to talk about how to cover this, and your editor wonders aloud how does this {countyLanguage[1]} compare with others in {stateName$State} since 2019? Now a question like this can serve two purposes for you, the person who has to answer this. First, it's a good paragraph in your story -- it adds context to a news event. Second, you should immediately realize a paragraph that lists the top 10 {countyLanguage[2]} by USDA investments is going to be boring and hard to read. This is an ideal place for a chart.
+     
+A key skill for data journalists to master is converting the question words people ask into code that answers that question. How does this {countyLanguage[1]} compare to others? So immediately, we need {countyLanguage[2]}, and since we have lots of investments, we're already looking at at `group_by`. And because we're lumping {countyLanguage[2]} together, we need a `summarize`. What makes the most sense here? Add up the dollars.")
 ```
-```{r chart-load-data-exercise, exercise = TRUE}
-crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
+
+That gives us a pretty good template to work from.
+
+Let's start by taking a peek at our data so we know what columns we're working with.
+
+```{r head-data, exercise=TRUE, exercise.setup = "load-data"}
+head(____)
 ```
-```{r chart-load-data-exercise-solution}
-crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
+```{r head-data-solution, exercise.reveal_solution = FALSE}
+head(investments)
 ```
-```{r chart-load-data-exercise-check}
+```{r head-data-check}
 grade_this_code()
 ```
+
+We've laid out what we need from our question words -- `county` and since we want to compare, and dollars is what we're comparing, we want to sum up the `investment_dollars`. I'm going to add two things to this to make our lives easier later -- we're going to add `county_fips` to this and also we're going to add up the number of investments as well. While we're at it, let's arrange it by our total dollars to see who got the most.
+
+### Exercise 1: Getting our data together
+
+```{r group-data, exercise=TRUE, exercise.setup = "load-data"}
+____ |> 
+  group_by(____, county_fips) |> 
+  summarize(
+    total_investments = sum(number_of_investments),
+    total_dollars = sum(____)
+  ) |> 
+  arrange(desc(____))
+
+```
+```{r group-data-solution, exercise.reveal_solution = FALSE}
+investments |> 
+  group_by(county, county_fips) |> 
+  summarize(
+    total_investments = sum(number_of_investments),
+    total_dollars = sum(investment_dollars)
+  )|> 
+  arrange(desc(total_dollars))
+
+```
+```{r group-data-check}
+grade_this_code()
+```
+
+```{r storysetup2, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("Let's look at what we have here. Did we get a list with a big number at the top and smaller numbers on down? Yep. But look closely at it. Using what you know about your state, are these the {countyLanguage[2]} you would expect to see on a list of rural investments? Do you see several {countyLanguage[2]} with fairly sizable populations? Do you see your most sparsely populated {countyLanguage[2]} in the list at the top? Places where a single large investment would have major impact, vs places where most people wouldn't notice the same investment?")
+```
+
+A question that should come with every comparison -- is it fair? Are the things we're comparing on the same footing? Is population a factor here? 
+
+```{r storysetup3, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("Answer ... yep. It would make sense that the USDA would spend more money in places with more people, and less in places with fewer people. In some states, the difference between the largest {countyLanguage[2]} and the smallest can be more than 200 times. Texas may be the most extreme example. In Texas, Harris County -- home of Houston -- is home to 4.8 million people. Texas is also home to the smallest county in the US -- Loving County, population 43. That means Harris County is about 112,445 times larger than Loving County. The difference in any numbers comparing these things are going to be vast.")
+```
+
+How do we solve for this? We put things on a population basis. That might be a simple percentage. It might be a rate -- per person, per 10,000 people, per 100,000 people. But to do that, we need to add population numbers.
+
+Thankfully, you learned how to grab population estimates in the previous chapter, so we're going to get the 2023 estimates for your state using `tidycensus`. Remember -- here you use the postal code of your state to get that data. To speed matters along, we're going to chain a filter onto the end that narrows it down to just population estimates right on import.
+
+```{r census-read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
+estimates23 <- get_estimates(geography="county", vintage = 2023, state="____") |> 
+  filter(variable == "POPESTIMATE")
+```
+
+```{r census-read-check}
+grade_this({
+  if (identical(nrow(.result), estimatesrows)) {
+    pass("Great work! You imported population estimates for your state.")
+  }
+  fail()
+})
+```
+
+Let's take a quick peek at our estimates data to help us with some column names.
+
+```{r head2-data, exercise=TRUE, exercise.setup = "load-data"}
+head(____)
+```
+```{r head2-data-solution, exercise.reveal_solution = FALSE}
+head(estimates23)
+```
+```{r head2-data-check}
+grade_this_code()
+```
+
+As we can see, we have estimates in the `value` column. The other column I want you to pay attention to is `GEOID`, which is the Census Bureau's way of say geographic identifier. That number is a federal government number called a FIPS number (for Federal Information Processing Standards). It's really two numbers -- a state code and a county code. Under FIPS, every state has a FIPS number and then every county has a number. The state numbers are unique. The county numbers, however, repeat in each state. Every state has a 001, 003, 005, 007 and so on. Yes, they're all odd numbers (to make room for new counties, which there aren't a lot of being added these days). 
+
+Recall that with our USDA data, I had you add a column called `county_fips`. Guess what? That number is identical to the GEOID -- meaning we have our keys to join these two datasets together. 
+
+### Exercise 2: joining together
+
+Behind the scenes, I saved your `group_by` and `summarize` work as `totalinvestments`. So what we're going to do here is join together `totalinvestments` and `estimates23`. Remember: our `totalinvestments` data has a `county_fips` column and our estimates has `GEOID`.  
+
+```{r join-data, exercise=TRUE, exercise.setup = "load-data"}
+totalinvestments |> 
+  inner_join(estimates23, by=c("____" = "____"))
+```
+```{r join-data-solution, exercise.reveal_solution = FALSE}
+totalinvestments |> 
+  inner_join(estimates23, by=c("county_fips" = "GEOID"))
+```
+```{r join-data-check}
+grade_this_code()
+```
+
+And just like that, you can see our investments data joined together with our population data. We have `total_dollars` and `value`, which is what we need to make a dollars per person metric. Per is another word you should immediately map to code. Whenever you hear the word per, you should think division. Dollars per person means number of dollars divided by number of people. 
+
+### Exercise 3: Making dollars per person
+
+```{r mutate-data, exercise=TRUE, exercise.setup = "load-data"}
+totalinvestments |> 
+  inner_join(estimates23, by=c("____" = "____")) |>
+  mutate(
+    investment_dollars_per_person = (____/____)
+  ) |> 
+  arrange(
+    desc(investment_dollars_per_person)
+  )
+```
+```{r mutate-data-solution, exercise.reveal_solution = FALSE}
+totalinvestments |> 
+  inner_join(estimates23, by=c("county_fips" = "GEOID")) |> 
+  mutate(
+    investment_dollars_per_person = (total_dollars/value)
+  ) |> 
+  arrange(
+    desc(investment_dollars_per_person)
+  )
+```
+```{r mutate-data-check}
+grade_this_code()
+```
+
+```{r storysetup4, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("Compare this list to your other one. Are the same names at the top? My guess? No. Your top {countyLanguage[2]} are vastly different. Large places are down, small places are up, and what you have here is a measure of the impact these investments have.")
+```
+
+Two last things before we move on to actually making a chart: First, you have a limited amount of space in a chart. Some charts can cram a *lot* of data into a small place. Bar charts are not one of them. If you want to read the labels, you need to limit the number of rows of data you have. Next: we need to save this all to a new dataframe, one we can plug into our chart. 
+
+### Exercise 4: limiting and saving.
+
+Remember all the way back to filters, when we learned about `top_n`, which gives us a top N list of whatever we have. With bar charts, 10 is good, 15 is probably pushing it, and 20 is almost certainly too many. For reasons that will become obvious later, let's push it and go with 15. We're going to name our data `top15`
+
+```{r save-data, exercise=TRUE, exercise.setup = "load-data"}
+____ <- totalinvestments |> 
+  inner_join(estimates23, by=c("____" = "____")) |> 
+  mutate(
+    investment_dollars_per_person = (____/____)
+  ) |> 
+  arrange(
+    desc(investment_dollars_per_person)
+  ) |> 
+  top_n(____, wt=investment_dollars_per_person)
+```
+```{r save-data-solution, exercise.reveal_solution = FALSE}
+top15 <- totalinvestments |> 
+  inner_join(estimates23, by=c("county_fips" = "GEOID")) |> 
+  mutate(
+    investment_dollars_per_person = (total_dollars/value)
+  ) |> 
+  arrange(
+    desc(investment_dollars_per_person)
+  ) |> 
+  top_n(15, wt=investment_dollars_per_person)
+```
+```{r save-data-check}
+grade_this_code()
+```
+
+At long last, we're ready to make bar charts. 
 
 ## Bar charts
 
-The first kind of chart we'll create is a simple bar chart. It's a chart designed to show differences between things -- the magnitude of one compared to the next and the next and the next. So if we have thing, like a county, or a state, or a group name, and then a count or a number attached to the group, we can make a bar chart.
+The simple bar chart is a chart designed to show differences between things -- the magnitude of one compared to the next and the next and the next. So if we have thing, like a county, or a state, or a group name, and then a count or a number attached to the group, we can make a bar chart.
 
-So what does the chart of the top 10 crimes on campus since 2018 look like? 
+Fortunately for us, we have `county` and `investment_dollars_per_person` in our data. Seems we have what we need.
 
-First, we'll create a dataframe of those top 10, called ... top10. Something we haven't worked with a lot here? The top_n function, which creates a top X list where X is the number you want. So ... 10. 
+The library inside the `tidyverse` that does all this charting is called `ggplot2` -- which no one uses the 2, and you won't in code either. Everyone calls it `ggplot` and so we will from now on. `ggplot` is one of the most popular and well known libraries in data science. When people are choosing between using R or Python to do data science, `ggplot` is often one of the reasons people choose R. 
 
-### Excercise 1: Making data
+To use `ggplot`, it follows a slightly different pattern than what we've been doing so long. For example, the first thing is no longer the data name, it's `ggplot`. We invoke it, which creates the canvas. 
 
-```{r top10, exercise=TRUE, exercise.setup = "chart-load-data"}
-____ <- ____ |> 
-  group_by(incident_code) |>
-  summarize(
-    count = n()
-  ) |>
-  ungroup() |>
-  top_n(____, wt=count)
-```
-```{r top10-solution, exercise.reveal_solution = FALSE}
-top10 <- crimes |> 
-  group_by(incident_code) |>
-  summarize(
-    count = n()
-  ) |>
-  ungroup() |>
-  top_n(10, wt=count)
-```
-```{r top10-check}
-grade_this_code()
-```
+Then, in `ggplot`, we work with geometries -- the shape that the data will take -- and aesthetics -- the data that will give it that shape. In a bar chart, we first pass in the data to the geometry, then set the aesthetic. We tell ggplot what the x value is -- in a bar chart, that's almost always your grouping variable from the data you created. Then we tell it the weight of the bar -- the number that will set the height. 
 
-Now ggplot. The first thing we do with ggplot is invoke it, which creates the canvas. In ggplot, we work with geometries -- the shape that the data will take -- and aesthetics -- the data that will give it that shape. In a bar chart, we first pass in the data to the geometry, then set the aesthetic. We tell ggplot what the x value is -- in a bar chart, that's almost always your grouping variable from the data you created. Then we tell it the weight of the bar -- the number that will set the height. To find these, look in the code from exercise 1. What did we call the number? What did we group it by?
+### Exercise 5: Your first bar
 
-Best to take a look:
-
-```{r top10head, exercise=TRUE, exercise.setup = "chart-load-data"}
-head(top10)
-```
-```{r top10head-solution, exercise.reveal_solution = FALSE}
-head(top10)
-```
-```{r top10head-check}
-grade_this_code()
-```
-
-Now that you know the names of your columns, you've got what you need to make a bar chart.
-
-### Exercise 2: Your first bar
-
-```{r bar1, exercise=TRUE, exercise.setup = "chart-load-data"}
+```{r bar1, exercise=TRUE, exercise.setup = "load-data"}
 ggplot() + 
-  geom_bar(data=top10, aes(x=_________, weight=____))
+  geom_bar(data=top15, aes(x=____, weight=____))
 ```
 ```{r bar1-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
-  geom_bar(data=top10, aes(x=incident_code, weight=count))
+  geom_bar(data=top15, aes(x=county, weight=investment_dollars_per_person))
 ```
 ```{r bar1-check}
 grade_this_code()
@@ -150,17 +374,17 @@ grade_this_code()
 
 The bars look good, but the order makes no sense. And, can you read the x axis labels? I can't. 
 
-We'll start with the bars. In ggplot, we use reorder. The thing to understand about reorder is it's WHAT ARE YOU REORDERING, HOW ARE YOU REORDERING IT. So if I had a list of students in a column called Name, and each of their grades were in a column called Grades, I am reordering Name by Grades, so `reorder(Name, Grades)`, for an example. Now apply that same pattern from the data you're working with here: 
+We'll start with the bars. In ggplot, we use reorder -- another change. When working with data, it's arrange. Here, working with shapes, it's reorder. The thing to understand about reorder is it's WHAT ARE YOU REORDERING, HOW ARE YOU REORDERING IT. So if I had a list of students in a column called Name, and each of their grades were in a column called Grades, I am reordering Name by Grades, so `reorder(Name, Grades)`, for an example. Now apply that same pattern from the data you're working with here: 
 
-### Exercise 3: Reordering
+### Exercise 6: Reordering
 
-```{r bar2, exercise=TRUE, exercise.setup = "chart-load-data"}
+```{r bar2, exercise=TRUE, exercise.setup = "load-data"}
 ggplot() + 
-  geom_bar(data=top10, aes(x=reorder(_________, ____), weight=____))
+  geom_bar(data=top15, aes(x=reorder(____, ____), weight=____))
 ```
 ```{r bar2-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
-  geom_bar(data=top10, aes(x=reorder(incident_code, count), weight=count))
+  geom_bar(data=top15, aes(x=reorder(county, investment_dollars_per_person), weight=investment_dollars_per_person))
 ```
 ```{r bar2-check}
 grade_this_code()
@@ -168,37 +392,36 @@ grade_this_code()
 
 Better, but it still looks ... not great on the bottom. We can fix that by flipping the coordinates with `coord_flip()`. That makes vertical bars go horizontal, which makes the labels easier to read. 
 
-### Exercise 4: Flipping
+### Exercise 7: Flipping
 
-```{r bar3, exercise=TRUE, exercise.setup = "chart-load-data"}
+```{r bar3, exercise=TRUE, exercise.setup = "load-data"}
 ggplot() + 
-  geom_bar(data=top10, aes(x=reorder(_________, ____), weight=____)) + 
+  geom_bar(data=top15, aes(x=reorder(____, ____), weight=____)) + 
   coord_flip()
 ```
 ```{r bar3-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
-  geom_bar(data=top10, aes(x=reorder(incident_code, count), weight=count)) + 
+  geom_bar(data=top15, aes(x=reorder(county, investment_dollars_per_person), weight=investment_dollars_per_person)) + 
   coord_flip()
 ```
 ```{r bar3-check}
 grade_this_code()
 ```
 
-Art? No. Tells you the story? Yep. And for reporting purposes, that's enough. 
+Art? No. Tells you the story? Yep. And for now, that's enough. This chart could help us write our story. You should show it to your editor to talk about what else this story could be about rather than just a simple one about a single investment. Would you publish this? Not like this you wouldn't. You need more, and we'll do more later.
 
 ## The Recap
 
-Throughout this lesson, you've learned the fundamentals of creating bar charts with ggplot2. You've practiced preparing data by grouping and summarizing, creating a basic bar chart, reordering bars based on values, and flipping coordinates for better readability. Remember, while these charts may not be publication-ready visualizations, they serve as valuable tools for quickly understanding and reporting on data trends. As you continue your data journalism journey, these skills will help you rapidly explore datasets and identify stories worth telling.
+Throughout this lesson, you've learned the fundamentals of creating bar charts with `ggplot`. You've practiced preparing data by grouping and summarizing, creating a basic bar chart, reordering bars based on values, and flipping coordinates for better readability. Remember, while these charts may not be publication-ready visualizations, they serve as valuable tools for quickly understanding and reporting on data trends.
 
 ## Terms to Know
 
 - `ggplot2`: A data visualization package in R that is part of the tidyverse.
-- Geometry: In ggplot2, the visual representation of data (e.g., bars, points, lines).
-- Aesthetics: In ggplot2, the visual properties of geometries, such as x and y positions, colors, or sizes.
-- `geom_bar()`: A ggplot2 function used to create bar charts.
+- Geometry: In `ggplot`, the visual representation of data (e.g., bars, points, lines).
+- Aesthetics: In `ggplot`, the visual properties of geometries, such as x and y positions, colors, or sizes.
+- `geom_bar()`: A `ggplot` function used to create bar charts.
 - `reorder()`: A function used to change the order of categorical variables, often used for improving chart readability.
-- `coord_flip()`: A ggplot2 function that switches the x and y axes, useful for making horizontal bar charts.
-- `top_n()`: A dplyr function used to select the top (or bottom) n rows from a dataset based on a specified variable.
-- `ungroup()`: A dplyr function that removes grouping from a dataset, often used after group-based operations.
+- `coord_flip()`: A `ggplot` function that switches the x and y axes, useful for making horizontal bar charts.
+- `top_n()`: A `dplyr` function used to select the top (or bottom) n rows from a dataset based on a specified variable.
 - `aes()`: Short for "aesthetics," this function in ggplot2 maps variables in your data to visual properties in the plot.
-- Canvas: In ggplot2, the initial plotting area created by the ggplot() function, onto which layers of geometries and other elements are added.
+- Canvas: In `ggplot`, the initial plotting area created by the `ggplot()` function, onto which layers of geometries and other elements are added.
