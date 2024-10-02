@@ -135,6 +135,11 @@ Or, as Cameron puts it, being able to communicate visually gives you a superpowe
 
 We're going to start today with bar charts. They're very basic -- some would even say boring -- but very effective. The most important part for you to learn, going forward, is not the code. The code, once you learn the pattern, is very easy and very repetitive. It's not the most important part. The most important part is what does this form of visualization communicate: What does it show? What kind of difference is it good at highlighting? What does it invite a reader to do with it? How much exploration does it encourage? And what kind? Each form of visualization -- the shapes, the colors, the choices -- emphasizes a different thing. Knowing what is good at what is *the* critical skill of the next dozen tutorials.
 
+<div class="alert alert-info">
+<h4 class="alert-heading">Key Concept</h4> 
+<p class="mb-0">Bar charts show magnitude -- how much something is in relation to another thing -- and invite comparison.</p>
+</div>
+
 ## The Basics
 
 Data visualization has become such an important skill in many different industries that a whole constellation of tools has appeared trying to make building graphics out of your data easy. Some are good, some are terrible, some cost money, some are free. Each attempts to solve a problem in the other, which often creates others. In short, there is no such thing as a perfect data visualization tool. The easier they are, the sooner you outgrow them. The more features they have, the harder they are to learn, say nothing of mastering. You want a tool that allows you to make graphics quickly, but gives you flexibility enough to customize your way into something you would publish. 
@@ -319,7 +324,8 @@ Two last things before we move on to actually making a chart: First, you have a 
 Remember all the way back to filters, when we learned about `top_n`, which gives us a top N list of whatever we have. With bar charts, 10 is good, 15 is probably pushing it, and 20 is almost certainly too many. For reasons that will become obvious later, let's push it and go with 15. We're going to name our data `top15`
 
 ```{r save-data, exercise=TRUE, exercise.setup = "load-data"}
-____ <- totalinvestments |> 
+____ <- totalinvestments |>
+  ungroup() |> 
   inner_join(estimates23, by=c("____" = "____")) |> 
   mutate(
     investment_dollars_per_person = (____/____)
@@ -331,6 +337,7 @@ ____ <- totalinvestments |>
 ```
 ```{r save-data-solution, exercise.reveal_solution = FALSE}
 top15 <- totalinvestments |> 
+  ungroup() |> 
   inner_join(estimates23, by=c("county_fips" = "GEOID")) |> 
   mutate(
     investment_dollars_per_person = (total_dollars/value)
@@ -343,6 +350,13 @@ top15 <- totalinvestments |>
 ```{r save-data-check}
 grade_this_code()
 ```
+
+Note the `ungroup()` in the code. For `top_n` to work, it can't have grouped dataframes. We used `group_by` to create `totalinvestments`, so we had to ungroup it in order for top_n to work.
+
+<div class="alert alert-warning"> 
+<h4 class="alert-heading">Common Mistake</h4> 
+<p class="mb-0"><code>top_n<code/> not working right? Try ungrouping before you use it.</p>
+</div>
 
 At long last, we're ready to make bar charts. 
 
