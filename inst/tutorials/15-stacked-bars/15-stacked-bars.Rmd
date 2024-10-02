@@ -1,0 +1,377 @@
+---
+title: "Data Journalism Lesson 15: Stacked bar charts"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  Extending the bar chart to add components.
+---
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(tidyverse)
+library(tidycensus)
+library(glue)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+```
+```{r load-data, message=FALSE, warning=FALSE}
+state <- Sys.getenv("tutorial.state")
+
+stateName <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/states.csv") |> filter(Postal == state) 
+
+stateName <- stateName |> 
+  mutate(dataurl = case_when(
+    Postal == "AL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "AK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "AZ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "AR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "CA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "CO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "CT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "DE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "FL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "GA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "HI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "ID" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "IL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "IN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "IA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "KS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "KY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "LA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "ME" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "MT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NJ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NM" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "NC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "ND" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "OH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "OK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "OR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "PA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "RI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "SC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "SD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "TN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "TX" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "UT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "VT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "VA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "WA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "WV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "WI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    Postal == "WY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/", str_to_lower(State), ".csv"),
+    TRUE ~ "https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/nebraska.csv"  # Default case if none match
+  ))
+
+investments <- read_csv(stateName$dataurl)
+
+investmentsrows <- nrow(investments)
+
+countyLanguage <- case_when(
+  state == "AK" ~ c("county equivalent", "county equivalents"),
+  state == "CT" ~ c("planning region", "planning regions"),
+  state == "LA" ~ c("parish", "parishes"),
+  state == "VA" ~ c("county or city", "counties or cities"),
+  TRUE ~ c("county", "counties")
+)
+
+totalinvestments <- investments |> 
+  group_by(county, county_fips) |> 
+  summarize(
+    total_investments = sum(number_of_investments),
+    total_dollars = sum(investment_dollars)
+  )
+
+estimates23 <- get_estimates(geography="county", vintage = 2023, state=state) |> 
+  filter(variable == "POPESTIMATE")
+
+estimatesrows <- nrow(estimates23)
+
+impact <- investments |> 
+  group_by(county, county_fips) |> 
+  summarize(
+    total_investments = sum(number_of_investments),
+    total_dollars = sum(investment_dollars)
+  ) |> 
+  inner_join(estimates23, by=c("county_fips" = "GEOID")) |> 
+  mutate(
+    investment_dollars_per_person = (total_dollars/value)
+  ) |> 
+  arrange(
+    desc(investment_dollars_per_person)
+  ) |> 
+  ungroup() |> 
+  top_n(15, wt=investment_dollars_per_person)
+
+stacked <- investments |> 
+  group_by(county, program_area) |> 
+  summarize(
+    program_dollars = sum(investment_dollars)
+  ) |> 
+  inner_join(impact)
+```
+
+## The Goal
+
+In this lesson, you'll learn how to create stacked bar charts, a powerful visualization for showing both the total magnitude and composition of data across categories. By the end of this tutorial, you'll understand when to use stacked bar charts, how to prepare data in the correct format, and how to construct these charts using ggplot2. You'll practice these skills using real USDA rural investment data, gaining hands-on experience in visualizing how different program areas contribute to total investments across counties. This ability to show both overall amounts and their component parts will be invaluable for presenting complex, multi-category data in your journalism projects.
+
+## Why Visualize Data?
+
+In the last chapter, we looked at the humble bar chart, which is very good at showing how much something is in relation to other things in the chart. It shows magnitude. Today, we're adding a wrinkle to the bar chart that is going to still show magnitude, but now it's going to show composition of that magnitude. It's called the stacked bar chart, and it's very good at showing not only how much of something there is compared to other things, but how much of the things that make up the whole there are. 
+
+Let's use an example that should feel close to home: grades. It's different at every university, but most students take somewhere in the neighorhood of 40 classes. Some students -- like yours truly -- are bad students and end up taking a few more (again). Some students are on the ball and came in with college credit and don't have to take as many classes. But it's all somewhere in that neighborhood. 
+
+With a stacked bar chart, you could look at not only how *many* classes each student took, but what was the grade breakdown they had in those classes. Imagine a bar, broken down into parts. Here's the A part, the B part, the C part, the D part and the F part. Your super nerds who need to go outside and touch some grass are going to have a very big A part and maybe very little of anything else.  Your average student will have some As, some Bs, maybe a C or two and not much else. Terrible students like your author will have some As, some Bs, some Cs, some Ds and a light smattering of Fs that had to be taken over again. What can I say? Ever meet someone on campus who really should have gone somewhere else and grown up a few years before trying to go to college? That was me. 
+
+The point is, how every student gets to graduation day is different. The stacked bar will show that difference far better than a regular bar chart.
+
+## The Basics
+
+To make a stacked bar chart work, you need long data. Recall that we ran into this problem in the Census chapter, where we learned the difference between long data and wide data. To review, using our student grades example, wide data would be something like this:
+
+|Student|As  |Bs  |Cs  |Ds  |Fs  |  
+|-------|----|----|----|----|----|
+|John   |15  |15  |10  |0   |0   |
+|Jane   |25  |10  |5   |0   |0   |
+
+Long data, on the other hand, would be like this:
+
+|Student|Grade|Count|
+|-------|-----|-----|
+|John   |A    |15   |
+|John   |B    |15   |
+|John   |C    |10   |
+|John   |D    |0    |
+|John   |F    |0    |
+|Jane   |A    |25   |
+|Jane   |B    |10   |
+|Jane   |C    |5    |
+|Jane   |D    |0    |
+|Jane   |F    |0    |
+
+What `ggplot` is going to do is group each student together by their name, then create a bar chart of each grade count all on the same line. We'll tell it to make each segment a different color to separate them out. 
+
+Instead of grades -- which I don't have -- let's use our USDA data from the bar charts lesson, and this time we're going to speed up the making of the data a smidge to get to it quicker.
+
+First, we need libraries. 
+
+```{r load-tidyverse, exercise=TRUE}
+library(tidyverse)
+library(tidycensus)
+```
+```{r load-tidyverse-solution}
+library(tidyverse)
+library(tidycensus)
+```
+```{r load-tidyverse-check}
+grade_this_code()
+```
+
+Now let's get the investments data. As before, you just need to add your state name, all lowercase letters, dashes for spaces. 
+
+```{r usda-read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
+investments <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/rural-grants/____.csv")
+```
+
+```{r usda-read-check}
+grade_this({
+  if (identical(nrow(.result), investmentsrows)) {
+    pass("Great work! You imported investments in your state.")
+  }
+  fail()
+})
+```
+
+And now the Census data. Remember -- here you use the postal code of your state to get that data. To speed matters along, we're going to chain a filter onto the end that narrows it down to just population estimates right on import.
+
+```{r census-read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
+estimates23 <- get_estimates(geography="county", vintage = 2023, state="____") |> 
+  filter(variable == "POPESTIMATE")
+```
+
+```{r census-read-check}
+grade_this({
+  if (identical(nrow(.result), estimatesrows)) {
+    pass("Great work! You imported population estimates for your state.")
+  }
+  fail()
+})
+```
+
+Now, to speed things up, we're going to create a dataframe called `impact` that is going to do everything we did to prepare our bar charts before, but in one block. We're going to total up investments in each county, join the census data to it, mutate a new `investment_dollars_per_person` column and use `top_n` to get the top 15 counties most impacted by these investments. It might *seem* like a lot of code, but it's all things you've already done, just stacked together instead of pulled apart into steps.
+
+```{r join-data, exercise=TRUE, exercise.setup = "load-data"}
+impact <- investments |> 
+  group_by(____, county_fips) |> 
+  summarize(
+    total_investments = sum(number_of_investments),
+    total_dollars = sum(investment_dollars)
+  ) |> 
+  inner_join(estimates23, by=c("county_fips" = "GEOID")) |> 
+  mutate(
+    ____ = (total_dollars/value)
+  ) |> 
+  arrange(
+    desc(investment_dollars_per_person)
+  ) |> 
+  ungroup() |> 
+  top_n(____, wt=investment_dollars_per_person)
+```
+```{r join-data-solution, exercise.reveal_solution = FALSE}
+impact <- investments |> 
+  group_by(county, county_fips) |> 
+  summarize(
+    total_investments = sum(number_of_investments),
+    total_dollars = sum(investment_dollars)
+  ) |> 
+  inner_join(estimates23, by=c("county_fips" = "GEOID")) |> 
+  mutate(
+    investment_dollars_per_person = (total_dollars/value)
+  ) |> 
+  arrange(
+    desc(investment_dollars_per_person)
+  ) |> 
+  ungroup() |> 
+  top_n(15, wt=investment_dollars_per_person)
+```
+```{r join-data-check}
+grade_this_code()
+```
+
+Now, our data is currently just county totals with a new measure of impact. And that's fine for bar charts, but for stacked bar charts we're looking at **categories** of our data within each county. One thing you want to be careful about is the *number* of categories you include. Rule of thumb? About the max you want to look at is 5. Any more than that and you're going to have a lot of colors to manage and it's hard to interpret what is going on. 
+
+Our original `investments` data has a column called `program_area` that we've looked at before in the filtering chapter. There, we looked at investments in housing. But here, since we're interested in all of the categories, it would be useful for us to create a summary of dollars in each county AND each program area. See if you can re-interpret how I said that into code.
+
+
+```{r join2-data, exercise=TRUE, exercise.setup = "load-data"}
+investments |> 
+  group_by(____, ____) |> 
+  summarize(
+    program_dollars = sum(investment_dollars)
+  )
+```
+```{r join2-data-solution, exercise.reveal_solution = FALSE}
+investments |> 
+  group_by(county, program_area) |> 
+  summarize(
+    program_dollars = sum(investment_dollars)
+  ) 
+```
+```{r join2-data-check}
+grade_this_code()
+```
+
+And, notice, we have long data. Each program area is one line. So a county appears multiple times, but each program area appears only once for that county (if they have an investment in that particular area). 
+
+```{r storysetup, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("So what's left to do? Note we have long data for *every* {countyLanguage[1]} in {stateName$State}. That is going to be way too much data. And we're interested in the top 15 by impact -- a number we *don't* have in our data. How do we get just the top 15, but by program area?")
+```
+
+Joining. Remember: we have a dataframe called `impact` and it has stuff we need in it. Another thing to remember from the joining chapter -- when we use `inner_join`, it keeps all rows that match from **both** dataframes. Meaning if we use `inner_join`, we'll get all rows from our program_areas group by work *and* a row that matches the county name from our top 15. We *won't* get places that *aren't* in the top 15. 
+
+While we're at this, we're going to store this in a new dataframe called `stacked`.
+
+
+```{r join3-data, exercise=TRUE, exercise.setup = "load-data"}
+____ <- investments |> 
+  group_by(____, ____) |> 
+  summarize(
+    program_dollars = sum(investment_dollars)
+  ) |> 
+  inner_join(____)
+```
+```{r join3-data-solution, exercise.reveal_solution = FALSE}
+stacked <- investments |> 
+  group_by(county, program_area) |> 
+  summarize(
+    program_dollars = sum(investment_dollars)
+  ) |> 
+  inner_join(impact)
+```
+```{r join3-data-check}
+grade_this_code()
+```
+
+We'll take a look at the results in the next section, but you're ready to move forward. You've got long data, broken down by categories, for a small enough set of data that it will make a useful graphic. 
+
+## The Stacked Bar
+
+To make a stacked bar chart, we need three things: A grouping (in our case, a `county`), a number to give the bars size, and a category to give the bars color (and to separate the components). 
+
+Let's take a look at our data. 
+
+```{r head-data, exercise=TRUE, exercise.setup = "load-data"}
+head(____)
+```
+```{r head-data-solution, exercise.reveal_solution = FALSE}
+head(stacked)
+```
+```{r head-data-check}
+grade_this_code()
+```
+
+More often than not with stacked bar charts, what you need to make each bar and to make the colors comes from your group by work. So just like last time, each bar is going to be a `county`. We're looking at the program dollars this time to give the bars size, and each program dollar comes from a program area. 
+
+How do we give each segment a new color? We're going to add a new thing to our bar chart called the `fill`. It does what you think -- fills in the bar with a color for each program area in that county. 
+
+```{r bar1, exercise=TRUE, exercise.setup = "load-data"}
+ggplot() + 
+  geom_bar(data=stacked, aes(x=____, weight=____, fill=____))
+```
+```{r bar1-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_bar(data=stacked, aes(x=county, weight=program_dollars, fill=program_area))
+```
+```{r bar1-check}
+grade_this_code()
+```
+
+And just like that, we've made a stacked bar chart. But just like our first, bar chart, it needs help to be readable. What we did last time works here too, but we're going to add one wrinkle. Last time, we reordered by the same number in our weight. In this case, we want the bars to be in order of `total_dollars`, not `program_dollars`. Think of it this way -- the `total_dollars` determines the total size of the bar. The `program_dollars` determines the size of each segment. And we'll throw a `coord_flip()` on the end to make it more readable.
+
+```{r bar2, exercise=TRUE, exercise.setup = "load-data"}
+ggplot() + 
+  geom_bar(data=stacked, aes(x=reorder(____, ____), weight=____, fill=____)) +
+  coord_flip()
+```
+```{r bar2-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_bar(data=stacked, aes(x=reorder(county, total_dollars), weight=program_dollars, fill=program_area)) + 
+  coord_flip()
+```
+```{r bar2-check}
+grade_this_code()
+```
+
+```{r storysetup2, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("Now, just like our mythical students and their quest to get to graduation day, each {countyLanguage[1]} in {stateName$State} gets to the total dollars of investments from the USDA in a different way. Major programs include community centers and business programs. Look at your {countyLanguage[2]} in your chart and interpret how the top places built their total investments. What program areas were the focus in those places? How are they different from each other? That's what stacked bar charts invite you to do.")
+```
+
+## The Recap
+
+Throughout this lesson, you've mastered the creation of stacked bar charts, a versatile tool for visualizing both totals and their component parts. You've learned to prepare data in the necessary "long" format, combine datasets to focus on the most relevant information, and use ggplot2 to construct informative stacked bar charts. Remember, stacked bar charts are particularly effective when you need to show both overall magnitudes and the composition of those totals across categories.
+
+## Terms to Know
+
+- Stacked bar chart: A type of bar chart where bars are divided into segments, each representing a subcategory of the total.
+- Long data: A data format where each row represents a single observation, with categories spread across multiple rows rather than columns.
+- Wide data: A data format where each row represents a complete set of observations, with categories spread across multiple columns.
+- `geom_bar()`: A `ggplot` function used to create bar charts, including stacked bar charts when fill is specified within aes().
+- `fill`: An aesthetic in `ggplot` used to specify the variable that determines the color of bar segments in a stacked bar chart.
+- `reorder()`: A function used to change the order of categorical variables, often used to sort bars by a numeric value.
+- `coord_flip()`: A ggplot2 function that switches the x and y axes, often used to create horizontal bar charts.
