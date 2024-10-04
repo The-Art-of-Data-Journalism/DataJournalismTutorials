@@ -120,7 +120,7 @@ top15 <- totalinvestments |>
 
 In this lesson, you'll learn how to create basic bar charts using ggplot2, a powerful data visualization package in R. By the end of this tutorial, you'll understand how to prepare data for visualization, create a simple bar chart, reorder bars for better readability, and flip coordinates to improve label visibility. You'll practice these skills using real-world data from the USDA and the Census Bureau, gaining practical experience in visualizing data for reporting purposes.
 
-## Why visualize data?
+## Why Visualize Data?
 
 Darla Cameron, now the Chief Product Officer at the Texas Tribune, has worked in visual journalism for more than 15 years with stops in Florida, Washington DC and now Texas. She's been at ground zero for an awakening in journalism that started in the 80s, got turbocharged by the internet and now seems like it was always so: journalism can be presented graphically. And for some stories, it's vastly better to do it with graphics. 
 
