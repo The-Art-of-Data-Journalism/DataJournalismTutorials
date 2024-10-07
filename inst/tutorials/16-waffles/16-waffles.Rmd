@@ -13,253 +13,398 @@ description: >
 ```{r setup, include=FALSE}
 library(learnr)
 library(gradethis)
+library(glue)
+library(tidyverse)
 library(waffle)
 knitr::opts_chunk$set(echo = FALSE)
 tutorial_options(exercise.completion=FALSE)
 ```
+```{r load-data, message=FALSE, warning=FALSE}
+house <- c("Republicans" = 220, "Democrats" = 212, "Vacant" = 3)
 
+state <- Sys.getenv("tutorial.state")
+
+stateName <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/states.csv") |> filter(Postal == state) 
+
+legislatures <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/state-legislatures/legislatures.csv")
+
+xgr <- legislatures |> filter(state == stateName$State)
+
+xgrrows <- nrow(xgr)
+
+senate <- xgr |> 
+  select(state, senate_dem, senate_rep, senate_other, senate_vacant) |>
+  pivot_longer(
+    cols=c(-state),
+    names_to = "party",
+    values_to = "members"
+  )
+
+mostpartisan <- legislatures |> 
+  mutate(partisan_lean = 
+           case_when(
+             senate_dem > senate_rep ~ senate_dem/total_senate,
+             senate_dem < senate_rep ~ senate_rep/total_senate
+             )
+         ) |> 
+  top_n(10, wt=partisan_lean) |> 
+  select(state, starts_with("senate")) |> 
+  pivot_longer(
+    cols=-state,
+    names_to = "party",
+    values_to = "members"
+  )
+
+if (stateName$State %in% mostpartisan$state) {
+  xgrs <- mostpartisan
+} else {
+  xgrs <- bind_rows(mostpartisan, senate)
+}
+
+```
 ## The Goal
 
-In this lesson, you'll learn how to create waffle charts, an effective alternative to pie charts for visualizing proportions. By the end of this tutorial, you'll understand how to use the waffle library in R to construct single and comparative waffle charts. You'll practice creating these charts with real data from university enrollment statistics, learning how to adjust chart parameters for clarity and how to handle uneven data comparisons. This skill will enable you to present proportional data in a clear, visually appealing format that's easier to interpret than traditional pie charts.
+In this lesson, you'll learn how to create waffle charts, an effective alternative to pie charts for visualizing proportions. By the end of this tutorial, you'll understand how to use the waffle library in R to construct single and comparative waffle charts. You'll practice creating these charts with real data from the US Census Bureau, learning how to adjust chart parameters for clarity and how to handle uneven data comparisons. This skill will enable you to present proportional data in a clear, visually appealing format that's easier to interpret than traditional pie charts.
+
+## Why Visualize Data?
+
+Pie charts are the devil. They should be an instant F in any data visualization class. The problem with them? How carefully can you evaluate angles and area? Unless they are blindingly obvious and only a few categories, not well. If you've got 25 categories, how can you tell the difference between 7 and 9 percent? You can't.
+
+So let's introduce a better way: The waffle chart. Why a waffle chart? Because it's made up of small squares, just like a waffle. Some call it a square pie chart. I personally hate that. Waffles it is. 
+
+A waffle chart is very similar to a stacked bar chart. **A waffle chart is designed to show you parts of the whole -- proportionality**. How many things make up the whole. It will also show magnitude, just like a stacked bar. 
+
+What's the difference? 
+
+The truth is, there really isn't one. If I had to stand before a judge and come up with an answer or go to jail, I'd say that a stacked bar chart can get more things in it -- more counties, more states, more schools, etc. The waffle chart demands focus -- which you'll see in a minute -- and so you can really only handle a small number of waffle charts at once. Two is great. Three is fine. Five is pushing it. Ten has to be something really special. But with a stacked bar, 10 is easily doable. 
+
+What that boils down to is that a waffle is a visually different form that accomplishes the same goal as a stacked bar chart, but works best when there's only a couple of things to compare. A two-bar stacked bar chart would look silly. A two-stack waffle chart would look great. 
 
 ## The Basics
 
-Pie charts are the devil. They should be an instant F in any data visualization class. The problem? How carefully can you evaluate angles and area? Unless they are blindingly obvious and only a few categories, not well. If you've got 25 categories, how can you tell the difference between 7 and 9 percent? You can't.
+Waffle charts are not built into `ggplot`. You can do a lot with `ggplot` but there are a world of developers out there building tools that use ggplot in the background but extend the functionality to do things the main library can't do. The waffle library is one of those. Like all libraries outside of the mega libraries (like the `tidyverse`), the quality and stability can be up and down. Personally, I love the waffle library, in spite of its flaws.
 
-So let's introduce a better way: The Waffle Chart. Some call it a square pie chart. I personally hate that. Waffles it is. 
+One of those flaws is that it's just easier to make your own data and bring it in than it is to try and use dataframes. And, while last year the library added `geom_waffle` to the party, it's just one of the ways to interact with it, and using the geom is substantially more difficult to fine tune. The end result -- waffle chart code looks very different from what you've done up to now, but the reality is, underneath it all, it's still using ggplot to draw the chart, no matter which way you go. 
 
-**A waffle chart is designed to show you parts of the whole -- proportionality**. How many things make up the whole.
-
-Let's look extremely locally to us and look at the College of Journalism. 
-
-To start, we load the waffle library. For this exercise, we don't need the tidyverse. 
+To start, we load the `tidyverse` and `waffle` libraries. 
 
 ```{r load-waffle, exercise=TRUE}
+library(tidyverse)
 library(waffle)
 ```
 ```{r load-waffle-solution}
+library(tidyverse)
 library(waffle)
 ```
 ```{r load-waffle-check}
 grade_this_code()
 ```
 
-## Making waffles with vectors
+We're going to try this waffle chart several different ways. The first way we're going to do it is completely without the tidyverse (at least, openly on the surface).
 
-The easiest way to do waffle charts is to make vectors of your data and plug them in. To make a vector, we use the `c` or concatenate function. We did this all the way back in Lesson 1. 
+The easiest way to do waffle charts is to make named vectors of your data and plug them in. To make a vector, we use the `c` or concatenate function. We did this all the way back in Lesson 1. 
 
-So let's look at the college. These are the latest numbers from the university.  
+For this, we're going to look at the partisan breakdown of the US House of Representatives. The House, without editorializing, is a mess, precisely because it's almost evenly divided (history nerd note: The House is supposed to be a mess. It was designed that way by the Founders. This is nothing new). For any measure to pass the House, the majority party has to have all of it's members on board. They can't have people voting against. So what does that look visually?
 
-```{r waffle-load-data, message=FALSE, warning=FALSE}
-enrollment <- c("Advertising" = 436, "Broadcasting" = 118, "Journalism" = 107, "Sports Media" = 314)
+First, we'll make our named vector. The named vector pattern is "What Is This Thing" = number of that thing. So there's 220 Republican members of the House, 212 Democrats and 3 seats are vacant as of this writing. 
 
-cojmc <- c("Men" = 324, "Women" = 431)
-cob <- c("Men" = 1890, "Women" = 1104)
-
-cojmc2 <- c("Men" = 324, "Women" = 431, 2239)
-cob2 <- c("Men" = 1890, "Women" = 1104)
+```{r load-data-exercise, exercise = TRUE}
+house <- c("Republicans" = 220, "Democrats" = 212, "Vacant" = 3)
 ```
-```{r waffle-load-data-exercise, exercise = TRUE}
-enrollment <- c("Advertising" = 436, "Broadcasting" = 118, "Journalism" = 107, "Sports Media" = 314)
+```{r load-data-exercise-solution}
+house <- c("Republicans" = 220, "Democrats" = 212, "Vacant" = 3)
 ```
-```{r waffle-load-data-exercise-solution}
-enrollment <- c("Advertising" = 436, "Broadcasting" = 118, "Journalism" = 107, "Sports Media" = 314)
-```
-```{r waffle-load-data-exercise-check}
+```{r load-data-exercise-check}
 grade_this_code()
 ```
 
-So what does the breakdown of the college look like?
+So what does the breakdown look like visually?
 
 ### Exercise 1: Make a waffle chart
 
-The waffle library can break this down in a way that's easier on the eyes than a pie chart. We call the `waffle` function, add the data for the college, specify the number of rows (5 is a good start), give it a title and an x value label, and to clean up a quirk of the library, we've got to specify colors. 
+The waffle library can break this down in a way that's easier on the eyes than a pie chart. We call the `waffle` function, add the name of the data for the House we created above, specify the number of rows (10 is a good start), give it a title and an x value label, and to clean up a quirk of the library, we've got to specify colors. Here, the colors are easy to specify because of the whole red state blue state business. You can specify colors using HTML hex codes if you want, but ggplot has built in color names that you can just use. Hex codes are useful when your groups are things like, say, sports teams where the very specific color helps identify them. 
 
-```{r waffle, exercise=TRUE, exercise.setup = "waffle-load-data", message=FALSE}
+```{r waffle, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
 waffle(
         ____, 
         rows = ____, 
-        title="COJMC majors", 
-        xlab="1 square = 1 major", 
-        colors = c("#E41C38", "#045CB8", "#249C38", "#44DCB8")
+        title="Partian breakdown of the House", 
+        xlab="1 square = 1 representative", 
+        colors = c("red", "blue", "grey")
 )
 ```
 ```{r waffle-solution, exercise.reveal_solution = FALSE}
 waffle(
-        enrollment, 
-        rows = 5, 
-        title="COJMC majors", 
-        xlab="1 square = 1 major", 
-        colors = c("#E41C38", "#045CB8", "#249C38", "#44DCB8")
+        house, 
+        rows = 10, 
+        title="Partian breakdown of the House", 
+        xlab="1 square = 1 representative", 
+        colors = c("red", "blue", "grey")
 )
 ```
 ```{r waffle-check}
 grade_this_code()
 ```
 
-Uh oh. We did everything right, but we see nothing. Why might that be? Well, you're trying to cram almost 1,000 squares in 5 rows into this small window. The waffle library is doing that, but in order to make them all fit, they have to be tiny. That isn't working very well. The solution? Division! 
+Now, this chart is attempting to put 435 dots on a chart, so they get kind small. Can we control that? The answer is: a little. How do we do that? Division.
 
-### Exercise 2: Divide by 10
+### Exercise 2: Divide by 
 
-The Waffle library has a neat feature that you can automatically turn each square into a factor of whatever number you want by just dividing your data vector by a number. So 1000 squares too many? Why not try dividing the data by 10? 
+The Waffle library has a neat feature that you can automatically turn each square into a factor of whatever number you want by just dividing your vector by a number. Want one dot to equal 10 members of Congress? Divide your vector name by 10. Note, however -- there's three vacancies. If you divide by 10, you won't see them because 3/10 is .3 which is less than one, so it won't appear. Let's solve that by dividing by 3.
 
-```{r waffle2, exercise=TRUE, exercise.setup = "waffle-load-data", message=FALSE}
+```{r waffle2, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
 waffle(
         ____/____, 
-        rows = ____, 
-        title="COJMC majors", 
-        xlab="1 square = 10 majors", 
-        colors = c("#E41C38", "#045CB8", "#249C38", "#44DCB8")
+        rows = 10, 
+        title="Partian breakdown of the House", 
+        xlab="1 square = 3 representatives", 
+        colors = c("red", "blue", "grey")
 )
 ```
 ```{r waffle2-solution, exercise.reveal_solution = FALSE}
 waffle(
-        enrollment/10, 
-        rows = 5, 
-        title="COJMC majors", 
-        xlab="1 square = 10 majors", 
-        colors = c("#E41C38", "#045CB8", "#249C38", "#44DCB8")
+        house/3, 
+        rows = 10, 
+        title="Partian breakdown of the House", 
+        xlab="1 square = 3 representatives", 
+        colors = c("red", "blue", "grey")
 )
 ```
 ```{r waffle2-check}
 grade_this_code()
 ```
 
-And now you have a waffle chart that shows journalism and broadcasting are two slices sandwiched between advertising and sports. 
+And now you have a waffle chart that shows the partisan breakdown of the People's House. A very good question to ask yourself right now -- is it a *good* chart? What story is it telling? Is that clear? Here's another question -- do we need this chart to tell this story? The house is nearly evenly divided. We've made a chart, dividing by 3, where it would take a beat or two for you to see that there's almost exactly the same number of dots for each party. Do we need to represent that visually? 
 
-## Two waffles = waffle iron
+I would say no. If your chart doesn't show some kind of difference -- tell some kind of story -- then a sentence in your story will do the same job with less code and with the same impact.
 
-What does it look like if we compare the gender breakdown of two colleges? In other words -- what if we have two waffles? To do that -- and I am not making this up -- you have to create a waffle iron. Get it? Waffle charts? Iron?
+## Now With geom_waffle
 
-To make an waffle iron, you wrap your `waffle` functions in an `iron` function. The `iron` is just a wrapper -- it just combines them together. Each waffle functions separately in the iron. 
+What does it look like if we try to use a dataframe instead of a named vector? And then what about geom_waffle?
 
-In this block, we're going to set up vectors comparing the College of Journalism and the College of Business (boo, we hate them).
+The first thing that you need to know is that for this to work, your data needs to be long data, and you want as little of it as you can get. 
 
-```{r waffle3, exercise=TRUE, exercise.setup = "waffle-load-data", message=FALSE}
-cojmc <- c("Men" = 324, "Women" = 431)
-cob <- c("Men" = 1890, "Women" = 1104)
+```{r storysetup, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+if (stateName$State == "Nebraska") {
+  glue("Instead of Congress, let's look at the partisan breakdown of the {stateName$State} Legislature. Now, technically speaking, the Nebraska Legislature is weird. First, the data is going to call it the state senate, but Nebraska only has one chamber (and it's members are called senators). But also: Nebraska is officially non-partisan. But which party each member belongs to is an open secret, so I've added the partisan breakdown to the National Conference of State Legislature's data on partisan control of state legsilatures.")
+} else {
+  "Instead of Congress, let's look at the partisan breakdown of the {stateName$State} Senate. Why the senate and not the house? Well, not every state has a house (cough, cough Nebraska), so to make it easier, we'll focus on the chamber everyone has. This data comes from the National Conference of State Legislature's data on partisan control of state legsilatures."
+}
 ```
-```{r waffle3-solution, exercise.reveal_solution = FALSE}
-cojmc <- c("Men" = 324, "Women" = 431)
-cob <- c("Men" = 1890, "Women" = 1104)
+
+We're going to grab the data and filter all in one step. You just need to add your state name to the filter.
+
+```{r xgr-read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
+legislatures <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/state-legislatures/legislatures.csv")
+
+xgr <- legislatures |> filter(state == "____")
 ```
-```{r waffle3-check}
+
+```{r xgr-read-check}
+grade_this({
+  if (identical(nrow(.result), xgrrows)) {
+    pass("Great work! You've got your state's legislature.")
+  }
+  fail()
+})
+```
+
+Let's take a quick look at it. It won't take long -- it's one row of data. FYI: The data name `xgr` is one of those old-timey journalism terms from way back in the day. In the Times of Yore, legislature stories from the AP all started with the slug XGR.
+
+```{r head-data, exercise=TRUE, exercise.setup = "load-data"}
+head(____)
+```
+```{r head-data-solution, exercise.reveal_solution = FALSE}
+head(xgr)
+```
+```{r head-data-check}
 grade_this_code()
 ```
 
-### Exercise 3: The waffle iron
+The problem we have is that it's one row -- and it's got lots of things we don't want or need. First, we want to get rid of all columns that aren't senate related. We can do that with select and just add each column we want. Then, we'll use `pivot_longer` -- the twin sibling of `pivot_wider` -- to make our wide data long. With `pivot_longer`, you have to tell it what columns are getting pivoted. You can just name them. But in our case, since we're pivoting every column *except* state, we can use a trick. If you put a negative sign in front of a column in cols, what you're saying is pivot everything EXCEPT this one. Then, instead of `names_from` and `values_from` like we used with `pivot_wider`, here we are giving names to two new columns. And because we're giving the names with `names_to` and `values_to` we can make these whatever we want. The first one is going to be the party, the second is the number of members in that party. Here's what it looks like.
 
-Now we just have to plug our cojmc and cob vectors into waffles. This time, however, we're going to divide by 20 because the numbers are bigger.  
+```{r waffle4, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
+senate <- xgr |> 
+  select(state, senate_dem, senate_rep, senate_other, senate_vacant) |> 
+  pivot_longer(
+    cols=c(-state),
+    names_to = "party",
+    values_to = "members"
+  )
 
-```{r waffle4, exercise=TRUE, exercise.setup = "waffle-load-data", message=FALSE}
-iron(
-  waffle(
-  ____/20,
-  rows=5,
-  title="COJMC gender breakdown", 
-  xlab="1 square = 20 students",
-  colors = c("orange", "green")
-),
-  waffle(
-  ____/20,
-  rows=5,
-  title="COB gender breakdown", 
-  xlab="1 square = 20 students",
-  colors = c("orange", "green")
-)
-)
 ```
 ```{r waffle4-solution, exercise.reveal_solution = FALSE}
-iron(
-  waffle(
-  cojmc/20,
-  rows=5,
-  title="COJMC gender breakdown", 
-  xlab="1 square = 20 students",
-  colors = c("orange", "green")
-),
-  waffle(
-  cob/20,
-  rows=5,
-  title="COB gender breakdown", 
-  xlab="1 square = 20 students",
-  colors = c("orange", "green")
-)
-)
+senate <- xgr |> 
+  select(state, senate_dem, senate_rep, senate_other, senate_vacant) |>
+  pivot_longer(
+    cols=c(-state),
+    names_to = "party",
+    values_to = "members"
+  )
 ```
 ```{r waffle4-check}
 grade_this_code()
 ```
 
-What do you notice about this chart? Notice how the squares aren't the same size? Well, I'm sad to say, the COB is much larger than COJMC. So the squares aren't the same size because the numbers aren't the same. 
+Now take a look at `senate`:
 
-### Exercise 4: Adding padding
+```{r head2-data, exercise=TRUE, exercise.setup = "load-data"}
+head(____)
+```
+```{r head2-data-solution, exercise.reveal_solution = FALSE}
+head(senate)
+```
+```{r head2-data-check}
+grade_this_code()
+```
 
-We can fix the uneven box sizes by adding an unnamed padding number so the number of majors add up to the same thing. The COB's total majors is 2994, to COJMC's 755. To make the squares the same, we need to make the total for COJMC be 2994. To do that, we need to add 2239 to COJMC. IMPORTANT NOTE: Don't name it or it'll show up in the legend.
+Now, we could use the `waffle` function here exactly like we did with the house vector before, but we're going to grow a bit and use `geom_waffle`. 
 
-Now, in our waffle iron, if we don't give that padding a color, we'll get an error. So we need to make it white. Which, given our white background, means it will disappear.
+### Exercise 3: geom_waffle
 
-```{r waffle5, exercise=TRUE, exercise.setup = "waffle-load-data", message=FALSE}
-cojmc2 <- c("Men" = 324, "Women" = 431, ____)
-cob2 <- c("Men" = 1890, "Women" = 1104)
+`geom_waffle` works similarly to other geoms we've worked with. This time, in the `aes`, instead of `x` or `y`, we're using `fill` and `values`. Fill is going to be what makes the colors of the boxes. In our case -- `party`. Then, values is the number column. What did we call that?
 
-iron(
-  waffle(
-  ____/20,
-  rows=5,
-  title="COJMC gender breakdown", 
-  xlab="1 square = 20 students",
-  colors = c("orange", "green", "____")
-),
-  waffle(
-  ____/20,
-  rows=5,
-  title="COB gender breakdown", 
-  xlab="1 square = 20 students",
-  colors = c("orange", "green")
-)
-)
+Outside of the `aes`, you'll see some additional stuff we need to make this look similar to our previous work. First -- instead of `rows` it's now `n_rows`. The `size` here is the size of the whitespace between the boxes. The `color` here is the color of that border around the boxes. 
+
+To add the colors, we have to use `scale_fill_manual` which is a way of manually assigning colors to each item in the legend, in the order they appear. What does `theme_void()` do? It removes all the default backgrounds, labels, axis ticks, gridlines -- everything. 
+
+```{r waffle5, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
+ggplot() + 
+  geom_waffle(
+    data=____,
+    aes(fill = ____, values = ____),
+    n_rows = 5,
+    size = 1.125,
+    color= "white"
+  ) +
+  scale_fill_manual(values = c("blue", "orange", "red", "grey")) +
+  theme_void()
 ```
 ```{r waffle5-solution, exercise.reveal_solution = FALSE}
-cojmc2 <- c("Men" = 324, "Women" = 431, 2239)
-cob2 <- c("Men" = 1890, "Women" = 1104)
-
-iron(
-  waffle(
-  cojmc2/20,
-  rows=5,
-  title="COJMC gender breakdown", 
-  xlab="1 square = 20 students",
-  colors = c("orange", "green", "white")
-),
-  waffle(
-  cob2/20,
-  rows=5,
-  title="COB gender breakdown", 
-  xlab="1 square = 20 students",
-  colors = c("orange", "green")
-)
-)
+ggplot() + 
+  geom_waffle(
+    data=senate,
+    aes(fill = party, values = members),
+    n_rows = 5,
+    size = 1.125,
+    color= "white"
+  ) +
+  scale_fill_manual(values = c("blue", "orange", "red", "grey")) +
+  theme_void()
 ```
 ```{r waffle5-check}
 grade_this_code()
 ```
 
-News flash: COB is big. Also, lots and lots of dudes. 
+Now we have a similar -- but not quite exact -- copy of what we did with the House, except now for your state's senate. Which party has the majority? Is that clear from your chart?  
+
+### Exercise 4: Letting geom_waffle shine
+
+What if we want to look at multiple states? We have some options. One is a function in the `waffle` library called `iron` -- get it? Waffle iron? -- that will put multiple waffles together. Or, we can use some ggplot tricks using `geom_waffle`.
+
+```{r storysetup2, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("Behind the scenes, I've created a dataframe called `xgrs` that has the most lopsided partisan legislatures in the US so we can compare {stateName$State} to those. My definition of lopsided partisan -- take the party with the majority, divide it by the total number of seats. Basically, the percentage of seats to that party. Arrange by that percentage and take the top 10. What you get are the 10 bluest or reddest state senates in the country.")
+```
+
+So how does yours compare?
+
+The trick here is using something called faceting. Faceting makes lots of little charts based on a category -- like a state, or year, or something like that. With `geom_waffle` before, we made one waffle with one state. With faceting, we can make a waffle for *each* state, faceting on the state name. 
+
+Let's take a quick peek at `xgrs` before we try to chart this.
+
+```{r head3-data, exercise=TRUE, exercise.setup = "load-data"}
+head(____)
+```
+```{r head3-data-solution, exercise.reveal_solution = FALSE}
+head(xgrs)
+```
+```{r head3-data-check}
+grade_this_code()
+```
+
+Just like our previous dataframe, there's a `party` and a `members` column. What we need to `facet_wrap` -- that's the `state`.
+
+
+```{r waffle6, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
+ggplot() +
+  geom_waffle(
+    data=xgrs,
+    aes(fill=____, values = ____),
+    color="white", 
+    size=.25,
+    n_rows = 2, 
+    flip = TRUE
+  ) +
+  scale_fill_manual(values = c("blue", "orange", "red", "grey")) +
+  facet_wrap(~____, nrow=1, strip.position = "bottom")
+```
+```{r waffle6-solution, exercise.reveal_solution = FALSE}
+ggplot() +
+  geom_waffle(
+    data=xgrs,
+    aes(fill=party, values = members),
+    color="white", 
+    size=.25,
+    n_rows = 2, 
+    flip = TRUE
+  ) +
+  scale_fill_manual(values = c("blue", "orange", "red", "grey")) +
+  facet_wrap(~state, nrow=1, strip.position = "bottom")
+```
+```{r waffle6-check}
+grade_this_code()
+```
+
+Note there's a few extra bits in `facet_wrap` that helps us here. First -- `nrow`. By now, with similar things we've done, that should make sense to you. It means the facets all end up in 1 row. The `strip.position` part just says where to put the label for each facet -- that's the state name. 
+
+What do we see here? Well, we have some work to do to bring this to publication. There's a bunch of background stuff -- tick lines and grids and axis labels that could all go. You can't read the state's completely. But those are all fixable later with things we'll learn down the road. 
+
+There are much bigger questions you should be thinking about now. Critical questions abound, questions you are going to have to confront regularly when making graphics:
+
+1. What story does this tell? 
+2. Is that story clear?
+3. Is this the best way to tell this story? 
+
+If the answer is no -- to any of these, but especially 2 -- then you're going to have to start thinking about changing course. Does this chart tell a story? It's pretty clear there are some very lop-sided senates in the US. Is your state one of them?
+
+**Just because you wrote code to make a graphic doesn't mean you have a graphic.** In journalism, the story is always the most important part. If it's not clear, if a reader who knows nothing about partisanship in America can't look at this and know what you're trying to communicate immediately, you need to keep working. That might be more fussing with this one. That might be dumping it entirely and trying something else. 
+
+Fiddling with this one, using tricks we won't get into for quite a while, I was able to get to this. 
+
+```{r fixdd, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data"}
+ggplot() +
+  geom_waffle(
+    data=xgrs,
+    aes(fill=party, values = members),
+    color="white", 
+    size=.25,
+    n_rows = 2, 
+    flip = TRUE
+  ) +
+  scale_fill_manual(values = c("blue", "orange", "red", "grey"), labels=c("Democrats", "Other", "Republicans", "Vacant"), name="Partisan Split") +
+  coord_equal() + 
+  facet_wrap(~state, nrow=1, strip.position = "bottom") +
+  theme_minimal() + 
+  theme(
+    panel.grid = element_blank(), 
+    axis.ticks.y = element_blank(),
+    axis.text = element_blank(),
+    strip.text = element_text(angle = 90)
+  ) 
+```
 
 ## The Recap
 
-Throughout this lesson, you've learned how to create and customize waffle charts using R's waffle library. You've practiced making single waffle charts to display proportions within a dataset, such as college majors within COJMC. You've also learned how to create comparative waffle charts using the iron() function, allowing you to visually compare proportions across different datasets, like gender breakdowns between colleges. You've discovered how to adjust your data and chart parameters to handle issues like scale differences and visual clarity. Remember, waffle charts offer a more precise and visually appealing alternative to pie charts for displaying proportional data, making them a valuable tool in your data visualization toolkit.
+Throughout this lesson, you've learned how to create and customize waffle charts using R's waffle library. You've practiced making single waffle charts to display proportions within a dataset, such as the partisan makeup of the US House of Representatives. You've also learned how to create comparative waffle charts using `geom_waffle`, allowing you to visually compare proportions across different facets. You've discovered how to adjust your data and chart parameters to handle issues like scale differences and visual clarity. Remember, waffle charts offer a more precise and visually appealing alternative to pie charts for displaying proportional data, making them a valuable tool in your data visualization toolkit.
 
 ## Terms to Know
 
 - Waffle chart: A chart type that represents data as squares in a grid, where each square represents a proportion of the whole.
 - Vector: In R, a basic data structure that holds elements of the same type in a specific order.
-- `waffle()` function: The main function in the waffle library used to create a single waffle chart.
-- `iron()` function: A function in the waffle library used to combine multiple waffle charts for comparison.
+- `waffle()` function: The main function in the `waffle` library used to create a single waffle chart.
+- `geom_waffle()` function: A `ggplot` geom that makes waffle charts, either with a named vector or with a dataframe.
 - Concatenate (`c()`): An R function used to create vectors by combining elements.
 - `rows` parameter: In waffle charts, determines the number of rows in the grid of squares.
 - `xlab`: A parameter in the waffle() function used to label the x-axis, often explaining what each square represents.
 - `colors` parameter: Used in waffle charts to specify the colors for each category in the data.
 - Division in waffle charts: A technique used to reduce the number of squares by making each square represent multiple units of data.
-- Padding: In comparative waffle charts, additional unnamed data added to make totals equal across charts for visual consistency.
