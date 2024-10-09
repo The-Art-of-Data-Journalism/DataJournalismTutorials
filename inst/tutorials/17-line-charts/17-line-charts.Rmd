@@ -1,0 +1,404 @@
+---
+title: "Data Journalism Lesson 17: Line charts"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  Showing how things change over time with lines.
+---
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(tidyverse)
+library(lubridate)
+library(glue)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+```
+```{r load-data, message=FALSE, warning=FALSE}
+state <- Sys.getenv("tutorial.state")
+
+stateName <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/states.csv") |> filter(Postal == state) 
+
+stateName <- stateName |> 
+  mutate(dataurl = case_when(
+    Postal == "AL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "AK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "AZ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "AR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "CA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "CO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "CT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "DE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "FL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "GA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "HI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "ID" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "IL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "IN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "IA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "KS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "KY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "LA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "ME" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "MD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "MA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "MI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "MN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "MS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "MO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "MT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "NE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "NV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "NH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "NJ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "NM" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "NY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "NC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "ND" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "OH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "OK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "OR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "PA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "RI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "SC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "SD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "TN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "TX" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "UT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "VT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "VA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "WA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "WV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "WI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    Postal == "WY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/", str_to_lower(State), ".csv"),
+    TRUE ~ "https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/nebraska.csv"  # Default case if none match
+  ))
+
+unemployment <- read_csv(stateName$dataurl)
+
+unemploymentrows <- nrow(unemployment)
+
+state_unemployment <- unemployment |> 
+  mutate(
+    combine_date = paste(periodName, " 1, ", year),
+    real_date = as.POSIXct(combine_date, format = "%B %d, %Y")
+    )
+
+national <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/national.csv")
+```
+## The Goal
+
+In this lesson, you'll learn how to create line charts to visualize change over time. By the end of this tutorial, you'll understand when to use line charts, how to prepare your data for this type of visualization, and how to create both single-line and multi-line charts using ggplot2. You'll practice filtering data, grouping by time periods, and adding aesthetic elements like color to differentiate multiple lines. These skills will enable you to effectively communicate trends and patterns in time-series data, a crucial ability for data journalists.
+
+## Why Visualize Data?
+
+More to come.
+
+## The Basics
+
+So far, we've talked about bar charts -- normal or waffle -- are good for showing relative size of a thing compared to another thing. Waffle charts are good at showing proportions of a whole. 
+
+**Line charts are good for showing change over time.** 
+
+Let's look at some recent history and some unemployment data and look at just how bonkers March of 2020 was. It seems like the world just stopped that month because of a global pandemic. You can see it in all kinds of data -- and we'll be studying that time period for years to come. 
+
+We'll start with libraries. Good news: We don't need much for this one. 
+
+```{r load-tidyverse, exercise=TRUE}
+library(tidyverse)
+```
+```{r load-tidyverse-solution}
+library(tidyverse)
+```
+```{r load-tidyverse-check}
+grade_this_code()
+```
+
+Let's work on some examples using the UNLPD reports data. You can download the data here if you want to use it in your own notebook -- and this is the same data we've used before, so if you already downloaded it, you don't need to do it again. 
+
+Now import the data. This is data from the Bureau of Labor Statistics of state unemployment rates from 2019 through the middle of 2024. Fill in your state name in the blank, all lowercase letters and dashes for any spaces.
+
+```{r bls-read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
+unemployment <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/unemployment-rates/____.csv")
+```
+
+```{r bls-read-check}
+grade_this({
+  if (identical(nrow(.result), unemploymentrows)) {
+    pass("Great work! You imported unemployment data for your state.")
+  }
+  fail()
+})
+```
+
+Line charts show change over time. It works the much the same as a bar chart, code wise, but instead of a weight, it uses a y. And if you have more than one group in your data, it takes a group element.
+
+The first secret to knowing if you have a line chart is if you have data that changes over time. The second secret to making a line chart is your x value is almost always a date. If it's not an actual date, it's a thing like a date -- a year, a season, a semester, something with date elements in it. 
+
+Let's look at how unemployment changed over the the last five years -- from before the pandemic until more recent months. First thing we'll do is take a look at our data. You should see a problem right away. 
+
+```{r head, exercise=TRUE, exercise.setup = "load-data"}
+head(____)
+```
+```{r head-solution, exercise.reveal_solution = FALSE}
+head(unemployment)
+```
+```{r head-check}
+grade_this_code()
+```
+
+See it? We have *monthly* data, but the data are in parts. March of 2020 is one line, April of 2020 is another line, but the month and the year in in two separate columns. And *neither* are a date. 
+
+This is precisely why there is a working with dates chapter. Every data systems on the planet has a slightly different idea of how to store dates. Every system has their own needs, and those needs are *rarely* ever aligned with yours. 
+
+How do we fix this? 
+
+We're going to do this in two steps. The first step is creating a fake date -- we're going to make every date the first of the month. A date in R has to have month, day and year in it. The first of the month is as good as any other day. We're going to do that by combining the `periodName` column, some text, and the `year` column. 
+
+### Exercise 1: Making a not-real date
+
+```{r line1, exercise=TRUE, exercise.setup = "load-data"}
+unemployment |> 
+  mutate(
+    combine_date = paste(____, " 1, ", ____)
+  )
+```
+```{r line1-solution, exercise.reveal_solution = FALSE}
+unemployment |> 
+  mutate(
+    combine_date = paste(periodName, " 1, ", year)
+  )
+```
+```{r line1-check}
+grade_this_code()
+```
+
+From this, you can see we now have what to you and me *looks* like a date, but right now isn't a date. January 1, 2020 is not in the right format. 
+
+Recall from the working with dates chapter that if the date follows a pattern, we can capture that using posix formatting. To remind you, here's what the options are: 
+
+| Code | Meaning                                        |
+|------|------------------------------------------------|
+| %a	 | Abbreviated weekday (Mon, Tue, Wed, etc)       |
+| %A	 | Full weekday (Monday, Tuesday, Wednesday, etc) |
+| %b	 | Abbreviated month (Jan, Feb, Mar, etc.)        |
+| %B	 | Full month (January, February, etc.)           |
+| %c	 | Locale-specific date and time                  |
+| %d	 | Decimal date                                   |
+| %H	 | Decimal hours (24 hour)                        |
+| %I	 | Decimal hours (12 hour)                        |
+| %j	 | Decimal day of the year                        |
+| %m	 | Decimal month                                  |
+| %M	 | Decimal minute                                 |
+| %p	 | Locale-specific AM/PM                          |
+| %S	 | Decimal second                                 |
+| %U	 | Decimal week of the year (starting on Sunday)  |
+| %w	 | Decimal Weekday (0=Sunday)                     |
+| %W	 | Decimal week of the year (starting on Monday)  |
+| %x	 | Locale-specific Date	                          |
+| %X	 | Locale-specific Time                           |
+| %y	 | 2-digit year                                   |
+| %Y	 | 4-digit year                                   |
+| %z	 | Offset from GMT                                |
+| %Z	 | Time zone (character)                          |
+
+We need a full month, a day and a four digit year. 
+
+### Exercise 2: Making a real date
+
+```{r line2, exercise=TRUE, exercise.setup = "load-data"}
+unemployment |> 
+  mutate(
+    combine_date = paste(____, " 1, ", ____),
+    real_date = as.POSIXct(combine_date, format = "____ %d, ____")
+    )
+```
+```{r line2-solution, exercise.reveal_solution = FALSE}
+unemployment |> 
+  mutate(
+    combine_date = paste(periodName, " 1, ", year),
+    real_date = as.POSIXct(combine_date, format = "%B %d, %Y")
+    )
+```
+```{r line2-check}
+grade_this_code()
+```
+
+And, as you can see, you now have a real date called ... `real_date`. Now we have the two things we need to make a line chart -- a date and a number. 
+
+### Excercise 3: Making a line chart
+
+Behind the scenes, I've gone ahead and saved your work so far into a dataframe called `state_unemployment` that has the `real_date` column in it. 
+
+The other number we need is the `Unemployment_Rate`. Line charts are easy because your `aes` is half filled out for you -- the x axis is always the date. 
+
+```{r line3, exercise=TRUE, exercise.setup = "load-data"}
+ggplot() + 
+  geom_line(data=____, aes(x=____, y=____))
+```
+```{r line3-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_line(data=state_unemployment, aes(x=real_date, y=Unemployment_Rate))
+```
+```{r line3-check}
+grade_this_code()
+```
+
+So what story does this tell? Looks like before the pandemic, unemployment was humming along reasonably stable, and then boom. The pandemic hits and the unemployment rate balloons. Then, after a bit, it returns to more normal ranges. 
+
+But a one-line line chart is usually not a line chart. At least, not a very good one. It doesn't tell a complete of a story as it could. We need more to compare to. 
+
+Behind the scenes, I've loaded up another dataframe -- this one is called `national` and instead of just your state, it's all of them, all together at once. In that file is the same `real_date` column your state data has that you created. In short -- `national` is identical to `state_unemployment` in every way except how much data is in it. Take a look for yourself.
+
+```{r head2, exercise=TRUE, exercise.setup = "load-data"}
+head(____)
+```
+```{r head2-solution, exercise.reveal_solution = FALSE}
+head(national)
+```
+```{r head2-check}
+grade_this_code()
+```
+
+### Exercise 4: More than one line.
+
+A critical concept to understand in visualizing data is the idea of **layering**. With layering, we can put multiple geoms in the same chart, each one with a different job. One might be there to provide context. One might be there to provide focus. Others will add text or shapes to further the story.  
+
+Let's start with making multiple lines. We can do that by using `national` instead of `state_unemployment`. But to get one line for each state, you have to add a new element -- `group`. What goes in group? What column tells you which state this data comes from?
+
+```{r line4, exercise=TRUE, exercise.setup = "load-data"}
+ggplot() + 
+  geom_line(
+    data=____, 
+    aes(
+      x=real_date, 
+      y=Unemployment_Rate, 
+      group=____
+      )
+    )
+```
+```{r line4-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_line(
+    data=national, 
+    aes(
+      x=real_date, 
+      y=Unemployment_Rate, 
+      group=Location
+      )
+    )
+```
+```{r line4-check}
+grade_this_code()
+```
+
+What do you see here? In the trade, we call this the hairball. Lines overlapping, a big mess. You can see the pandemic hitting, clear as a bell, but what else are you supposed to look at? What happened to your state? How does it compare to the rest of the country? 
+
+And now you know why layering is important.
+
+First, let's do some things to fade the hairball into the background a little. With each geom, we can add parameters to them to change the color, or the size, or a dozen other things. Since we don't want to focus on all of the lines, we need to fade them into the background a little. We can do that making them grey instead of black and making the line width smaller -- say .2.
+
+### Exercise 5: fading it back
+
+```{r line5, exercise=TRUE, exercise.setup = "load-data"}
+ggplot() + 
+  geom_line(
+    data=____, 
+    aes(
+      x=____, 
+      y=____, 
+      group=____
+      ), 
+      color="____",
+      linewidth = ____
+    )
+```
+```{r line5-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_line(
+    data=national, 
+    aes(
+      x=real_date, 
+      y=Unemployment_Rate, 
+      group=Location
+      ), 
+      color="grey",
+      linewidth = .2
+    )
+```
+```{r line5-check}
+grade_this_code()
+```
+
+Better. Now we need to add another layer. `ggplot` layers are rendered in the order they appear in code. So your `ggplot` bit is like adding a canvas on a table. You are looking down at that canvas. The first `geom_line` you added is put on top of your canvas. Now, we're going to add a second `geom_line`. 
+
+In this case, adding a layer is very easy. The reason? We're adding a layer with just your state in it. So this new layer is identical to your `national` layer with two small changes -- your dataframe name is your state dataframe we used in exercise 3. And instead of grey, we're going to make it red, so it stands out from the pack. 
+
+```{r line6, exercise=TRUE, exercise.setup = "load-data"}
+ggplot() + 
+  geom_line(
+    data=____, 
+    aes(
+      x=____, 
+      y=____, 
+      group=____
+      ), 
+      color="____",
+      linewidth = ____
+    )  + 
+  geom_line(
+    data=____, 
+    aes(
+      x=____, 
+      y=____, 
+      group=____
+      ), 
+      color="____"
+    )
+```
+```{r line6-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_line(
+    data=national, 
+    aes(
+      x=real_date, 
+      y=Unemployment_Rate, 
+      group=Location
+      ), 
+      color="grey",
+      linewidth = .2
+    ) + 
+  geom_line(
+    data=state_unemployment, 
+    aes(
+      x=real_date, 
+      y=Unemployment_Rate, 
+      group=Location
+      ), 
+      color="red"
+    )
+```
+```{r line6-check}
+grade_this_code()
+```
+
+And now we ask some critical questions: Does this tell a story? What is that story? How does your state compare to the nation, during the pandemic and after?
+
+## The Recap
+
+Throughout this lesson, you've learned the fundamentals of creating line charts to show change over time. You've practiced preparing data, creating basic single-line charts, and expanding to multi-line charts to compare different states over time. You've seen how line charts can reveal trends, such as the impact of the pandemic on employment across the country. Remember, while line charts are powerful tools for visualizing temporal data, they're just the starting point. The patterns you discover should lead to further questions and deeper reporting to uncover the full story behind the numbers.
+
+## Terms to Know
+
+- Line chart: A type of graph that displays data points connected by straight line segments, typically used to show trends over time.
+- `geom_line()`: A ggplot2 function used to add lines to a plot.
+- `group`: An aesthetic in ggplot2 that determines how data should be divided into different groups, often used to create multiple lines in a line chart.
+- `color`: An aesthetic in ggplot2 used to assign different colors to different groups or categories in a plot.
+- Time-series data: Data that is collected at different points in time, allowing for analysis of trends and patterns over time.
+- x-axis: The horizontal axis in a chart, typically representing time in a line chart.
+- y-axis: The vertical axis in a chart, typically representing the quantity being measured in a line chart.
