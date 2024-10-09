@@ -8,52 +8,49 @@ output:
     ace_theme: github
 runtime: shiny_prerendered
 description: >
-  Comparing one year to the next
+  Comparing one time to another one
 ---
 ```{r setup, include=FALSE}
 library(learnr)
 library(gradethis)
+library(glue)
 library(tidyverse)
 knitr::opts_chunk$set(echo = FALSE)
 tutorial_options(exercise.completion=FALSE)
 ```
+```{r load-data, message=FALSE, warning=FALSE}
+state <- Sys.getenv("tutorial.state")
+
+stateName <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/states.csv") |> filter(Postal == state) 
+
+peak <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/peak-unemployment/peak.csv")
+
+state_peak <- peak |> filter(Location == stateName$State)
+
+staterows <- nrow(state_peak)
+```
 
 ## The Goal
 
-In this lesson, you'll learn how to create slope charts, a powerful tool for visualizing changes between two time periods. By the end of this tutorial, you'll understand when to use slope charts, how to prepare your data, and how to construct these charts using ggplot2 in R. You'll practice filtering data, manipulating chart elements, and adding informative labels to create clear and impactful visualizations. These skills will enable you to effectively communicate trends and comparisons in your data journalism projects, especially when dealing with before-and-after scenarios or year-over-year changes.
+In this lesson, you'll learn how to create slope charts, a powerful tool for visualizing changes between two time periods. By the end of this tutorial, you'll understand when to use slope charts, how to prepare your data, and how to construct these charts using ggplot. You'll practice filtering data, manipulating chart elements, and adding informative labels to create clear and impactful visualizations. These skills will enable you to effectively communicate trends and comparisons in your data journalism projects, especially when dealing with before-and-after scenarios or year-over-year changes.
+
+## Why Visualize Data?
+
+More to come.
 
 ## The Basics
 
-A line chart, as we learned, shows change over time, with the date on the x-axis and each line representing a team or player. But sometimes, you have just two seasons -- a line chart of two seasons is ... not a line chart. 
+A line chart, as we learned, shows change over time, with the date on the x-axis and each line representing a state or county or some other entity. But sometimes, you have just two time periods -- a line chart of two years is ... not a line chart. 
 
 But with some fiddling with lines and points, you can create a new chart type that does show change over two time periods quite well: A slope chart. 
 
 Think of a slope chart like the meme you see online: How is started vs how it's going. 
 
-For purposes of this exercise, we're going to look at how many Nebraska high school students went to college. The state Department of Education tracks this year after year. We're going to look at students who enrolled in the fall of 2022 and the fall of 2021. Just two years, but that's what slope charts do well. 
+For purposes of this exercise, we're going to look at unemployment again, but this time, we're just looking at April 2020 and April 2024. April 2020 is the month when unemployment was higest for almost every state. How does that compare four years later? 
 
 Think of it like playing connect the dots from elementary school.
 
-The data you're going to use is only the 25 largest school districts. There's 180 school districts with complete data -- way too many to chart. 
-
-**For purposes of this exercise, you don't need to do this. The data is included here if you want to try this in your own notebook.**
-
-```{r echo=FALSE, class.output="bg-info", results="asis",  message=FALSE,  warning=FALSE}
-library(downloadthis)
-library(glue)
-
-dllink <- download_link(
-  link = "https://mattwaite.github.io/datajournalismfiles/college_bound.csv",
-  button_label = "Download csv file",
-  button_type = "danger",
-  has_icon = TRUE,
-  icon = "fa fa-save",
-  self_contained = FALSE
-)
-
-glue("<pre><p><strong>For this walkthrough:</strong></p><p>{dllink}</p></pre>")
-
-```
+The difference between slope charts and most other chart types in ggplot is that there is no geom for a slope chart. We're going to make one using pieces and parts of other geoms. Combine the parts together and you get a chart. This is another example of where layering is going to come in very handy.
 
 We'll need the tidyverse.
 
@@ -67,34 +64,28 @@ library(tidyverse)
 grade_this_code()
 ```
 
-And the data.
+And we'll grab the data, which is just one file for the nation. 
 
-```{r slope-load-data, message=FALSE, warning=FALSE}
-schools <- read_csv("https://mattwaite.github.io/datajournalismfiles/college_bound.csv")
 
-sb <- schools |> filter(agency_name == "SCOTTSBLUFF PUBLIC SCHOOLS") |> mutate(agency_label = "Scottsbluff")
-gi <- schools |> filter(agency_name == "GRAND ISLAND PUBLIC SCHOOLS") |> mutate(agency_label = "Grand Island")
-se <- schools |> filter(agency_name == "SEWARD PUBLIC SCHOOLS") |> mutate(agency_label = "Seward")
+```{r load-data-exercise, exercise = TRUE}
+peak <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/peak-unemployment/peak.csv")
 ```
-```{r slope-load-data-exercise, exercise = TRUE}
-schools <- read_csv("https://mattwaite.github.io/datajournalismfiles/college_bound.csv")
+```{r load-data-exercise-solution}
+peak <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/peak-unemployment/peak.csv")
 ```
-```{r slope-load-data-exercise-solution}
-schools <- read_csv("https://mattwaite.github.io/datajournalismfiles/college_bound.csv")
-```
-```{r slope-load-data-exercise-check}
+```{r load-data-exercise-check}
 grade_this_code()
 ```
 
-We should take a quick look at our data so we know what we're working with. We'll use `glimpse` for that. 
+We should take a quick look at our data so we know what we're working with. We'll use `head` for that. 
 
-```{r glimpse-data, exercise=TRUE, exercise.setup = "slope-load-data"}
-glimpse(schools)
+```{r head-data, exercise=TRUE, exercise.setup = "load-data"}
+head(peak)
 ```
-```{r glimpse-data-solution}
-glimpse(schools)
+```{r head-data-solution}
+head(peak)
 ```
-```{r glimpse-data-check}
+```{r head-data-check}
 grade_this_code()
 ```
 
@@ -102,17 +93,17 @@ grade_this_code()
 
 Our data is in pretty good shape already, so we can go right to making a chart. 
 
-A slope chart is really made up of two separate geoms that combine to make a form -- a geom_point and a geom_line. The form the two geoms take is identical. In this case, we're going to have the x be the `college_enrollment_date` because like a line chart, our x has to be a date or date-like thing. The y is our college going percent column and we're going to add a group value, which is the `agency_name`. I'm also going to go ahead and set the color for these to grey, which you'll see why in a moment. 
+A slope chart is really made up of two separate geoms that combine to make a form -- a geom_point and a geom_line. The parts inside the two geoms take is identical. In this case, we're going to have the x be the `year` because like a line chart, our x has to be a date or date-like thing. The y is our unemployment rate column and we're going to add a group value, which is the `Location`. I'm also going to go ahead and set the color for these to grey, which you'll see why in a moment. 
 
-```{r slope2, exercise=TRUE, exercise.setup = "slope-load-data", message=FALSE}
+```{r slope2, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
 ggplot() + 
-  geom_line(data=____, aes(x=college_enrollment_date, y=____, group=agency_name), color="grey") +
-  geom_point(data=____, aes(x=college_enrollment_date, y=____, group=agency_name), color="grey")
+  geom_line(data=____, aes(x=____, y=____, group=____), color="grey") +
+  geom_point(data=____, aes(x=____, y=____, group=____), color="grey")
 ```
 ```{r slope2-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
-  geom_line(data=schools, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="grey") +
-  geom_point(data=schools, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="grey")
+  geom_line(data=peak, aes(x=year, y=Unemployment_Rate, group=Location), color="grey") +
+  geom_point(data=peak, aes(x=year, y=Unemployment_Rate, group=Location), color="grey")
 ```
 ```{r slope2-check}
 grade_this_code()
@@ -120,215 +111,117 @@ grade_this_code()
 
 Well, we got something. But who changed the most? What should we focus on? We don't have anything to guide us here.  
 
-## Working with your data
+```{r storysetup, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("Might as well be selfish and focus on {stateName$State}. Unless you work for a major national news organization, you're going to be focusing on where you live -- on the audience you serve. People care about where they are, so give them what they want.")
+```
 
-Because our data is long data -- we have two rows for each school -- finding the schools with the biggest drops in college-bound students is a little convoluted. We first have to change the structure of the data, so instead of two rows for each district we have 1. That is a function called `pivot_wider` and it takes long data and makes it wide. In other words, two becomes one and our numbers, instead of being in two different rows, they're in the same row. Let's first look at the data as it is. 
+### Exercise 2: Filtering
 
-```{r slope3, exercise=TRUE, exercise.setup = "slope-load-data", message=FALSE}
-head(schools)
+To let us focus, let's build a dataframe called `state_peak` and filter the `Location` by your state name.
+
+```{r peak-read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
+state_peak <- peak |> 
+  filter(Location == "____")
+```
+
+```{r peak-read-check}
+grade_this({
+  if (identical(nrow(.result), staterows)) {
+    pass("Great work! You've got it.")
+  }
+  fail()
+})
+```
+
+Now, with a state to focus on, we can set about making two new geoms -- identical to our previous ones, just with a different dataframe and a different color.
+
+### Exercise 3: Give readers a focus
+
+```{r slope3, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
+ggplot() + 
+  geom_line(data=peak, aes(x=year, y=Unemployment_Rate, group=Location), color="grey") +
+  geom_point(data=peak, aes(x=year, y=Unemployment_Rate, group=Location), color="grey") +
+  geom_line(data=____, aes(x=____, y=____, group=____), color="red") +
+  geom_point(data=____, aes(x=____, y=____, group=____), color="red")
 ```
 ```{r slope3-solution, exercise.reveal_solution = FALSE}
-head(schools)
+ggplot() + 
+  geom_line(data=peak, aes(x=year, y=Unemployment_Rate, group=Location), color="grey") +
+  geom_point(data=peak, aes(x=year, y=Unemployment_Rate, group=Location), color="grey") +
+  geom_line(data=state_peak, aes(x=year, y=Unemployment_Rate, group=Location), color="red") +
+  geom_point(data=state_peak, aes(x=year, y=Unemployment_Rate, group=Location), color="red")
 ```
 ```{r slope3-check}
 grade_this_code()
 ```
 
-See how there's two rows for each district? 
+Now we can start with our questions: What story does this tell? Is it very clear? 
 
-Now, let's flip that. I'm going to use select to narrow down the columns I have, then I'm going to use `pivot_wider`. In pivot_wider, I have to specify which columns are going to become column *names*, which in this case are going to be the school years. Then, where `values_to` is, that's where the numbers that go below those years appear. I want those numbers to be the college going percent. 
+### Exercise 4: Getting creative with spacing and breaks
 
-Let's look at it halfway through what we need to do to see if we're getting what we need.
+Now that we have something to work with, it's time to start improving it. It would be good to label the state we're highlighting. Maybe we label them on each end of the graph to help people follow the line. Given how much space the default ggplot behavior has left us to do that, we're going to need to make some space.
 
-```{r slope4, exercise=TRUE, exercise.setup = "slope-load-data", message=FALSE}
-schools |>
-  select(agency_name, nep_school_year, college_going_pct) |> 
-  pivot_wider(names_from = nep_school_year, values_from = college_going_pct)
+We can do that with some clever manipulations of the x axis. In ggplot, there are all kinds of ways to work with the x and y axis scales. In this case, we have a year on the x axis, which to R is just a number, so we'll use `scale_x_continuous` to work with that kind of scale. We're going to first set the line breaks manually so there's just 2020 and 2024. Then, we're going to set the limits of our x axis so that it doesn't just default to 2020-2024, but is a little wider so we have extra space. We're going to add one year on each side to pad it out. But think about it -- how do you *add* one year of space to the *left* of 2020? You subtract one year. How do you *add* a year of space to the *right* of 2024? You add one year. 
+
+```{r slope4, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
+ggplot() + 
+  geom_line(data=peak, aes(x=year, y=Unemployment_Rate, group=Location), color="grey") +
+  geom_point(data=peak, aes(x=year, y=Unemployment_Rate, group=Location), color="grey") +
+  geom_line(data=state_peak, aes(x=year, y=Unemployment_Rate, group=Location), color="red") +
+  geom_point(data=state_peak, aes(x=year, y=Unemployment_Rate, group=Location), color="red") + 
+  scale_x_continuous(breaks = c(____, ____), limits = c(____, ____))  
 ```
 ```{r slope4-solution, exercise.reveal_solution = FALSE}
-schools |>
-  select(agency_name, nep_school_year, college_going_pct) |> 
-  pivot_wider(names_from = nep_school_year, values_from = college_going_pct)
+ggplot() + 
+  geom_line(data=peak, aes(x=year, y=Unemployment_Rate, group=Location), color="grey") +
+  geom_point(data=peak, aes(x=year, y=Unemployment_Rate, group=Location), color="grey") +
+  geom_line(data=state_peak, aes(x=year, y=Unemployment_Rate, group=Location), color="red") +
+  geom_point(data=state_peak, aes(x=year, y=Unemployment_Rate, group=Location), color="red") + 
+  scale_x_continuous(breaks = c(2020, 2024), limits = c(2019, 2025)) 
 ```
 ```{r slope4-check}
 grade_this_code()
 ```
 
-Good news. We're on the right path. Now I can calculate the change in the number of college bound students with a simple mutate. Then, I can find the three biggest drops with an arrange.
+A ha! Better. We now just have the two years and we have some space to put our state name in there to help people.
 
-### Exercise 2: Finding and filtering
+### Exercise 6: adding labels
 
-To get the column names for the mutate, look at what we just did. 
+To add the labels, we again need to be a bit clever. We want to label each dot *twice* -- once for 2020 and once for 2024. To do this *looks* like a lot, but it really isn't. It's two rows for each state, but most of it is copy and paste work. Once you get one state working, you can add more with copy, paste, change the dataframe and done. 
 
-```{r slope5, exercise=TRUE, exercise.setup = "slope-load-data", message=FALSE}
-schools |>
-  select(agency_name, nep_school_year, college_going_pct) |> 
-  pivot_wider(names_from = nep_school_year, values_from = college_going_pct) |> 
-  mutate(
-    change = `____`-`____`
-  ) |> 
-  arrange(____)
+The first problem we have is our `state_peak` data has both years in it, so we're going to have to do something we don't do a lot of: put a `dplyr` filter into our data= bits. 
+
+We're going to use a `geom_text`, which will just put text anywhere on your graph. The aes will be the same as the geom_point, except it will have a label in it that we'll set to the `Location`. Then, for data, we're going to filter our dataframes for the `min(year)` and the `max(year)`, which will give us 2020 and 2024 respectively. Then, one last little trick -- we're going to nudge our labels over a little. For our min, we're going to subtract .5 years off our `year`, which will have the effect of moving the text to the left just a bit. Then, on the max side, we'll nudge it .5 years to the right by adding it to the `year`. How did I come to .5? The truth is I just found it through trial and error. Tried something, adjusted from there. Rinse and repeat until I got the number I liked.
+
+```{r slope5, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
+ggplot() + 
+  geom_line(data=peak, aes(x=year, y=Unemployment_Rate, group=Location), color="grey") +
+  geom_point(data=peak, aes(x=year, y=Unemployment_Rate, group=Location), color="grey") +
+  geom_line(data=state_peak, aes(x=year, y=Unemployment_Rate, group=Location), color="red") +
+  geom_point(data=state_peak, aes(x=year, y=Unemployment_Rate, group=Location), color="red") + 
+  geom_text(data=____ |> filter(year == max(____)), aes(x=year + .5, y=Unemployment_Rate, group=Location, label=____)) + 
+  geom_text(data=____ |> filter(year == min(____)), aes(x=year - .5, y=Unemployment_Rate, group=Location, label=____)) + 
+  scale_x_continuous(breaks = c(2020, 2024), limits = c(2019, 2025)) 
 ```
 ```{r slope5-solution, exercise.reveal_solution = FALSE}
-schools |>
-  select(agency_name, nep_school_year, college_going_pct) |> 
-  pivot_wider(names_from = nep_school_year, values_from = college_going_pct) |> 
-  mutate(
-    change = `2022-2023`-`2021-2022`
-  ) |> 
-  arrange(change)
+ggplot() + 
+  geom_line(data=peak, aes(x=year, y=Unemployment_Rate, group=Location), color="grey") +
+  geom_point(data=peak, aes(x=year, y=Unemployment_Rate, group=Location), color="grey") +
+  geom_line(data=state_peak, aes(x=year, y=Unemployment_Rate, group=Location), color="red") +
+  geom_point(data=state_peak, aes(x=year, y=Unemployment_Rate, group=Location), color="red") + 
+  geom_text(data=state_peak |> filter(year == max(year)), aes(x=year + .5, y=Unemployment_Rate, group=Location, label=Location)) + 
+  geom_text(data=state_peak |> filter(year == min(year)), aes(x=year - .5, y=Unemployment_Rate, group=Location, label=Location)) + 
+  scale_x_continuous(breaks = c(2020, 2024), limits = c(2019, 2025)) 
 ```
 ```{r slope5-check}
 grade_this_code()
 ```
 
-Now we know Scottsbluff, Grand Island and Seward had the biggest drops year to year. To add them to our slope chart, we're going to need to make dataframes of each one of them. 
-
-### Exercise 3: Making three new dataframes
-
-Looking at the previous block, look at the agency names. To filter them out, the match has to be exact. Then, I'm going to mutate a new column onto our data called `agency_label` which will come in very handy later when we have limited room on our chart to work with. 
-
-```{r slope6, exercise=TRUE, exercise.setup = "slope-load-data", message=FALSE}
-sb <- schools |> filter(agency_name == "____") |> mutate(agency_label = "Scottsbluff")
-gi <- schools |> filter(agency_name == "____") |> mutate(agency_label = "Grand Island")
-se <- schools |> filter(agency_name == "____") |> mutate(agency_label = "Seward")
-```
-```{r slope6-solution, exercise.reveal_solution = FALSE}
-sb <- schools |> filter(agency_name == "SCOTTSBLUFF PUBLIC SCHOOLS") |> mutate(agency_label = "Scottsbluff")
-gi <- schools |> filter(agency_name == "GRAND ISLAND PUBLIC SCHOOLS") |> mutate(agency_label = "Grand Island")
-se <- schools |> filter(agency_name == "SEWARD PUBLIC SCHOOLS") |> mutate(agency_label = "Seward")
-```
-```{r slope6-check}
-grade_this_code()
-```
-
-Now that we have these schools isolated, we can layer them in. 
-
-### Exercise 4: Layering with color
-
-Adding in layers in ggplot is easy, we just have to be aware of ordering and color. Putting a black line on a black line will not do much. So we're going to add our schools points and lines first, then, we'll layer in the other schools. For each school, we'll add two geoms -- the point and the line. The aes will be the same as the schools with one exception -- the color. 
-
-```{r slope7, exercise=TRUE, exercise.setup = "slope-load-data", message=FALSE}
-ggplot() + 
-  geom_line(data=schools, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="grey") +
-  geom_point(data=schools, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="grey") +
-  geom_line(data=____, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="red") +
-  geom_point(data=____, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="red") +
-  geom_line(data=____, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="black") +
-  geom_point(data=____, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="black") +
-  geom_line(data=____, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="blue") +
-  geom_point(data=____, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="blue")
-```
-```{r slope7-solution, exercise.reveal_solution = FALSE}
-ggplot() + 
-  geom_line(data=schools, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="grey") +
-  geom_point(data=schools, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="grey") +
-  geom_line(data=sb, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="red") +
-  geom_point(data=sb, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="red") +
-  geom_line(data=gi, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="black") +
-  geom_point(data=gi, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="black") +
-  geom_line(data=se, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="blue") +
-  geom_point(data=se, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="blue")
-```
-```{r slope7-check}
-grade_this_code()
-```
-
-What story does this tell? 
-
-### Exercise 5: Getting creative with spacing and breaks
-
-Now that we have something to work with, it's time to start improving it. It would be good to label each school district -- the reason we mutated that label earlier. Maybe we label them on each end of the graph. Given how much space the default ggplot behavior has left us to do that, we're going to need to make some space.
-
-We can do that with some clever manipulations of the x axis. In ggplot, there are all kinds of ways to work with the x and y axis scales. In this case, we have a date on the x axis, so we'll use `scale_x_date` and we're going to first set the line breaks manually so there's just 2021 and 2022. Then, we're going to set the limits of our x axis so that it doesn't just default to 2021-2022, but is a little wider so we have extra space. We're going to add a half a year on each side to pad it out. But because our column is a date column, all of our work here has to be in date format. That's why you see all the as.Date stuff. 
-
-```{r slope8, exercise=TRUE, exercise.setup = "slope-load-data", message=FALSE}
-ggplot() + 
-  geom_line(data=schools, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="grey") +
-  geom_point(data=schools, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="grey") +
-  geom_line(data=sb, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="red") +
-  geom_point(data=sb, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="red") +
-  geom_line(data=gi, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="black") +
-  geom_point(data=gi, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="black") +
-  geom_line(data=se, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="blue") +
-  geom_point(data=se, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="blue") + 
-  scale_x_date(breaks = c(as.Date("____-10-15"), as.Date("____-10-15")), labels = c(2021, 2022), limits = c(as.Date("2021-04-15"), as.Date("2023-04-15"))) 
-```
-```{r slope8-solution, exercise.reveal_solution = FALSE}
-ggplot() + 
-  geom_line(data=schools, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="grey") +
-  geom_point(data=schools, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="grey") +
-  geom_line(data=sb, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="red") +
-  geom_point(data=sb, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="red") +
-  geom_line(data=gi, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="black") +
-  geom_point(data=gi, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="black") +
-  geom_line(data=se, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="blue") +
-  geom_point(data=se, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="blue") + 
-  scale_x_date(breaks = c(as.Date("2021-10-15"), as.Date("2022-10-15")), labels = c(2021, 2022), limits = c(as.Date("2021-04-15"), as.Date("2023-04-15"))) 
-```
-```{r slope8-check}
-grade_this_code()
-```
-
-A ha! Better. We now just have the two years and we have some space to put our school names in there to help people.
-
-### Exercise 6: adding labels
-
-To add the labels, we again need to be a bit clever. We want to label each dot *twice* -- once for 2021 and once for 2022. To do this *looks* like a lot, but it really isn't. It's two rows for each school, but most of it is copy and paste work. Once you get one school working, you can do the rest with copy, paste, change the dataframe and done. 
-
-The first problem we have is our data has both years in it, so we're going to have to do something we don't do a lot of: put a `dplyr` filter into our data= bits. 
-
-We're going to use a `geom_text`, which will just put text anywhere on your graph. The aes will be the same as the geom_point, except it will have a label in it that we'll set to the Team. Then, for data, we're going to filter our dataframes for the `min(college_enrollment_date)` and the `max(college_enrollment_date)`, which will give us 2021 and 2022 respectively. Then, one last little trick -- we're going to nudge our labels over a little. For our min, we're going to subtract 80 days off our enrollment date, which will have the effect of moving the text to the left just a bit. Then, on the max side, we'll nudge it 80 days to the right by adding it to the enrollment date. How did I come to 80? The truth is I just found it through trial and error. Tried something, adjusted from there. Rinse and repeat until I got the number I liked.
-
-To cap it off, we'll add `theme_minimal()` at the end because we want to remove the grey background. 
-
-```{r slope9, exercise=TRUE, exercise.setup = "slope-load-data", message=FALSE}
-ggplot() + 
-  geom_line(data=schools, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="grey") +
-  geom_point(data=schools, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="grey") +
-  geom_line(data=sb, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="red") +
-  geom_point(data=sb, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="red") +
-  geom_line(data=gi, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="black") +
-  geom_point(data=gi, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="black") +
-  geom_line(data=se, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="blue") +
-  geom_point(data=se, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="blue") + 
-  geom_text(data=sb |> filter(college_enrollment_date == max(____)), aes(x=college_enrollment_date + 80, y=college_going_pct, group=agency_name, label=____)) + 
-  geom_text(data=sb |> filter(college_enrollment_date == min(____)), aes(x=college_enrollment_date - 80, y=college_going_pct, group=agency_name, label=____)) + 
-  geom_text(data=gi |> filter(college_enrollment_date == max(college_enrollment_date)), aes(x=college_enrollment_date + 80, y=college_going_pct, group=agency_name, label=agency_label)) + 
-  geom_text(data=gi |> filter(college_enrollment_date == min(college_enrollment_date)), aes(x=college_enrollment_date - 80, y=college_going_pct, group=agency_name, label=agency_label)) + 
-  geom_text(data=se |> filter(college_enrollment_date == max(college_enrollment_date)), aes(x=college_enrollment_date + 80, y=college_going_pct, group=agency_name, label=agency_label)) + 
-  geom_text(data=se |> filter(college_enrollment_date == min(college_enrollment_date)), aes(x=college_enrollment_date - 80, y=college_going_pct, group=agency_name, label=agency_label)) + 
-  scale_x_date(breaks = c(as.Date("2021-10-15"), as.Date("2022-10-15")), labels = c(2021, 2022), limits = c(as.Date("2021-04-15"), as.Date("2023-04-15"))) +
-  theme_minimal()
-```
-```{r slope9-solution, exercise.reveal_solution = FALSE}
-ggplot() + 
-  geom_line(data=schools, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="grey") +
-  geom_point(data=schools, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="grey") +
-  geom_line(data=sb, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="red") +
-  geom_point(data=sb, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="red") +
-  geom_line(data=gi, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="black") +
-  geom_point(data=gi, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="black") +
-  geom_line(data=se, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="blue") +
-  geom_point(data=se, aes(x=college_enrollment_date, y=college_going_pct, group=agency_name), color="blue") + 
-  geom_text(data=sb |> filter(college_enrollment_date == max(college_enrollment_date)), aes(x=college_enrollment_date + 80, y=college_going_pct, group=agency_name, label=agency_label)) + 
-  geom_text(data=sb |> filter(college_enrollment_date == min(college_enrollment_date)), aes(x=college_enrollment_date - 80, y=college_going_pct, group=agency_name, label=agency_label)) + 
-  geom_text(data=gi |> filter(college_enrollment_date == max(college_enrollment_date)), aes(x=college_enrollment_date + 80, y=college_going_pct, group=agency_name, label=agency_label)) + 
-  geom_text(data=gi |> filter(college_enrollment_date == min(college_enrollment_date)), aes(x=college_enrollment_date - 80, y=college_going_pct, group=agency_name, label=agency_label)) + 
-  geom_text(data=se |> filter(college_enrollment_date == max(college_enrollment_date)), aes(x=college_enrollment_date + 80, y=college_going_pct, group=agency_name, label=agency_label)) + 
-  geom_text(data=se |> filter(college_enrollment_date == min(college_enrollment_date)), aes(x=college_enrollment_date - 80, y=college_going_pct, group=agency_name, label=agency_label)) + 
-  scale_x_date(breaks = c(as.Date("2021-10-15"), as.Date("2022-10-15")), labels = c(2021, 2022), limits = c(as.Date("2021-04-15"), as.Date("2023-04-15")))  +
-  theme_minimal()
-```
-```{r slope9-check}
-grade_this_code()
-```
-
-And there you have it. A clean and clear slope chart showing how last year compared to the previous one. 
+And there you have it. A clean and clear slope chart showing how the peak of the pandemic compares to four years later. 
 
 ## The Recap
 
-Throughout this lesson, you've mastered the art of creating slope charts to visualize changes between two time periods. You've learned how to prepare your data, construct the basic chart structure, and enhance it with custom colors, labels, and spacing. Remember, slope charts are particularly effective for showing how different entities (like school districts in our example) change relative to each other over time. As you continue your data journalism journey, you'll find slope charts to be a valuable addition to your visualization toolkit, especially when you need to clearly communicate before-and-after comparisons or year-over-year changes in a compelling and easy-to-understand format.
+Throughout this lesson, you've mastered the art of creating slope charts to visualize changes between two time periods. You've learned how to prepare your data, construct the basic chart structure, and enhance it with colors, labels, and spacing. Remember, slope charts are particularly effective for showing how different entities (like states in our example) change relative to each other over time. As you go forward, you'll find slope charts to be a valuable addition to your visualization toolkit, especially when you need to clearly communicate before-and-after comparisons or year-over-year changes in a compelling and easy-to-understand format.
 
 ## Terms to Know
 
@@ -336,7 +229,4 @@ Throughout this lesson, you've mastered the art of creating slope charts to visu
 - `geom_line`: A ggplot2 function used to create lines in a chart, essential for connecting points in a slope chart.
 - `geom_point`: A ggplot2 function used to create points in a chart, used to mark the start and end points in a slope chart.
 - `geom_text`: A ggplot2 function used to add text labels to a chart, often used to label data points in slope charts.
-`scale_x_date`: A ggplot2 function used to customize the x-axis when working with date data.
-- `theme_minimal()`: A ggplot2 function that applies a minimalist theme to the chart, removing unnecessary visual elements.
-- `aes()`: Short for "aesthetics," this ggplot2 function maps variables to visual properties of the chart.
-- `nudge`: In the context of ggplot2, a technique used to slightly adjust the position of elements like labels to improve readability and avoid overlaps.
+- `scale_x_continuous`: A ggplot2 function used to customize the x-axis when working with numerical (i.e. continuous) data.
