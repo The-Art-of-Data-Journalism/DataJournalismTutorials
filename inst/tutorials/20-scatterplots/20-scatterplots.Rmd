@@ -14,20 +14,40 @@ description: >
 library(learnr)
 library(gradethis)
 library(tidyverse)
+library(glue)
+library(cli)
 library(ggrepel)
 knitr::opts_chunk$set(echo = FALSE)
 tutorial_options(exercise.completion=FALSE)
 ```
+```{r load-data, message=FALSE, warning=FALSE}
+state <- Sys.getenv("tutorial.state")
 
+stateName <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/states.csv") |> filter(Postal == state) 
+
+colleges <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/college-cost/national.csv")
+
+state_colleges <- colleges |> filter(STABBR == state)
+
+state_colleges_count <- nrow(state_colleges)
+
+collegeplural <- pluralize("There {?is/are} {state_colleges_count} {?college/colleges} in the state.")
+
+collegeplural2 <- pluralize("{state_colleges_count} institution{?s} that grant bachelors degrees.")
+```
 ## The Goal
 
-In this lesson, you'll learn how to create and interpret scatterplots, a powerful tool for visualizing relationships between two numerical variables. By the end of this tutorial, you'll understand how to prepare data for scatterplots, construct basic plots using ggplot2, highlight specific data points, and add labels using ggrepel. You'll practice these skills using real-world college admissions and tuition data, gaining insight into how to uncover and communicate trends and outliers in your datasets. These abilities will be crucial for identifying patterns and relationships in your data journalism projects.
+In this lesson, you'll learn how to create and interpret scatterplots, a powerful tool for visualizing relationships between two numerical variables. By the end of this tutorial, you'll understand how to prepare data for scatterplots, construct basic plots using ggplot2, highlight specific data points, and add labels using ggrepel. You'll practice these skills using real-world college completion and cost data, gaining insight into how to uncover and communicate trends and outliers in your datasets. These abilities will be crucial for identifying patterns and relationships in your data journalism projects.
+
+## Why Visualize Data?
+
+More to come
 
 ## The Basics
 
 One of the most powerful things that we can do with visualizing data is establish relationships and find when things don't fit the relationship. 
 
-We've been looking at colleges this semester, at the gap between in-state and out-of-state tuition and admission rates. Next question: Is there a relationship between tuition -- how much you pay -- and how many people get into the school? In other words -- do the really exclusive schools also charge a lot of money? Do the schools that will take anyone not charge as much for tuition because they aren't as exclusive? 
+In the last assignment, we looked at colleges, at the gap between in-state and out-of-state tuition. Next question: Is there a relationship between how much it costs to go to a college and how many people graduate? In other words -- if it's really expensive to go there, is that creating problems for people finishing their degrees? Or is it that the more expensive the school, the more likely those people graduate? Maybe they only let smart people in. Maybe they only let rich people in who don't worry about the cost. Maybe all of those things. We don't know. 
 
 We'll start with libraries. We're adding `ggrepel` to this one because one very common thing to do is to label dots in the scatterplot. `ggrepel` does that. 
 
@@ -43,162 +63,134 @@ library(ggrepel)
 grade_this_code()
 ```
 
-We'll work with the colleges data from before. This is the same data we've used before, so if you already downloaded it, you don't need to do it again. **For purposes of this exercise, you don't need to do this. The data is included here if you want to try this in your own notebook.**
+We're going to work with a slightly different version of the college data. In this case, the differences are: 
 
-```{r echo=FALSE, class.output="bg-info", results="asis",  message=FALSE,  warning=FALSE}
-library(downloadthis)
-library(glue)
+* We're only looking at 4-year colleges, ones that primarily grant bachelors and graduate degrees, for the entire nation.
+* The two fields we're going to look at are the average cost of attendance and the completion rate. The average cost of attendance -- `COSTT4_A` in the data -- is the total cost for a year at that school, including tuition, housing, books and fees. The completion rate -- `C150_4` in the data -- is the percent of first time, first semester freshmen who complete their degree in *6* years.
+* I have filtered out schools who didn't report one or both of these bits of data. Example: There's 23 schools who reported zero students graduating in 6 years. That's ... odd.
 
-dllink <- download_link(
-  link = "https://mattwaite.github.io/datajournalismfiles/colleges.csv",
-  button_label = "Download csv file",
-  button_type = "danger",
-  has_icon = TRUE,
-  icon = "fa fa-save",
-  self_contained = FALSE
-)
+Let's import the data now.
 
-glue("<pre><p><strong>For this walkthrough:</strong></p><p>{dllink}</p></pre>")
-
+```{r load-data-exercise, exercise = TRUE}
+colleges <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/college-cost/national.csv")
 ```
-
-Now import the data.
-
-```{r chart-load-data, message=FALSE, warning=FALSE}
-colleges <- read_csv("https://mattwaite.github.io/datajournalismfiles/colleges.csv")
-
-collegechart <- colleges |> na.omit()
-
-nu <- collegechart |> filter(INSTNM == "University of Nebraska-Lincoln")
+```{r load-data-exercise-solution}
+colleges <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/college-cost/national.csv")
 ```
-```{r chart-load-data-exercise, exercise = TRUE}
-colleges <- read_csv("https://mattwaite.github.io/datajournalismfiles/colleges.csv")
-```
-```{r chart-load-data-exercise-solution}
-colleges <- read_csv("https://mattwaite.github.io/datajournalismfiles/colleges.csv")
-```
-```{r chart-load-data-exercise-check}
+```{r load-data-exercise-check}
 grade_this_code()
 ```
-
-## Scatterplots
 
 Scatterplots are, for my money, the most revealing and useful chart type out there that isn't a map. They reveal so much, and they allow you to make comparisons between two numbers. With a scatterplot, we put what we think predicts the thing on the x axis, and the thing being predicted on the y axis. `geom_point` works just like other geoms -- we need an x and a y and a data element. Both x and y are numbers. 
 
-But first, we need to remove some bad data in our dataset. Not every school has an admit rate or in-state tuition. We can't have NA in our data. We can remove all rows with NA in any column with `na.omit()`
-
-### Excercise 1: Cleanup
-
-We'll run `na.omit()` on our colleges data and save it to a new dataframe called collegechart.
-
-```{r scatter1, exercise=TRUE, exercise.setup = "chart-load-data"}
-____ <- colleges |> ____
-```
-```{r scatter1-solution, exercise.reveal_solution = FALSE}
-collegechart <- colleges |> na.omit()
-```
-```{r scatter1-check}
-grade_this_code()
-```
-
-Doing that takes us from 1,828 colleges to 1,302. 
+The other advantage of scatterplots? You can put a *huge* amount of data on them. There are more than 1,700 colleges that fit our criteria. Do we need to narrow it down for us to fit them all in the chart? Nope.
 
 Let's take a look at our data so we know what we can work with going forward. 
 
-```{r scatter2, exercise=TRUE, exercise.setup = "chart-load-data"}
-head(collegechart)
+```{r scatter2, exercise=TRUE, exercise.setup = "load-data"}
+head(colleges)
 ```
 ```{r scatter2-solution, exercise.reveal_solution = FALSE}
-head(collegechart)
+head(colleges)
 ```
 ```{r scatter2-check}
 grade_this_code()
 ```
 
-Now we're ready to start making a chart. 
+### Excercise 1: Making a scatterplot
 
-### Exercise 2: Dots on a graph
+Remember -- we're looking at how much it costs to go to that school and comparing it to the completion rate. We talked about exactly which of the columns you have are those two things above.
 
-The great part about scatterplots is that you can include a *lot* of data on it. To make our graph, we're going to put the admit rate in for x and the in-state tuition on the y. We're going to do ourselves a favor right away and make every dot grey.  
-
-```{r scatter3, exercise=TRUE, exercise.setup = "chart-load-data"}
+```{r scatter3, exercise=TRUE, exercise.setup = "load-data"}
 ggplot() + 
-  geom_point(data=collegechart, aes(x=____, y=____), color="grey")
+  geom_point(data=colleges, aes(x=____, y=____), color="grey")
 ```
 ```{r scatter3-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
-  geom_point(data=collegechart, aes(x=ADM_RATE, y=TUITIONFEE_IN), color="grey")
+  geom_point(data=colleges, aes(x=COSTT4_A, y=C150_4), color="grey")
 ```
 ```{r scatter3-check}
 grade_this_code()
 ```
 
-So that chart is kinda wild. Think about dividing it up into quadrants -- on the upper left quadrant is the Admit Few, Charge Them a Ton schools. On the bottom right are schools that lets lots of people in and don't charge them a ton of money (relative to the expensive schools, that is). 
+The way to read this chart -- when you're looking for relationships -- is do the dots sort of cluster in a pattern? In this case ... they do! At the lower costs, they all kind of bunch together, but the more expensive you get, the higher the completion percentage gets. See how they flow up and to the right? That's the relationship. The more expensive the school, the more likely a student is to complete it. A massive question that should be rattling around in your head right now: Why?
 
-Where is Nebraska in this chart? Let's find Dear Old Nebraska U. 
-
-### Exercise 3: There is no place like ... 
-
-The way to highlight a dot is to make a dataframe of one and add another geom_point. If you change the color of that one dot, it stands out. First, the dataframe. 
-
-
-```{r scatter4, exercise=TRUE, exercise.setup = "chart-load-data"}
-nu <- collegechart |> filter(____ == "University of ____-Lincoln")
-
-```
-```{r scatter4-solution, exercise.reveal_solution = FALSE}
-nu <- collegechart |> filter(INSTNM == "University of Nebraska-Lincoln")
-
-```
-```{r scatter4-check}
-grade_this_code()
+```{r storysetup, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("Where are {stateName$State} colleges on this chart? {collegeplural} You may have noticed we set the others to grey. Let's make these a color. But first, we have to make a dataframe of them.")
 ```
 
-Now we have a dataframe of one. Let's use it. 
+### Exercise 2: Colleges in your state 
 
-### Exercise 4: One red dot please
+The way to highlight a dot is to make a dataframe of one and add another geom_point. If you change the color of that one dot, it stands out. First, the dataframe. We'll call it `state_colleges` and the state abbreviation you want is your state's postal code. 
 
-```{r scatter5, exercise=TRUE, exercise.setup = "chart-load-data"}
+```{r college-read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
+____ <- colleges |> filter(STABBR == "____")
+```
+
+```{r college-read-check}
+grade_this({
+  if (identical(nrow(.result), state_colleges_count)) {
+    pass("Great work! You now have your state colleges.")
+  }
+  fail()
+})
+```
+
+```{r storysetup2, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("Now we have a dataframe of {state_colleges_count}. Let's use it in a new geom.")
+```
+
+### Exercise 4: Red dots please
+
+```{r scatter5, exercise=TRUE, exercise.setup = "load-data"}
 ggplot() + 
-  geom_point(data=collegechart, aes(x=____, y=____), color="grey") + 
+  geom_point(data=colleges, aes(x=____, y=____), color="grey") + 
   geom_point(data=____, aes(x=____, y=____), color="red")
 ```
 ```{r scatter5-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
-  geom_point(data=collegechart, aes(x=ADM_RATE, y=TUITIONFEE_IN), color="grey") +
-  geom_point(data=nu, aes(x=ADM_RATE, y=TUITIONFEE_IN), color="red")
+  geom_point(data=colleges, aes(x=COSTT4_A, y=C150_4), color="grey") +
+  geom_point(data=state_colleges, aes(x=COSTT4_A, y=C150_4), color="red")
 ```
 ```{r scatter5-check}
 grade_this_code()
 ```
 
-There we are. As a state school -- a Land Grant school no less -- we don't reject a lot of people and tuition is relatively cheap compared to a lot of places. 
+```{r storysetup3, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("And there's a chart of {stateName$State}'s {collegeplural2} But who is who?")
+```
 
-Better, but while we might know who that dot is, does everyone else? To get a label on there, we're going to add another geom. This one is called `geom_text_repel` and it's going to add text near each dot -- a `label` -- without them overlapping. The good news -- your `geom_text_repel` aes is exactly the same as your geom_point aes, just adding a `label`. And what column would make the most sense here to label the dot? 
+To get labels on there, we're going to add another geom. This one is called `geom_text_repel` and it's going to add text near each dot -- a `label` -- without them overlapping. The good news -- your `geom_text_repel` aes is exactly the same as your geom_point aes, just adding a `label`. And what column would make the most sense here to label the dot? 
 
 ### Exercise 5: Labeling
 
-```{r scatter6, exercise=TRUE, exercise.setup = "chart-load-data"}
+```{r scatter6, exercise=TRUE, exercise.setup = "load-data"}
 ggplot() + 
-  geom_point(data=collegechart, aes(x=____, y=____), color="grey") + 
+  geom_point(data=colleges, aes(x=____, y=____), color="grey") + 
   geom_point(data=____, aes(x=____, y=____), color="red") + 
   geom_text_repel(data=____, aes(x=____, y=____, label=____))
 ```
 ```{r scatter6-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
-  geom_point(data=collegechart, aes(x=ADM_RATE, y=TUITIONFEE_IN), color="grey") +
-  geom_point(data=nu, aes(x=ADM_RATE, y=TUITIONFEE_IN), color="red") + 
-  geom_text_repel(data=nu, aes(x=ADM_RATE, y=TUITIONFEE_IN, label=INSTNM))
+  geom_point(data=colleges, aes(x=COSTT4_A, y=C150_4), color="grey") +
+  geom_point(data=state_colleges, aes(x=COSTT4_A, y=C150_4), color="red") + 
+  geom_text_repel(data=state_colleges, aes(x=COSTT4_A, y=C150_4, label=INSTNM))
 ```
 ```{r scatter6-check}
 grade_this_code()
 ```
 
-And now everyone knows where the Harvard of the Plains resides on this chart. 
+```{r storysetup4, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+if (state_colleges_count <= 5) {
+  glue("And now you know which and where {stateName$State}'s colleges reside in this Cheap/Expensive vs Graduates Nobody/Everybody comparison.")
+} else {
+  glue("And now you know which and where {stateName$State}'s colleges reside in this Cheap/Expensive vs Graduates Nobody/Everybody comparison. But let's be honest: is it kind of a mess? Do you even see all of them? Do you need that many labels on there? What you would normally do at this point is pick and choose who you label. Is is just the largest? Is it a specific set of schools? You probably don't want more than about 5 to avoid cluttering up your scatterplot.")
+}
+```
 
 ## The Recap
 
-Throughout this lesson, you've mastered the basics of creating informative scatterplots. You've learned how to clean your data by removing NA values, plot multiple data points to reveal overall trends, highlight specific points of interest, and add labels to key data points. Remember, scatterplots are excellent for visualizing relationships between two variables and identifying outliers. As you continue your data journalism journey, you'll find scatterplots invaluable for uncovering stories within your data, such as the relationship between college selectivity and tuition costs. Always consider how you can use color, labels, and additional data points to enhance the story your scatterplot tells.
+Throughout this lesson, you've mastered the basics of creating informative scatterplots. You've learned how to plot multiple data points to reveal overall trends, highlight specific points of interest, and add labels to key data points. Remember, scatterplots are excellent for visualizing relationships between two variables and identifying outliers. As you gain more experience, you'll find scatterplots invaluable for uncovering stories within your data, such as the relationship between college costs and completion. Always consider how you can use color, labels, and additional data points to enhance the story your scatterplot tells.
 
 ## Terms to Know
 
@@ -206,8 +198,6 @@ Throughout this lesson, you've mastered the basics of creating informative scatt
 - `ggrepel`: An R package that provides text and label geoms for ggplot2 that repel each other to avoid overlapping.
 - `geom_point()`: A ggplot2 function used to create the points (dots) in a scatterplot.
 - `geom_text_repel()`: A function from the ggrepel package used to add non-overlapping text labels to points in a plot.
-- `na.omit()`: A function in R used to remove any rows containing NA (missing) values from a dataset.
 - `aes()`: Short for "aesthetics," this ggplot2 function maps variables in your data to visual properties in the plot.
 - `x-axis`: The horizontal axis in a scatterplot, typically representing the independent variable.
 - `y-axis`: The vertical axis in a scatterplot, typically representing the dependent variable.
-- Outlier: A data point in a scatterplot that falls far from the overall pattern of the other points, often representing an unusual or interesting case.
