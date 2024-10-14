@@ -186,9 +186,9 @@ The first thing that you need to know is that for this to work, your data needs 
 
 ```{r storysetup, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
 if (stateName$State == "Nebraska") {
-  glue("Instead of Congress, let's look at the partisan breakdown of the {stateName$State} Legislature. Now, technically speaking, the Nebraska Legislature is weird. First, the data is going to call it the state senate, but Nebraska only has one chamber (and it's members are called senators). Even more weird: Nebraska is officially non-partisan. But which party each member belongs to is an open secret, so I've added the partisan breakdown to the National Conference of State Legislature's data on partisan control of state legsilatures.")
+  glue("Instead of Congress, let's look at the partisan breakdown of the {stateName$State} Legislature. Now, technically speaking, the Nebraska Legislature is weird. First, the data is going to call it the state senate, but Nebraska only has one chamber (and it's members are called senators). Even more weird: Nebraska is officially non-partisan. But which party each member belongs to is an open secret, so I've added the partisan breakdown to the National Conference of State Legislature's data on partisan control of state legislatures.")
 } else {
-  "Instead of Congress, let's look at the partisan breakdown of the {stateName$State} Senate. Why the senate and not the house? Well, not every state has a house (cough, cough Nebraska), so to make it easier, we'll focus on the chamber everyone has. This data comes from the National Conference of State Legislature's data on partisan control of state legsilatures."
+  "Instead of Congress, let's look at the partisan breakdown of the {stateName$State} Senate. Why the senate and not the house? Well, not every state has a house (cough, cough Nebraska), so to make it easier, we'll focus on the chamber everyone has. This data comes from the National Conference of State Legislature's data on partisan control of state legislatures."
 }
 ```
 
