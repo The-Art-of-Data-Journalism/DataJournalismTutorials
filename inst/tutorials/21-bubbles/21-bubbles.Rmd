@@ -14,14 +14,30 @@ description: >
 library(learnr)
 library(gradethis)
 library(tidyverse)
+library(glue)
+library(cli)
 library(ggrepel)
 knitr::opts_chunk$set(echo = FALSE)
 tutorial_options(exercise.completion=FALSE)
 ```
+```{r load-data, message=FALSE, warning=FALSE}
+state <- Sys.getenv("tutorial.state")
 
+stateName <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/states.csv") |> filter(Postal == state) 
+
+bigpublic <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/college-cost/bigpublic.csv")
+
+state_college <- bigpublic |> filter(STABBR == state)
+
+state_college_count <- nrow(state_college)
+```
 ## The Goal
 
 In this lesson, you'll learn how to create bubble charts, which add a third dimension to scatterplots through varying circle sizes. By the end of this tutorial, you'll understand when bubble charts are effective, how to construct them using ggplot2, and how to enhance them with transparency and labels. You'll practice filtering data, adjusting visual elements, and using ggrepel for clear labeling. These skills will enable you to visualize complex relationships between three variables, a powerful tool for uncovering and communicating insights in your data journalism projects.
+
+## Why Visualize Data?
+
+More to come.
 
 ## The Basics
 
@@ -31,31 +47,13 @@ If you want to see it work spectacularly well, [watch a semi-famous Ted Talk](ht
 
 And since then, people have wanted bubble charts. And we're back to the original problem: They're hard. There's a finite set of circumstances where they work. 
 
-Let's make one. 
+Let's try to make one. 
 
 To make a bubble chart, you're making a scatterplot, just like we did in the previous exercise. Then you're adding one more element -- the size of the dot. 
 
-I've got a dataset that we've been looking at lately. It's got school districts, their average composite ACT scores and their college going percent. The new bit of data? The number of kids going to college. 
+I've got a subset of data from the last exercise. It's the same cost vs completion data, but this time, it's only for the largest public universities in each state. For almost every state, this is Big State U, where they have Big Time sports teams and jerseys you can buy in stores all over the state. A *lot* of media attention goes to exclusive private universities -- the Ivy League, for example -- but the truth is the overwhelming plurality of college educated adults went to Big State U. 
 
-Here is that data. Per usual: **For purposes of this exercise, you don't need to do this. The data is included here if you want to try this in your own notebook.**
-
-```{r echo=FALSE, class.output="bg-info", results="asis",  message=FALSE,  warning=FALSE}
-library(downloadthis)
-library(glue)
-
-dllink <- download_link(
-  link = "https://mattwaite.github.io/datajournalismfiles/districtbubble.csv",
-  button_label = "Download csv file",
-  button_type = "danger",
-  has_icon = TRUE,
-  icon = "fa fa-save",
-  self_contained = FALSE
-)
-
-glue("<pre><p><strong>For this walkthrough:</strong></p><p>{dllink}</p></pre>")
-```
-
-We'll need the tidyverse and a library called ggrepel that we'll talk about later.
+We don't need any new libraries from last time. We need the `tidyverse` and `ggrepel`.
 
 ```{r load-tidyverse, exercise=TRUE}
 library(tidyverse)
@@ -71,29 +69,23 @@ grade_this_code()
 
 And the data.
 
-```{r bubble-load-data, message=FALSE, warning=FALSE}
-districts <- read_csv("https://mattwaite.github.io/datajournalismfiles/districtbubble.csv")
-
-bigschools <- districts |> 
-  filter(college_going_count > 500)
+```{r load-data-exercise, exercise = TRUE}
+bigpublic <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/college-cost/bigpublic.csv")
 ```
-```{r bubble-load-data-exercise, exercise = TRUE}
-districts <- read_csv("https://mattwaite.github.io/datajournalismfiles/districtbubble.csv")
+```{r load-data-exercise-solution}
+bigpublic <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/college-cost/bigpublic.csv")
 ```
-```{r bubble-load-data-exercise-solution}
-districts <- read_csv("https://mattwaite.github.io/datajournalismfiles/districtbubble.csv")
-```
-```{r bubble-load-data-exercise-check}
+```{r load-data-exercise-check}
 grade_this_code()
 ```
 
 A bubble chart is just a scatterplot with one additional element in the aesthetic -- a size. Let's make the scatterplot version first. Let's first take a peek at the data. 
 
-```{r bubble1, exercise=TRUE, exercise.setup = "bubble-load-data", message=FALSE}
-head(districts)
+```{r bubble1, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
+head(bigpublic)
 ```
 ```{r bubble1-solution, exercise.reveal_solution = FALSE}
-head(districts)
+head(bigpublic)
 ```
 ```{r bubble1-check}
 grade_this_code()
@@ -101,25 +93,27 @@ grade_this_code()
 
 ### Exercise 1: First, we scatterplot
 
-To make this scatterplot, let's put the college going percent on the x axis and the average act score on the y. 
+To make this scatterplot, let's just repeat what we did last time: the cost on the x axis, the completion rate (`C150_4`) on the other. 
 
-```{r bubble2, exercise=TRUE, exercise.setup = "bubble-load-data", message=FALSE}
-ggplot() + geom_point(data=____, aes(x=____, y=____))
+```{r bubble2, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
+ggplot() + 
+  geom_point(data=____, aes(x=____, y=____))
 ```
 ```{r bubble2-solution, exercise.reveal_solution = FALSE}
-ggplot() + geom_point(data=districts, aes(x=college_going_pct, y=average_composite_score))
+ggplot() + 
+  geom_point(data=bigpublic, aes(x=COSTT4_A, y=C150_4))
 ```
 ```{r bubble2-check}
 grade_this_code()
 ```
 
-Looks like a scatterplot, eh? But which of these schools are sending *lots* of kids to college and which ones ... aren't? 
+Looks like a scatterplot, eh? But which of these schools really big and which ones ... aren't? 
 
 ### Exercise 2: The bubble chart
 
-Let's add the size element. From our data work above, we want to add the column that has the number of college bound kids in it. That's a hint, look at the code.
+Let's add the size element. From our peek at the data above, we want to add the column that has the number of undergrads in it. That's a hint: the column is a weird shortening of that word.
 
-```{r bubble3, exercise=TRUE, exercise.setup = "bubble-load-data", message=FALSE}
+```{r bubble3, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
 ggplot() + 
   geom_point(
     data=____, 
@@ -129,21 +123,23 @@ ggplot() +
 ```{r bubble3-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
   geom_point(
-    data=districts, 
-    aes(x=college_going_pct, y=average_composite_score, size=college_going_count)
+    data=bigpublic, 
+    aes(x=COSTT4_A, y=C150_4, size=UGDS)
     )
 ```
 ```{r bubble3-check}
 grade_this_code()
 ```
 
-What does this chart tell you? Seems there's a big dot up at the top, and a really big dot at the bottom. And there's a mess in the middle. We should start by trying to clean that up a bit.
+What does this chart tell you? Seems there's some big schools that cost a bunch and are graduating a ton of people. There's some smaller schools who are kinda in the middle. And there's a small handful of small state schools who are graduating fewer than 40 percent of first-time first-year students.
+
+Our chart needs some improvement.
 
 ### Exercise 3: Adding transparency and scale
 
 We can make this more readable by adding an `alpha` element outside the aesthetic -- `alpha` in this case is transparency -- and we can manually change the size of the dots by adding `scale_size` and a `range`. Let's try an `alpha` of .3. 
 
-```{r bubble4, exercise=TRUE, exercise.setup = "bubble-load-data", message=FALSE}
+```{r bubble4, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
 ggplot() + 
   geom_point(
     data=____, 
@@ -155,8 +151,8 @@ ggplot() +
 ```{r bubble4-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
   geom_point(
-    data=districts, 
-    aes(x=college_going_pct, y=average_composite_score, size=college_going_count),
+    data=bigpublic, 
+    aes(x=COSTT4_A, y=C150_4, size=UGDS),
     alpha = .3) + 
   scale_size(range = c(1, 10))
 ```
@@ -166,67 +162,80 @@ grade_this_code()
 
 Better?
 
-### Exercise 4: First step to labeling
+### Exercise 4: Adding a focus
 
-What would help the most is if we added names to the biggest school dots. Let's make a new dataframe called bigschools and get all school districts who are sending more than 500 kids to college. 
+What would help the most is if we added a school to focus on. So let's add your state's largest public university to this chart. First step -- filtering. Let's call that dataframe `state_college`.
 
-```{r bubble6, exercise=TRUE, exercise.setup = "bubble-load-data", message=FALSE}
-____ <- districts |> 
-  filter(college_going_count > ____)
-```
-```{r bubble6-solution, exercise.reveal_solution = FALSE}
-bigschools <- districts |> 
-  filter(college_going_count > 500)
-```
-```{r bubble6-check}
-grade_this_code()
+```{r college-read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
+____ <- bigpublic |> filter(STABBR == "____")
 ```
 
-If you had an environment, you'd see you now have 5 schools who sent more than 500 kids to college last year. 
+```{r college-read-check}
+grade_this({
+  if (identical(nrow(.result), state_college_count)) {
+    pass("Great work! You now have your state colleges.")
+  }
+  fail()
+})
+```
 
-### Exercise 5: Adding labels 
+```{r storysetup, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("If you had an environment, you'd see you now have 1 school in {stateName$State}: {state_college$INSTNM}.")
+```
 
-Let's add those names to the chart. We're going to do add a `geom_text_repel` to our code. The `geom_text_repel` aes is the same as the scatterplot, except it needs a `label`. From the head step above, what would make a good label?  
+### Exercise 5: Adding a red dot and labels
 
-```{r bubble7, exercise=TRUE, exercise.setup = "bubble-load-data", message=FALSE}
+Let's add that school to the chart. We're going to do add a second `geom_point` that is identical in all ways to your first **except** for the dataframe. Then we'll add a `geom_text_repel` to our code. The `geom_text_repel` aes is the same as the `state_college` geom_point, except it needs a `label`. From the head step above, what would make a good label?  
+
+```{r bubble7, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
 ggplot() + 
   geom_point(
     data=____, 
-    aes(x=college_going_pct, y=average_composite_score, size=college_going_count),
-    alpha = .3
+    aes(x=____, y=____, size=____),
+    alpha = ____
+    ) + 
+  geom_point(
+    data=____, 
+    aes(x=____, y=____, size=____),
+    color = "red"
     ) + 
   geom_text_repel(
     data=____, 
-    aes(x=college_going_pct, y=average_composite_score, label=____)
+    aes(x=____, y=____, label=____)
     ) + 
-  scale_size_continuous(range=c(1,10))
+  scale_size(range = c(1, 10))
 ```
 ```{r bubble7-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
   geom_point(
-    data=districts, 
-    aes(x=college_going_pct, y=average_composite_score, size=college_going_count),
+    data=bigpublic, 
+    aes(x=COSTT4_A, y=C150_4, size=UGDS),
     alpha = .3
     ) + 
-  geom_text_repel(
-    data=bigschools, 
-    aes(x=college_going_pct, y=average_composite_score, label=agency_name)
+  geom_point(
+    data=state_college, 
+    aes(x=COSTT4_A, y=C150_4, size=UGDS),
+    color = "red"
     ) + 
-  scale_size_continuous(range=c(1,10))
+  geom_text_repel(
+    data=state_college, 
+    aes(x=COSTT4_A, y=C150_4, label=INSTNM)
+    ) + 
+  scale_size(range = c(1, 10))
 ```
 ```{r bubble7-check}
 grade_this_code()
 ```
 
-And what story does that tell? 
+And what story does that tell? Where does your state's biggest public university fit in this picture? Is that a good or a bad thing? The next step after this? What about other schools that are similar to your state's largest? These institutions are multi-billion dollar entities in your state. They're a big deal.
 
 ## The Recap
 
-Throughout this lesson, you've mastered the creation of bubble charts, learning to visualize relationships between three variables simultaneously. You've practiced transforming scatterplots into bubble charts, adjusting transparency and size scales for clarity, and adding labels to highlight key data points. Remember, while bubble charts can be powerful, they're most effective when used judiciously - when the relationships between all three variables tell a compelling story. As you continue your data journalism journey, consider how bubble charts might reveal hidden patterns in your datasets, but always balance their complexity with the clarity of your message.
+Throughout this lesson, you've mastered the creation of bubble charts, learning to visualize relationships between three variables simultaneously. You've practiced transforming scatterplots into bubble charts, adjusting transparency and size scales for clarity, and adding labels to highlight key data points. Remember, while bubble charts can be powerful, they're most effective when used judiciously - when the relationships between all three variables tell a compelling story. Going forward, consider how bubble charts might reveal hidden patterns in your datasets, but always balance their complexity with the clarity of your message.
 
 ## Terms to Know
 
--- Bubble chart: A variation of a scatterplot where data points are represented by circles (bubbles) whose sizes correspond to a third variable.
--- Scatterplot: A type of chart that shows the relationship between two variables as points on a two-dimensional grid.
+- Bubble chart: A variation of a scatterplot where data points are represented by circles (bubbles) whose sizes correspond to a third variable.
+- Scatterplot: A type of chart that shows the relationship between two variables as points on a two-dimensional grid.
 - `scale_size()`: A ggplot2 function used to adjust the range of sizes for elements like points in a bubble chart.
 - range: In the context of scale_size(), this parameter sets the minimum and maximum sizes for the bubbles in the chart.
