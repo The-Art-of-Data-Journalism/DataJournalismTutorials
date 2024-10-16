@@ -1,0 +1,205 @@
+---
+title: "Data Journalism Lesson 22: Beeswarm plots"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  What if we combined bar charts and scatterplots?
+---
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+library(tidyverse)
+library(glue)
+library(cli)
+library(ggbeeswarm)
+library(ggrepel)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+```
+```{r load-data, message=FALSE, warning=FALSE}
+state <- Sys.getenv("tutorial.state")
+
+stateName <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/states.csv") |> filter(Postal == state) 
+
+accredited <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/college-cost/accredited.csv")
+
+belowpar <- accredited |> 
+  filter(C150_4 < .5)
+```
+
+## The Goal
+
+In this lesson, you'll learn how to create and interpret beeswarm plots, a powerful visualization tool that combines elements of bar charts and scatterplots. By the end of this tutorial, you'll understand when to use beeswarm plots, how to construct them using `ggplot` and the `ggbeeswarm` package, and how to customize them to reveal patterns in your data. You'll practice these skills using real-world data on college completion rates and costs, gaining insight into how to uncover and communicate trends across multiple categories.
+
+## Why Visualize Data?
+
+More to come
+
+## The Basics
+
+If you're a college student on a campus right now, there is someone near you, likely with a very important sounding title and a sizable paycheck to go with it who is worried about something called The Enrollment Cliff. What is this scary sounding thing? It's a topic of intense discussion and debate in higher education and it goes a little something like this: In 2025(ish), we will hit peak high school graduates. The number of high school graduates has been going up for decades. But as of 2025, no longer. It'll drop. By some estimates, there will be 400,000 fewer college-bound high school graduates by 2030. That might not seem like a lot when you figure there's 345 million people in the United States, but that 400,000 student decline would be 4/5ths of the undergrads at the 18 Big Ten campuses. 
+
+This decline is not going to be felt equally. And it's already being felt. More than 100 schools have closed, merged or been consolidated into other schools since 2016. Hundreds more schools have seen steep declines in enrollment, threatening their existence. At the same time, most flagship campuses are growing. 
+
+So who is going to feel the pain from the enrollment cliff the most? We don't know exactly, but we can use the data we've been looking at and a new chart type called a beeswarm plot to raise some questions about some schools.
+
+what is a beeswarm plot? Think of it like the child of the bar chart and the scatterplot. It looks like Mother Scatterplot in that every row of data is a dot on the chart. But it looks like Father Bar Chart because the dots are organized on a number line and contained in an invisible rectangle. What is it good for? Beeswarms are excellent at showing how a group of things are distributed along a number. 
+
+Like bar charts, they are limited in how many bars they can show. And unlike scatterplots, they are a bit constrained by how many dots they can show. They work well when there's less than 10 categories (bars) grouping them together and the numbers are spread out, not clustered on some artificial boundary. 
+
+Beeswarms are not part of ggplot, but we can add them by bringing in the `ggbeeswarm` library. We'll need the `tidyverse` too. 
+
+```{r load-tidyverse, exercise=TRUE}
+library(tidyverse)
+library(ggbeeswarm)
+```
+```{r load-tidyverse-solution}
+library(tidyverse)
+library(ggbeeswarm)
+```
+```{r load-tidyverse-check}
+grade_this_code()
+```
+
+And now we'll grab some data. This data comes from the US Department of Education's College Scorecard, just like the last two. But this dataset is all main campuses for schools that mostly grant bachelor's degrees or higher. In other words -- colleges and universities. We have both public and private this time. The difference this time -- we're only looking at accredited schools. Accreditation agencies are designed to make sure a school is meeting certain requirements. To be accredited, schools have to do A, B and C. And then they have to demonstrate that they indeed do A, B and C and do it at a certain level. Accreditation is supposed to give students a sign that this school is legit. 
+
+Starting with the Obama administration, the US Department of Education had been highly critical of -- and indeed have closed down -- private, for-profit colleges. Schools that lose accreditation often lose access to federal funding, and students who go there can't take out federally-backed student loans or get federal student aid. No money means no college.
+
+There's nearly two dozen accreditors out there, but just seven of them cover the overwhelming majority of schools. This dataset is all colleges and universities accredited by these big seven accreditation agencies. 
+
+```{r load-data-exercise, exercise = TRUE}
+accredited <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/college-cost/accredited.csv")
+```
+```{r load-data-exercise-solution}
+accredited <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/college-cost/accredited.csv")
+```
+```{r load-data-exercise-check}
+grade_this_code()
+```
+
+Let's take a quick peek at it to see what we have to work with.
+
+```{r head-data, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
+head(accredited)
+```
+```{r head-data-solution, exercise.reveal_solution = FALSE}
+head(accredited)
+```
+```{r head-data-check}
+grade_this_code()
+```
+
+Similar to scatterplots, beeswarms often don't require a lot of work to get the data into shape to make charts. In this case, I've done the work for you. It wasn't complicated -- I filtered colleges by if they were the main campus, and then filtered the colleges by if they were accredited by one of the seven big accreditation agencies. 
+
+The beeswarm plot uses `geom_beeswarm` and uses and x and a y. The x is your number line. For this chart, let's use the completion percentage column we've used before as our number line. The y axis acts more like a group by -- this is what makes the invisible columns that group all the dots together. For this, we're going to use the accreditation agency column.
+
+### Exercise 1: Your first beeswarm
+
+```{r beeswarm1, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
+ggplot() + 
+  geom_beeswarm(data=accredited, aes(x=____, y=____))
+```
+```{r beeswarm1-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_beeswarm(data=accredited, aes(x=C150_4, y=ACCREDAGENCY))
+```
+```{r beeswarm1-check}
+grade_this_code()
+```
+
+What do we see and what are we looking for? What we're looking for here are patterns. Is there a blob of dots on one side or the other? Look at the Middle States Commission of Higher Education, then look at the Higher Learning Commission, then the Southern Association of Colleges and Schools Commission on Colleges. Note how the hump -- which is roughly the average -- keeps shifting left with each of these? That means a large chunk of schools accredited by that agency graduate at that rate -- and the further left that hump appears, the worse the average school is a graduating people in 6 years. 
+
+Another thing I'm seeing here that surprises me -- how many schools have below 50 percent completion percentages. Find that .5 line and look at all the dots left of that. That means fewer than half of first-time, first-year students at those schools graduate in 6 years. That's bonkers to me -- that finishing college is worse than a coin-flip in these places.
+
+Let's look specifically at them, and make a slightly different kind of beeswarm to draw out some differences. 
+
+First, let's make a new dataframe called `belowpar` and filter all schools where less than half of students finish in 6 years. 
+
+### Exercise 2: Stay in school kids
+
+```{r beeswarm2, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
+____ <- accredited |> 
+  filter(C150_4 < ____)
+```
+```{r beeswarm2-solution, exercise.reveal_solution = FALSE}
+belowpar <- accredited |> 
+  filter(C150_4 < .5)
+```
+```{r beeswarm2-check}
+grade_this_code()
+```
+
+Now that we have that slice of data, we're going to introduce a new geom in the `ggbeeswarm` library that's a variation on the `geom_beeswarm` we used. Sometimes, when the data is *too* spread out and you don't have a giant number of dots, you end up with a lot of dots on top of each other and it looks like a straight line. In `ggbeeswarm`, there are two other geoms called `geom_jitter` and `geom_quasirandom`. We're going to use `geom_jitter`, which draws it's name from jittering, where data visualizers and cartographers who have a lot of dots to get onto a screen will introduce a little random noise to the location of the dot to separate them from others. That way, they're 99 percent in the place they're supposed to be, just slightly offset from other dots so you can see them. 
+
+### Exercise 3: Using geom_jitter
+
+For this chart, instead of using accrediting agencies, we're going to look at the school type -- `SCHTYPE` -- as our grouping. Are these schools that fail to graduate more than half of their students in our `belowpar` dataset public colleges? Private? Let's find out.
+
+```{r beeswarm3, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
+ggplot() + 
+  geom_jitter(data=____, aes(x=C150_4, y=____))
+```
+```{r beeswarm3-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_jitter(data=belowpar, aes(x=C150_4, y=SCHTYPE))
+```
+```{r beeswarm3-check}
+grade_this_code()
+```
+
+Well ... we got something. But what is a school type of 1? Or 2? You have to dig into the documentation to find it, but 1 is public, 2 is private non-profit and 3 is proprietary, which is another way of saying private for-profit. How do we clean this up a bit? We can use a `scale_y_continuous` in our chart and replace the numbers with words like this:
+
+```{r beeswarm4, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
+ggplot() + 
+  geom_jitter(data=____, aes(x=C150_4, y=____)) +
+  scale_y_continuous(breaks=c(1,2,3), labels=c("Public", "Private Nonprofit", "Private For-Profit"))
+```
+```{r beeswarm4-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_jitter(data=belowpar, aes(x=C150_4, y=SCHTYPE)) +
+  scale_y_continuous(breaks=c(1,2,3), labels=c("Public", "Private Nonprofit", "Private For-Profit"))
+```
+```{r beeswarm4-check}
+grade_this_code()
+```
+
+One more thing we can do to add some context to this, and bring us back to our original goal of raising questions about colleges in the coming enrollment cliff. How much does it cost to go to one of these schools? Are these schools charging a lot of money and then leaving students without a degree and a lot of debt?
+
+### Exercise 4: Adding color 
+
+How can we do that? By adding a `color` *inside* the `aes`, where it will shade the dot by the cost. That cost comes in the `COSTT4_A` column. 
+
+```{r beeswarm5, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
+ggplot() + 
+  geom_jitter(data=____, aes(x=C150_4, y=____, color=____)) +
+  scale_y_continuous(breaks=c(1,2,3), labels=c("Public", "Private Nonprofit", "Private For-Profit"))
+```
+```{r beeswarm5-solution, exercise.reveal_solution = FALSE}
+ggplot() + 
+  geom_jitter(data=belowpar, aes(x=C150_4, y=SCHTYPE, color=COSTT4_A)) +
+  scale_y_continuous(breaks=c(1,2,3), labels=c("Public", "Private Nonprofit", "Private For-Profit"))
+```
+```{r beeswarm5-check}
+grade_this_code()
+```
+
+Now what do you see? Looks to me like the public colleges on this graph all have darker colors, which would mean they're lower cost. The private non-profits have a lot of lighter colored dots, which would indicate considerably more expense -- double to nearly triple the cost. 
+
+A question you could ask education experts from this: What does the future hold for under-performing schools with large tuition bills? My guess is not good things. 
+
+## The Recap
+
+Throughout this lesson, you've mastered the creation and interpretation of beeswarm plots, a versatile tool for visualizing distributions across categories. You've learned to construct basic beeswarm plots, modify them using geom_jitter for clearer visualization, and enhance them with color coding to add another dimension of data. Remember, beeswarm plots are particularly effective when you need to show how values are distributed within and across categories, making them ideal for comparing groups or identifying outliers. 
+
+## Terms To Know
+
+- Beeswarm plot: A data visualization that combines elements of bar charts and scatterplots, showing the distribution of individual data points along a number line within categorical groups.
+- `ggbeeswarm`: An R package that extends `ggplot` to create beeswarm plots and other specialized point distributions.
+- `geom_beeswarm()`: A function from the `ggbeeswarm` package used to create basic beeswarm plots in ggplot.
+- `geom_jitter()`: A function that adds a small amount of random variation to the location of each point, useful for reducing overplotting in beeswarm plots.
+- Jittering: The technique of adding small random noise to data points in a visualization to reduce overlapping and reveal density.
