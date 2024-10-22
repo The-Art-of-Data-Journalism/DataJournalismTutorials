@@ -14,6 +14,7 @@ description: >
 ```{r setup, include=FALSE}
 library(learnr)
 library(gradethis)
+library(glue)
 library(tidyverse)
 library(ggrepel)
 knitr::opts_chunk$set(echo = FALSE)
@@ -22,9 +23,15 @@ tutorial_options(exercise.completion=FALSE)
 
 ## The Goal
 
-In this lesson, you'll learn about the critical role of text elements in creating effective data visualizations for journalism. By the end of this tutorial, you'll understand how to craft compelling headlines, write informative subtitles, add clear axis labels, and use strategic annotations to guide readers through your charts. You'll practice applying these text elements to a bubble chart, gaining hands-on experience in transforming raw data into a story-driven visualization. These skills will enable you to create more impactful and informative graphics that effectively communicate your data stories to readers.
+In this lesson, you'll learn about the critical role of text elements in creating effective data visualizations for journalism. By the end of this tutorial, you'll understand how to craft compelling headlines, write informative subtitles, add clear axis labels, and use strategic annotations to guide readers through your charts. You'll practice applying these text elements to a scatterplot, gaining hands-on experience in transforming raw data into a story-driven visualization. These skills will enable you to create more impactful and informative graphics that effectively communicate your data stories to readers.
+
+## Why Visualize Data
+
+More to come
 
 ## The Basics
+
+We started down this road a bit in the tables tutorial, but repeating some important stuff from that, text is a vital part of a good graphic. Some text is absolutely required. 
 
 These are the pieces of a good graphic:
 
@@ -57,41 +64,56 @@ grade_this_code()
 ```
 
 ```{r text-load-data, message=FALSE, warning=FALSE}
-districts <- read_csv("https://mattwaite.github.io/datajournalismfiles/districtbubble.csv")
+national <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/college-cost/national.csv")
 
-bigschools <- districts |> 
-  filter(college_going_count > 500)
+exclusivencheap <- national |> 
+  filter(ADM_RATE < .2) |> 
+  filter(COSTT4_A < 50000)
+
+natstats <- national |> 
+  summarize(
+    average_admit_rate = round(mean(ADM_RATE)*100, 0),
+    average_cost = round(mean(COSTT4_A),0)
+  )
 ```
 
-The data and the chart code isn't important for you to follow along. The code is nothing special -- it's taken straight out of the bubble charts lesson. Under the hood, I've loaded up all school districts, their college going count and their composite ACT score.
+The data and the chart code isn't important for you to follow along. The code is nothing special -- it's a riff off of work we've done before. Under the hood, I've loaded up all colleges and universities, and we're going to look at comparing how exclusive a school is vs how much it costs.
 
-Let's bring up the bubble chart the big districts labeled as a starting place.
+Let's bring up the scatterplot with an odd group of schools -- colleges that admit fewer than 20 percent of applicants, but cost less than $50,000 a year to attend -- as a starting place.
 
 ```{r bubble1, exercise=TRUE, exercise.setup = "text-load-data", message=FALSE}
 ggplot() + 
   geom_point(
-    data=districts, 
-    aes(x=college_going_pct, y=average_composite_score, size=college_going_count),
-    alpha = .3
+    data=national, 
+    aes(x=ADM_RATE, y=COSTT4_A),
+    color="grey"
+    ) + 
+  geom_point(
+    data=exclusivencheap, 
+    aes(x=ADM_RATE, y=COSTT4_A),
+    color="red"
     ) + 
   geom_text_repel(
-    data=bigschools, 
-    aes(x=college_going_pct, y=average_composite_score, label=agency_name)
-    ) + 
-  scale_size_continuous(range=c(1,10))
+    data=exclusivencheap, 
+    aes(x=ADM_RATE, y=COSTT4_A, label=INSTNM),
+    )
 ```
 ```{r bubble1-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
   geom_point(
-    data=districts, 
-    aes(x=college_going_pct, y=average_composite_score, size=college_going_count),
-    alpha = .3
+    data=national, 
+    aes(x=ADM_RATE, y=COSTT4_A),
+    color="grey"
+    ) + 
+  geom_point(
+    data=exclusivencheap, 
+    aes(x=ADM_RATE, y=COSTT4_A),
+    color="red"
     ) + 
   geom_text_repel(
-    data=bigschools, 
-    aes(x=college_going_pct, y=average_composite_score, label=agency_name)
-    ) + 
-  scale_size_continuous(range=c(1,10))
+    data=exclusivencheap, 
+    aes(x=ADM_RATE, y=COSTT4_A, label=INSTNM),
+    )
 ```
 ```{r bubble1-check}
 grade_this_code()
@@ -99,7 +121,7 @@ grade_this_code()
 
 This chart is missing major parts -- required for any chart.
 
-To fix this, we add labels -- `labs`. Each graphic -- regardless of type --needs a title, subtitle, caption, x and y. Your title is your headline. The subtitle is called chatter -- a sentence under the headline that explains a little about the graphic. The caption is where you'll put the source of your data and the credit line -- your name. x and y should be in each `labs`, but sometimes what x and y are is obvious and you can leave them blank. For example: A bar chart with states on the y axis doesn't need to label them as States. It's obvious by the rest of the chart.
+To fix this, we add labels -- `labs`. Each graphic -- regardless of type -- needs a title, subtitle, caption, x and y. Your title is your headline. The subtitle is called chatter -- a sentence under the headline that explains a little about the graphic. The caption is where you'll put the source of your data and the credit line -- your name. x and y should be in each `labs`, but sometimes what x and y are is obvious and you can leave them blank. For example: A bar chart with states on the y axis doesn't need to label them as States. It's obvious by the rest of the chart. In our case, nothing is obvious unless you've seen this data before. None of our readers have.
 
 First, let's start with some headline basics:
 
@@ -111,54 +133,62 @@ First, let's start with some headline basics:
 
 ### Exercise 1: Adding a headline, some chatter and some better labels
 
-Let's add some text to our labs here. For your x and y labels, spell out and properly space and capitalize the initial characters of the column names. For a headline, use `Who is sending kids to college?` and for a subtitle, use this: State data shows smaller school districts send a larger share to college.
+Let's add some text to our labs here. For your x and y labels, spell out and properly space and capitalize the initial characters of the column names. For a headline, use `Exclusive doesn't mean expensive` and for a subtitle, use this: `According to the federal Department of Education, there are seven schools who admit fewer than 20 percent of applicants but are among the most affordable.` On our x axis is the `Admit rate` and on the y axis is the `Average annual cost`.
 
 ```{r bubble2, exercise=TRUE, exercise.setup = "text-load-data", message=FALSE}
 ggplot() + 
   geom_point(
-    data=districts, 
-    aes(x=college_going_pct, y=average_composite_score, size=college_going_count),
-    alpha = .3
+    data=national, 
+    aes(x=ADM_RATE, y=COSTT4_A),
+    color="grey"
+    ) + 
+  geom_point(
+    data=exclusivencheap, 
+    aes(x=ADM_RATE, y=COSTT4_A),
+    color="red"
     ) + 
   geom_text_repel(
-    data=bigschools, 
-    aes(x=college_going_pct, y=average_composite_score, label=agency_name)
+    data=exclusivencheap, 
+    aes(x=ADM_RATE, y=COSTT4_A, label=INSTNM),
     ) + 
-  scale_size_continuous(range=c(1,10)) + 
   labs(
     x="____", 
     y="____", 
     title="____", 
     subtitle="____", 
-    caption="Source: Nebraska Department of Education | By Your Name"
+    caption="Source: US Department of Education | By Your Name"
     )
 ```
 
 ```{r bubble2-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
   geom_point(
-    data=districts, 
-    aes(x=college_going_pct, y=average_composite_score, size=college_going_count),
-    alpha = .3
+    data=national, 
+    aes(x=ADM_RATE, y=COSTT4_A),
+    color="grey"
+    ) + 
+  geom_point(
+    data=exclusivencheap, 
+    aes(x=ADM_RATE, y=COSTT4_A),
+    color="red"
     ) + 
   geom_text_repel(
-    data=bigschools, 
-    aes(x=college_going_pct, y=average_composite_score, label=agency_name)
+    data=exclusivencheap, 
+    aes(x=ADM_RATE, y=COSTT4_A, label=INSTNM),
     ) + 
-  scale_size_continuous(range=c(1,10)) + 
   labs(
-    x="College Going Percent", 
-    y="Average Composite Score", 
-    title="Who is sending kids to college?", 
-    subtitle="State data shows smaller school districts send a larger share to college.", 
-    caption="Source: Nebraska Department of Education | By Your Name"
+    x="Admit rate", 
+    y="Average annual cost", 
+    title="Exclusive doesn't mean expensive", 
+    subtitle="According to the federal Department of Education, there are seven schools who admit fewer than 20 percent of applicants but are among the most affordable.", 
+    caption="Source: US Department of Education | By Your Name"
     )
 ```
 ```{r bubble2-check}
 grade_this_code()
 ```
 
-The headline here works because it asks a provocative question (especially for parents). The chatter reveals what's in the chart without pointing at it -- show don't tell. Our x and y labels are clearer and let the reader know what's going on. 
+The headline here works because it lays out a provocative premise (especially for parents). The chatter reveals what's in the chart without pointing at it -- show don't tell. Our x and y labels are clearer and let the reader know what's going on. 
 
 ## Annotations
 
@@ -166,25 +196,25 @@ Another important part of a chart -- but not every chart -- is annotation. Somet
 
 Annotations also help us draw attention to things, or help the reader understand what they're looking at.
 
-We're going to add some lines to our chart that represent the average ACT score and average college going percent. To get that, we first have to calculate that. It's simple -- just a summarize and two means.
+We're going to add some lines to our chart that represent the average admit rate and average cost. To get that, we first have to calculate that. It's simple -- just a summarize and two means.
 
 ### Exercise 2: The means
 
 If you don't remember what these columns are, look at your chart code above. They're the x and y in the bubble chart.
 
 ```{r bubble3, exercise=TRUE, exercise.setup = "text-load-data", message=FALSE}
-districts |> 
+national |> 
   summarize(
-    average_college_going_pct = mean(____),
-    average_act_composite_score = mean(____)
+    average_admit_rate = mean(____),
+    average_cost = mean(____)
   )
 ```
 
 ```{r bubble3-solution, exercise.reveal_solution = FALSE}
-districts |> 
+national |> 
   summarize(
-    average_college_going_pct = mean(college_going_pct),
-    average_act_composite_score = mean(average_composite_score)
+    average_admit_rate = mean(ADM_RATE),
+    average_cost = mean(COSTT4_A)
   )
 ```
 
@@ -192,7 +222,11 @@ districts |>
 grade_this_code()
 ```
 
-To add lines for the average college going percent and average composite score, we're going to use `geom_hline` and `geom_vline` which mean horizontal line and vertical line. The averages will create lines to divide the chart into four corners. On one side -- lots of kids going to college, good scores. On the other, bad scores and not a lot of kids going to college. The geoms just require an intercept -- xintercept for geom_vline and yintercept for the geom_hline. We get the values for those from the averages we just made.
+```{r storysetup, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "text-load-data", results='asis'}
+glue("So what does that say? It says the average college admits about {natstats$average_admit_rate} percent of students and costs an average of ${natstats$average_cost} to attend for a year.")
+```
+
+To add lines for the average admit rate and average cost, we're going to use `geom_hline` and `geom_vline` which mean horizontal line and vertical line. The averages will create lines to divide the chart into four corners. On the upper right quadrant -- lots of kids getting admitted, super expensive. On the lower left quadrant, nobody getting in, but super cheap. The geoms just require an intercept -- `xintercept` for `geom_vline` and `yintercept` for the `geom_hline`. We get the values for those from the averages we just made.
 
 To label them, I'm going to use geom_text and I'm just going to put numbers in the x and the y to move them where I need them. I can get those numbers by looking at the x and y axis of my chart and guessing. After that, it's increasing or decreasing the number, depending on which direction I want to move it around.
 
@@ -203,60 +237,72 @@ Note here -- I'm only labeling two sections of the chart. There is such a thing 
 ```{r bubble4, exercise=TRUE, exercise.setup = "text-load-data", message=FALSE}
 ggplot() + 
   geom_point(
-    data=districts, 
-    aes(x=college_going_pct, y=average_composite_score, size=college_going_count),
-    alpha = .3
+    data=national, 
+    aes(x=ADM_RATE, y=COSTT4_A),
+    color="grey"
+    ) + 
+  geom_point(
+    data=exclusivencheap, 
+    aes(x=ADM_RATE, y=COSTT4_A),
+    color="red"
     ) + 
   geom_text_repel(
-    data=bigschools, 
-    aes(x=college_going_pct, y=average_composite_score, label=agency_name)
+    data=exclusivencheap, 
+    aes(x=ADM_RATE, y=COSTT4_A, label=INSTNM),
+    size=3
     ) + 
   geom_vline(xintercept = ____) + 
   geom_hline(yintercept = ____) +
-  geom_text(aes(x=80, y=25, label="Higher scores, lots going to college"), color="blue") +
-  geom_text(aes(x=60, y=17, label="Lower scores, not many going to college"), color="blue") +
-  scale_size_continuous(range=c(1,10)) + 
+  geom_text(aes(x=.87, y=85000, label="High admits, high cost"), color="blue") +
+  geom_text(aes(x=.3, y=15000, label="Fewer admits, below average cost"), color="blue") + 
   labs(
-    x="College Going Percent", 
-    y="Average Composite Score", 
-    title="Who is sending kids to college?", 
-    subtitle="According to state data, smaller school districts send a larger percentage of students to college than larger districts.", 
-    caption="Source: Nebraska Department of Education | By Your Name"
-    ) 
+    x="Admit rate", 
+    y="Average annual cost", 
+    title="Exclusive doesn't mean expensive", 
+    subtitle="According to the federal Department of Education, there are seven schools who admit fewer than 20 percent of applicants but are among the most affordable.", 
+    caption="Source: US Department of Education | By Your Name"
+    )
 ```
 
 ```{r bubble4-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
   geom_point(
-    data=districts, 
-    aes(x=college_going_pct, y=average_composite_score, size=college_going_count),
-    alpha = .3
+    data=national, 
+    aes(x=ADM_RATE, y=COSTT4_A),
+    color="grey"
+    ) + 
+  geom_point(
+    data=exclusivencheap, 
+    aes(x=ADM_RATE, y=COSTT4_A),
+    color="red"
     ) + 
   geom_text_repel(
-    data=bigschools, 
-    aes(x=college_going_pct, y=average_composite_score, label=agency_name)
+    data=exclusivencheap, 
+    aes(x=ADM_RATE, y=COSTT4_A, label=INSTNM),
+    size=3
     ) + 
-  geom_vline(xintercept = 76.89802) + 
-  geom_hline(yintercept = 18.90495) +
-  geom_text(aes(x=80, y=25, label="Higher scores, lots going to college"), color="blue") +
-  geom_text(aes(x=60, y=17, label="Lower scores, not many going to college"), color="blue") +
-  scale_size_continuous(range=c(1,10)) + 
+  geom_vline(xintercept = 0.7246474) + 
+  geom_hline(yintercept = 40745.59) +
+  geom_text(aes(x=.87, y=85000, label="High admits, high cost"), color="blue") +
+  geom_text(aes(x=.3, y=15000, label="Fewer admits, below average cost"), color="blue") + 
   labs(
-    x="College Going Percent", 
-    y="Average Composite Score", 
-    title="Who is sending kids to college?", 
-    subtitle="According to state data, smaller school districts send a larger percentage of students to college than larger districts.", 
-    caption="Source: Nebraska Department of Education | By Your Name"
-    ) 
+    x="Admit rate", 
+    y="Average annual cost", 
+    title="Exclusive doesn't mean expensive", 
+    subtitle="According to the federal Department of Education, there are seven schools who admit fewer than 20 percent of applicants but are among the most affordable.", 
+    caption="Source: US Department of Education | By Your Name"
+    )
 ```
 
 ```{r bubble4-check}
 grade_this_code()
 ```
 
+This is a good start. It's got some warts -- the grey background, a lack of any real typography, but we're getting to that. Note how I also made the dots for the cheap and exclusive schools red, the bulk of them grey and the lines blue. We're talking about color in the next tutorial.
+
 ## The Recap
 
-Throughout this lesson, you've learned how to enhance your data visualizations with key text elements. You've practiced writing headlines that grab attention and convey the main story, crafting subtitles that provide context, and adding clear labels to guide readers through your chart. You've also explored how to use annotations to highlight key insights and divide your chart into meaningful sections. Remember, effective data journalism isn't just about the numbers—it's about using text strategically to tell a compelling story. As you continue to create visualizations, always consider how you can use headlines, labels, and annotations to make your charts more accessible and impactful for your audience.
+Throughout this lesson, you've learned how to enhance your data visualizations with key text elements. You've practiced writing headlines that grab attention and convey the main story, crafting subtitles that provide context, and adding clear labels to guide readers through your chart. You've also explored how to use annotations to highlight key insights and divide your chart into meaningful sections. Remember, effective data journalism isn't just about the numbers — it's about using text strategically to tell a compelling story. As you continue to create visualizations, always consider how you can use headlines, labels, and annotations to make your charts more accessible and impactful for your audience.
 
 ## Terms to Know
 
