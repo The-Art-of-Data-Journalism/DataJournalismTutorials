@@ -306,7 +306,7 @@ Throughout this lesson, you've learned how to enhance your data visualizations w
 
 ## Terms to Know
 
-- Headline: The main title of a chart that should convey the key message or story of the visualization.
+- Headline (Title): The main title of a chart that should convey the key message or story of the visualization.
 - Chatter (Subtitle): A brief explanatory text below the headline that provides context or additional information about the chart.
 - Annotation: Text or graphical elements added to a chart to highlight or explain specific data points or trends.
 - Caption: Text below a chart that provides information about the data source and creator.
