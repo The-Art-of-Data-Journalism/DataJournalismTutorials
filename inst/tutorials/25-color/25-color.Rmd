@@ -10,27 +10,95 @@ runtime: shiny_prerendered
 description: >
   Learn how to add color to draw attention.
 ---
-
-
 ```{r setup, include=FALSE}
 library(learnr)
 library(gradethis)
 library(tidyverse)
 library(ggrepel)
 library(ggtext)
+library(glue)
 knitr::opts_chunk$set(echo = FALSE)
 tutorial_options(exercise.completion=FALSE)
 ```
+```{r colors-load-data, message=FALSE, warning=FALSE}
+state <- Sys.getenv("tutorial.state")
 
+stateName <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/states.csv") |> filter(Postal == state) 
+
+stateName <- stateName |> 
+  mutate(dataurl = case_when(
+    Postal == "AL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "AK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "AZ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "AR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "CA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "CO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "CT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "DE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "FL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "GA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "HI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "ID" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "IL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "IN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "IA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "KS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "KY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "LA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "ME" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "MD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "MA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "MI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "MN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "MS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "MO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "MT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "NE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "NV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "NH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "NJ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "NM" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "NY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "NC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "ND" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "OH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "OK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "OR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "PA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "RI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "SC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "SD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "TN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "TX" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "UT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "VT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "VA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "WA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "WV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "WI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    Postal == "WY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/", str_to_lower(State), ".csv"),
+    TRUE ~ "https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/nebraska.csv"  # Default case if none match
+  ))
+
+uninsured <- read_csv(stateName$dataurl)
+
+uninsuredrows <- nrow(uninsured)
+
+top20 <- uninsured |> 
+  mutate(percent_uninsured = nui_pt/(nui_pt + nic_pt)) |> 
+  top_n(20, wt=percent_uninsured)
+
+top <- top20 |> filter(nui_pt == max(nui_pt))
+```
 ## The Goal
 
-In this lesson, you'll learn how to effectively use color in data visualizations to enhance storytelling and guide reader attention. By the end of this tutorial, you'll understand key principles of color usage in charts, including limiting color palette, using contrast for emphasis, and avoiding overuse of color. You'll practice applying these concepts by creating a bar chart of campus police calls, using color strategically to highlight specific data points. These skills will enable you to create more impactful and clear visualizations in your data journalism projects.
+In this lesson, you'll learn how to effectively use color in data visualizations to enhance storytelling and guide reader attention. By the end of this tutorial, you'll understand key principles of color usage in charts, including limiting color palette, using contrast for emphasis, and avoiding overuse of color. You'll practice applying these concepts by creating a bar chart of uninsured rates, using color strategically to highlight specific data points. These skills will enable you to create more impactful and clear visualizations in your data journalism projects.
 
-## The Basics
+## Why Visualize Data?
 
 The main focus of this whole class -- indeed the whole journalism major -- is to tell a story. If the chart is not telling a story, then it doesn't serve a purpose and we've failed. And if our chart does tell a story, but the reader can't find it, then that means we've still failed the main purpose. 
 
-Some charts do a lot of work showing the reader what the story is before we even anything to it. Some need more help. One way we can offer that help is to use color. 
+Some charts do a lot of work showing the reader what the story is before we even do anything to it. Some need more help. One way we can offer that help is to use color. 
 
 Color can be very powerful. It can also ruin a graphic. And the right use of color isn't science -- it's art. That means color has been argued about for centuries, even in the world of graphics. 
 
@@ -52,7 +120,7 @@ He went on:
 
 **Rule 3:** Edward Tufte, in Envisioning Information, wrote that adding color was the easy part. "The often scant benefits derived from coloring data indicate that putting a good color in a good place is a complex matter. Indeed, so difficult and subtle that avoiding catastrophe becomes the first principle in bringing color to information: Above all, do no harm."
 
-## An example of using color
+## The Basics
 
 We're going to build a simple bar chart and layer in come color as an example. We're going to wind the clock back and look at the top 20 calls to campus police since 2018. You did this before -- as a top 10 list -- in the first bar charts assignment. 
 
@@ -68,53 +136,42 @@ library(tidyverse)
 grade_this_code()
 ```
 
-And the data. We're going to do three things here: first, we'll load in the calls data. Then, we'll make our top 20 list with a simple group by, summarize and top_n. Lastly, we'll use grepl to find all incident_codes that contain the word NARCOTICS.   
+And the data. We're going to do three things here: first, we'll load in the uninsured data. Add your state name to get it.
 
-```{r colors-load-data, message=FALSE, warning=FALSE}
-crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
-
-top20 <- crimes |> 
-  group_by(incident_code) |>
-  summarize(
-    count = n()
-  ) |>
-  ungroup() |>
-  top_n(20, wt=count)
-
-drugs <- top20 |> filter(grepl("NARCOTICS", incident_code) == TRUE)
-
+```{r sahie-read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "colors-load-data"}
+uninsured <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/uninsured/____.csv")
 ```
-```{r colors-load-data-exercise, exercise = TRUE}
-crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
 
-top20 <- crimes |> 
-  group_by(incident_code) |>
-  summarize(
-    count = n()
-  ) |>
-  ungroup() |>
-  top_n(20, wt=count)
-
-drugs <- top20 |> filter(grepl("NARCOTICS", incident_code) == TRUE)
+```{r sahie-read-check}
+grade_this({
+  if (identical(nrow(.result), uninsuredrows)) {
+    pass("Great work! You imported heath insurance estimates in your state.")
+  }
+  fail()
+})
 ```
-```{r colors-load-data-exercise-solution}
-crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
 
-top20 <- crimes |> 
-  group_by(incident_code) |>
-  summarize(
-    count = n()
-  ) |>
-  ungroup() |>
-  top_n(20, wt=count)
+Now we need a subset of this data.
 
-drugs <- top20 |> filter(grepl("NARCOTICS", incident_code) == TRUE)
+### Exercise 1: Make a top 20 list
+
+What we need is a top 20 list of counties. We did this exact same thing in the tables tutorial, except there we used the top 10. We're going to create a column called `percent_uninsured` and use that same column in the `top_n`.
+
+```{r colors-load-data-exercise, exercise=TRUE, exercise.setup = "colors-load-data", message=FALSE}
+top20 <- uninsured |> 
+  mutate(____ = nui_pt/(nui_pt + nic_pt)) |> 
+  top_n(20, wt=____)
+```
+```{r colors-load-data-exercise-solution, exercise.reveal_solution = FALSE}
+top20 <- uninsured |> 
+  mutate(percent_uninsured = nui_pt/(nui_pt + nic_pt)) |> 
+  top_n(20, wt=percent_uninsured)
 ```
 ```{r colors-load-data-exercise-check}
 grade_this_code()
 ```
 
-And we can see that `top20` data with head. The `drugs` dataframe has the same columns. 
+And we can see that `top20` data with head.
 
 ```{r head-data, exercise=TRUE, exercise.setup = "colors-load-data"}
 head(top20)
@@ -126,18 +183,18 @@ head(top20)
 grade_this_code()
 ```
 
-### Exercise 1: Making the first bar
+### Exercise 2: Making the first bar
 
-Let's start by making a simple bar chart of `count`. We're going to re-order it and coord_flip it like we've done before. 
+Let's start by making a simple bar chart of `percent_uninsured`. We're going to re-order it and coord_flip it like we've done before. 
 
 ```{r colors-bar, exercise=TRUE, exercise.setup = "colors-load-data", message=FALSE}
 ggplot() + 
-  geom_bar(data=top20, aes(x=reorder(incident_code, ____), weight=____)) + 
+  geom_bar(data=top20, aes(x=reorder(ctyname, ____), weight=____)) + 
   coord_flip()
 ```
 ```{r colors-bar-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
-  geom_bar(data=top20, aes(x=reorder(incident_code, count), weight=count)) + 
+  geom_bar(data=top20, aes(x=reorder(ctyname, percent_uninsured), weight=percent_uninsured)) + 
   coord_flip()
 ```
 ```{r colors-bar-check}
@@ -146,18 +203,18 @@ grade_this_code()
 
 Now we've got a base. 
 
-### Exercise 2: Using color to reduce attention
+### Exercise 3: Using color to reduce attention
 
 Let's make that base fade into the background by changing the color to light grey (which is one word in ggplot). With bar charts, we're changing the `fill`. Changing the `color` will only change the outline of the bar. 
 
 ```{r colors-bar2, exercise=TRUE, exercise.setup = "colors-load-data", message=FALSE}
 ggplot() + 
-  geom_bar(data=top20, aes(x=reorder(incident_code, ____), weight=____), fill="____") + 
+  geom_bar(data=top20, aes(x=reorder(ctyname, ____), weight=____), fill="____") + 
   coord_flip()
 ```
 ```{r colors-bar2-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
-  geom_bar(data=top20, aes(x=reorder(incident_code, count), weight=count), fill="lightgrey") + 
+  geom_bar(data=top20, aes(x=reorder(ctyname, percent_uninsured), weight=percent_uninsured), fill="lightgrey") + 
   coord_flip()
 ```
 ```{r colors-bar2-check}
@@ -166,31 +223,33 @@ grade_this_code()
 
 Now we can add layers.
 
-### Exercise 3: More layers, more colors
+### Exercise 4: More layers, more colors
 
-Now we're going to add `drugs` to our chart and make it waaaay cooler. Kidding. Don't do drugs kids. We want them to stand out from the rest of the incident codes, so we're going to make `narcotics` dark green, and just like light grey, it's one word. 
+Now we're going to add a second `geom_bar` to our chart. We want them to stand out from the rest of the incident codes, so we're going to make our second `geom_bar` dark green, and just like light grey, it's one word. We're going to use top20, but we're going to add a filter, like we've done in previous exercise, that finds the county in the top20 that has the most uninsured people. 
 
 ```{r colors-bar3, exercise=TRUE, exercise.setup = "colors-load-data", message=FALSE}
 ggplot() + 
-  geom_bar(data=top20, aes(x=reorder(incident_code, count), weight=count), fill="____") + 
-  geom_bar(data=____, aes(x=reorder(incident_code, count), weight=count), fill="____") +    
+  geom_bar(data=top20, aes(x=reorder(ctyname, percent_uninsured), weight=percent_uninsured), fill="____") + 
+  geom_bar(data=____ |> filter(nui_pt == max(nui_pt)), aes(x=reorder(ctyname, percent_uninsured), weight=percent_uninsured), fill="____") +    
   coord_flip()
 ```
 ```{r colors-bar3-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
-  geom_bar(data=top20, aes(x=reorder(incident_code, count), weight=count), fill="lightgrey") + 
-  geom_bar(data=drugs, aes(x=reorder(incident_code, count), weight=count), fill="darkgreen") +    
+  geom_bar(data=top20, aes(x=reorder(ctyname, percent_uninsured), weight=percent_uninsured), fill="lightgrey") + 
+  geom_bar(data=top20 |> filter(nui_pt == max(nui_pt)), aes(x=reorder(ctyname, percent_uninsured), weight=percent_uninsured), fill="darkgreen") +    
   coord_flip()
 ```
 ```{r colors-bar3-check}
 grade_this_code()
 ```
 
-See how you can now see how often campus police are called to people involved in some kind of substance? It's a lot.
+```{r storysetup, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "colors-load-data", results='asis'}
+glue("In {stateName$State}, the county the most uninsured people in the top 20 by percentage is {top$ctyname}. The method we used just picked a county to highlight. You could do anything you wanted with the filter. Counties were there were more than x uninsured people, for example. Or you can just make a filter that is `top20 |> filter(ctyname == \"{top$ctyname}\")` to highlight a specific county. The point being here -- you want to draw the reader's eye with color. Give them something to focus on. Hopefully your story has {top$ctyname} in it so it makes sense to focus on it.")
+```
 
 We've got one last color-based thing to do -- get rid of the grey background.
 
-### Exercise 4: Getting out of the way of our colors
+### Exercise 5: Getting out of the way of our colors
 
 `ggplot` by default adds a grey background to every chart. I don't know why, but it's there. That grey takes away from our contrast and makes the reader's eye wander more. We want to draw attention to our shapes, and use color to draw the eye to the shape we want them to see. Something that impacts that is bad, so we want to get rid of it. 
 
@@ -200,15 +259,15 @@ Let's use `theme_minimal` here.
 
 ```{r colors-bar4, exercise=TRUE, exercise.setup = "colors-load-data", message=FALSE}
 ggplot() + 
-  geom_bar(data=top20, aes(x=reorder(incident_code, count), weight=count), fill="____") + 
-  geom_bar(data=____, aes(x=reorder(incident_code, count), weight=count), fill="____") +    
+  geom_bar(data=top20, aes(x=reorder(ctyname, percent_uninsured), weight=percent_uninsured), fill="____") + 
+  geom_bar(data=____ |> filter(nui_pt == max(nui_pt)), aes(x=reorder(ctyname, percent_uninsured), weight=percent_uninsured), fill="____") +    
   coord_flip() + 
   ___()
 ```
 ```{r colors-bar4-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
-  geom_bar(data=top20, aes(x=reorder(incident_code, count), weight=count), fill="lightgrey") + 
-  geom_bar(data=drugs, aes(x=reorder(incident_code, count), weight=count), fill="darkgreen") +    
+  geom_bar(data=top20, aes(x=reorder(ctyname, percent_uninsured), weight=percent_uninsured), fill="lightgrey") + 
+  geom_bar(data=top20 |> filter(nui_pt == max(nui_pt)), aes(x=reorder(ctyname, percent_uninsured), weight=percent_uninsured), fill="darkgreen") +    
   coord_flip() + 
   theme_minimal()
 ```
@@ -220,7 +279,7 @@ This chart has some work left -- headlines, some text to explain the dark grey b
 
 ## Using color wrong
 
-The best way to know you're using color wrong is to watch what is without argument the best Pixar movie: The Incredibles. In it, the bad guy tries to not only destroy superheroes but the very idea of them by making everyone a superhero. This is the money quote: 
+The best way to know you're using color wrong is to watch what is -- without argument -- the best Pixar movie: The Incredibles. In it, the bad guy tries to not only destroy superheroes but the very idea of them by making everyone a superhero. This is the money quote: 
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/e2hO2tALgCY?si=V6PtKEM1PaHMgGSq" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
@@ -228,26 +287,26 @@ So how do you do that here? By moving the fill inside the aes and making everyth
 
 ### Exercise 5: Doing it wrong
 
-So what do we use for our fill? We've already used count to make the width of the bars We need the other column name we have.
+So what do we use for our fill? When working *inside* the aes -- meaning inside the () after aes -- we have to use column names without quotes. We've already used `percent_uninsured` to make the width of the bars We need the other column name we have used in this geom_bar.
 
 ```{r colorswrong-bar, exercise=TRUE, exercise.setup = "colors-load-data", message=FALSE}
 ggplot() + 
-  geom_bar(data=top20, aes(x=reorder(incident_code, ____), weight=____, fill=____)) + 
+  geom_bar(data=top20, aes(x=reorder(ctyname, percent_uninsured), weight=percent_uninsured, fill=____)) + 
   coord_flip()
 ```
 ```{r colorswrong-bar-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
-  geom_bar(data=top20, aes(x=reorder(incident_code, count), weight=count, fill=incident_code)) + 
+  geom_bar(data=top20, aes(x=reorder(ctyname, percent_uninsured), weight=percent_uninsured, fill=ctyname)) + 
   coord_flip()
 ```
 ```{r colorswrong-bar-check}
 grade_this_code()
 ```
-Good luck reading that -- the legend needed to tell you which color is which bar consumes the whole graph area. Even if you could see it, good luck finding something to focus on. If you give your reader too much to focus on, there's nothing they can focus on. 
+Good luck reading that. Looks like a pack of crayons from when you were a little little kid. Because everything is a color, good luck finding something to focus on. If you give your reader too much to focus on, there's nothing they can focus on. 
 
 ## The Recap
 
-Throughout this lesson, you've explored the power of color in data visualization and learned how to use it judiciously to enhance your charts. You've practiced creating a base chart, using color to fade less important elements into the background, and highlighting key data points with contrasting colors. Remember, effective use of color is about balance - drawing attention to the most important aspects of your data while avoiding visual clutter. As you continue your data journalism journey, consider how thoughtful color choices can make your visualizations more engaging and easier to understand, ultimately helping you tell stronger data-driven stories.
+Throughout this lesson, you've explored the power of color in data visualization and learned how to use it judiciously to enhance your charts. You've practiced creating a base chart, using color to fade less important elements into the background, and highlighting key data points with contrasting colors. Remember, effective use of color is about balance - drawing attention to the most important aspects of your data while avoiding visual clutter. Consider how thoughtful color choices can make your visualizations more engaging and easier to understand, ultimately helping you tell stronger data-driven stories.
 
 ## Terms to Know
 
