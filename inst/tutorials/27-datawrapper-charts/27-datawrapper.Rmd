@@ -20,39 +20,35 @@ tutorial_options(exercise.completion=FALSE)
 
 ## The Goal
 
-In this lesson, you'll learn how to use Datawrapper, a powerful online tool for creating interactive charts and maps. By the end of this tutorial, you'll understand how to upload data, choose appropriate chart types, customize visual elements, and add annotations to your visualizations. You'll practice these skills by creating a bar chart of campus police calls, gaining hands-on experience in transforming raw data into a publication-ready graphic. This ability to quickly create professional visualizations will be invaluable for presenting your data findings in a clear and engaging manner.
+In this lesson, you'll learn how to use Datawrapper, a powerful online tool for creating interactive charts and maps. By the end of this tutorial, you'll understand how to upload data, choose appropriate chart types, customize visual elements, and add annotations to your visualizations. You'll practice these skills by creating a scatterplot of colleges, gaining hands-on experience in transforming raw data into a publication-ready graphic. This ability to quickly create professional visualizations will be invaluable for presenting your data findings in a clear and engaging manner.
 
-## The Basics
+## Why Visualize Data?
+
+It's rare that you can get 1,000 data journalists to stare, mouths hanging open, in awe, but Gregor Aisch did it in under 5 minutes. In 2015, in lightning talk at the NICAR conference in Atlanta, Aisch demo'd a project he had been building inside the New York Times called Mr. Chartmaker. It was a browser-based tool that allowed you to upload data, pick a chart type, change some text and publish a New York Times-level graphic in minutes.
+
+Today, that seems like no big deal. Indeed, there were already online charting tools around that time too. The problem? They were trying to be everything to everyone, and in the process, they could only make simple charts in very bland ways. Aisch manange to make **New York Times** level graphics with his online chart maker. 
+
+Most of us in the room that day for that demo felt like we were watching the Gods give fire to the mortals. It was a revelation. And we were all jealous as hell that this tool only existed inside the times.
+
+Lucky for us, Aisch co-founded a company called Datawrapper. Technically, he started it before he went to work for the Times, and came back to it after he left. Today, Datawrapper does everything that demo showed us back in the day and more. And anyone can get an account for free. 
 
 Making charts in Datawrapper is preposterously simple, which is the point. There are dozens of chart types, and dozens of options. To get from a csv to a chart to publication is very, very easy.
 
+So you might be asking right now ... if it's so easy, why did we just go through all that stuff using R and `ggplot` to make graphics? Well, young scholar, the *reason* Datawrapper is so easy is *because* you just went through all that work to get to where we are now. Because you made graphics with your bare hands, you now understand the pieces that go into it. The thinking. The reason certain things are as they are. What charts require. All of the choices in Datawrapper -- once you get past some differences in what things are called and figure out what is where -- will all make complete sense to you.
+
+And, having both tools at your disposal means knowing when one works and one doesn't. Datawrapper works *great* for simple charts, especially ones that have to get done quick and put online to match the pace of news. But hopefully, the Gods of Journalism will smile upon you and bless you with a story and some ambition that goes beyond what Datawrapper can handle. That's when knowing how to write code comes in very handy.
+
+But enough of this. Let's dive in.
+
+## The Basics
+
 First, go to [datawrapper.de](https://www.datawrapper.de/) and sign up for an account. It’s free.
 
-## Data prep
+Next, we need some data. Datawrapper has multiple ways to pull in data. You quite literally can copy and paste from a spreadsheet into it. You can share the url to a Google Sheet with it. You can upload your own csv made from your own data. To do that, it's just `write_csv(dataframename, "filename.csv")` and you'll have a csv file, called filename.csv in your directory where your notebook is. 
 
-Next, we need some data. **Start a notebook in your homework project**, copy this block of code and run it: 
+But we don't even have to do that. We can feed it a url of a csv straight away. So copy this url:
 
-```
-library(tidyverse)
-
-crimes <- read_csv("http://mattwaite.github.io/datajournalismfiles/crimelogs.csv")
-
-top20 <- crimes |> 
-  group_by(incident_code) |>
-  summarize(
-    count = n()
-  ) |>
-  ungroup() |>
-  top_n(20, wt=count)
-
-write_csv(top20, "top20calls.csv")
-```
-
-This block of code does a few things -- it pulls in the UNL Police data we've worked with, groups the call types together and creates a top 20 list of the most common. Then, using write_csv it writes the dataframe out to a csv file. It's the opposite of read_csv. 
-
-After you run that, you'll have a csv file in your homework directory called top20calls.csv. We'll use that for our datawrapper example. 
-
-## Working in Datawrapper
+`https://the-art-of-data-journalism.github.io/tutorial-data/college-cost/national.csv`
 
 In your Datawrapper dashboard, we want to start with a new chart. So let's make a chart.
 
@@ -60,51 +56,83 @@ In your Datawrapper dashboard, we want to start with a new chart. So let's make 
 knitr::include_graphics(rep("images/datawrapper1.png"))
 ```
 
-We're going to make a chart, similar to what we did in the Color chapter. When you pick chart, it's going to take you right to the steps to making a chart. The first thing we're going to do is upload our csv file to Datawrapper. Click XLS/CSV upload, find your file and hit okay.
+We're going to make a chart, similar to what we did in the Finishing Touches chapter. When you pick chart, it's going to take you right to the steps to making a chart. The first thing we're going to do add our csv file to Datawrapper. Click Link external data and paste your url into the spot where it says enter url. Everything should work fine and you can hit Proceed.
 
 ```{r, echo=FALSE, out.width = "100%"}
 knitr::include_graphics(rep("images/datawrapper2.png"))
 ```
 
-Once you do that, hit proceed. Datawrapper is going to show you what it thinks your data is like. Text will appear in black, numbers in blue, dates in green. If there's something in red, that means there's a problem. Your data is very simple, so very little to go wrong. You can hit proceed.
+Datawrapper is now going to show you what it thinks your data is like. Text will appear in black, numbers in blue, dates in green. If there's something in red, that means there's a problem. Your data is very simple, so very little to go wrong. You can hit proceed.
 
-Once you do, it's going to show you all of the chart types you can make, and it's going to guess (wrongly) at one. Pick a bar chart and hit proceed.
+Once you do, it's going to show you all of the chart types you can make, and it's going to guess (wrongly) at one. Pick a scatterplot and hit proceed.
 
 ```{r, echo=FALSE, out.width = "100%"}
 knitr::include_graphics(rep("images/datawrapper3.png"))
 ```
 
-In the next window, we're going to do two things: First, we're going to sort the bars. Then, change the bar color to grey. 
+In the next window, we're going to do two things: First, we're going select the correct columns for the correct axes. First, set the Horizontal axis column to ADM_RATE. Then, change the vertical axis to COSTT4_A. 
 
 ```{r, echo=FALSE, out.width = "100%"}
 knitr::include_graphics(rep("images/datawrapper4.png"))
 ```
 
-Now, let's highlight Narcotics possession calls by clicking customize colors, finding Narcotics possession in the dropdown list and then making that color green. To finish it off, uncheck the color key box. 
+Click proceed. Now we're on the annotate screen. A lot of work is going to be done here. This is where we add all important text to our chart. What are required parts? Headline, chatter, annotations, credit and source lines, right? Well, here they're title, description, data source and byline. Another incredibly important piece here: alternative text for screen readers. There are millions of visually impaired people on the internet every day who experience visual parts of the internet through alt-text. Be a good human and add some. 
+
+So we can borrow from previous work here. For a title, try Not all exclusive schools are expensive. For a description: According to federal data, there are seven schools who admit fewer than 20 percent of applicants but are among the more affordable colleges in the US.
+
+The data source is the US Department of Education's College Scorecard. The url for it is https://collegescorecard.ed.gov/
+
+As a challenge, try to describe the scatterplot you are making as if you were describing it to someone who can't see in the alternative text box. 
 
 ```{r, echo=FALSE, out.width = "100%"}
 knitr::include_graphics(rep("images/datawrapper5.png"))
 ```
 
-Hit proceed. Now we're on the annotate menu. This is where we get to add a headline, byline and source. The description is the chatter or subtitle in what we've been doing. You should also be sure to add alt-text at the bottom.  
+Scroll down below the text boxes we've been filling out. What makes Datawrapper great is that it's interactive, which means people can click on the dots and get the data back. But, we need to enable that and we need to fix some stuff. 
+
+First, you can make the Label column the INSTNM. 
+
+Then, turn on Show tooltips. A full explanation of all you can do here is beyond the scope of this tutorial -- there's a lot -- but Datawrapper has it's own templating language in the tooltips that can help you make the pop-up box into something human readable. 
+
+Click in the top box and then click on the INSTNM box below the tooltips. Now the headline for your pop up box is the institution name. If you want to verify, just hover over a dot in your chart.
+
+Then, in the main text box, try something like this:
+
+```
+Average annual cost: ${{ costt4_a }}</br>
+Admit rate: {{ adm_rate }}
+```
+
+Where you get to the {{ cost4_a }} bits -- I didn't have to type that. You can click the blue rectangles below and it will fill them in. If you click on the down-arrow next to the column names, you'll see a bunch of formatting options. Hang onto that for a moment -- we're going to fix that.
 
 ```{r, echo=FALSE, out.width = "100%"}
 knitr::include_graphics(rep("images/datawrapper6.png"))
 ```
 
-After adding annotations, hit proceed. The next screen is layout, and we rarely ever change anything there. You can just hit proceed again. 
+Normally, we could proceed to the publish screen but we've got some warts. For example -- the x-axis and y-axis labels aren't very reader friendly. And our admit rate on the bottom isn't a percentage -- it's a decimal still. There aren't universities admitting just .2 percent of applicants. That should be 20 percent. But how do we fix all of that? 
 
-Now, the last screen is the publish screen. We don't need to publish this, but to get credit for the assignment, you need to hit the png button on the bottom and download the image. 
+The easiest way is to go back a few steps. Click on the Check and Describe step up near the top of your chart. Here, we can do several transformations at once, just like this is a spreadsheet. For example: Change your ADM_RATE column name to Admit rate. For the COSTT4_A column, click in there and make it Average annual cost.
+
+Then, if you click on the D at the top of the spreadsheet, it will highlight the column but it will also open up new tools on the left. Note one is Divide/multiply by and it defaults to (no change). If you click that, you'll see there's a Multiply by 100 option. That's right -- this is so common a thing they just made it a click to fix. 
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/datawrapper7.png"))
+```
+
+That will get us 99.9 percent of the way there. Want to be extremely nit-picky? Got that editor urge to make everything absolutely perfect? Click back on the Visualize step, and under the Horizontal axis area, change the Number format from (automatic) to 0% to get that sweet sweet percent sign on the bottom axis labels. Completely necessary? No. A sign of professional attention to detail? Yes. 
+
+You can hit proceed until you get to the Publish and Embed step. That is the last screen. 
+
+On this screen, there's a big Publish Now button. If you want to embed your interactive chart onto a website, you'll have to click that. Then, follow the instructions on your content management system for embedding media. 
+
+One one thing I'll point out to you is that you can also download your chart as a static image. Publishing to Instagram or Blue Sky? Need a static image to be the display image in your CMS? This is how you can get your chart out in a clean format easily.
 
 ```{r, echo=FALSE, out.width = "100%"}
 knitr::include_graphics(rep("images/datawrapper8.png"))
 ```
-
-If we did publish it, we could embed the chart into a story on a website. How you do that depends on what publication system you use. 
-
 ## The Recap
 
-Throughout this lesson, you've learned the step-by-step process of creating a chart in Datawrapper, from data preparation to final publication. You've practiced uploading data, selecting chart types, customizing colors and sorting, adding annotations, and exporting your finished visualization. Remember, Datawrapper's strength lies in its simplicity and speed, allowing you to create professional-looking charts quickly. As you continue your data journalism journey, you'll find Datawrapper to be a valuable tool for rapidly visualizing data and creating graphics that can be easily embedded in your stories or shared with your audience.
+Throughout this lesson, you've learned the step-by-step process of creating a chart in Datawrapper, from data preparation to final publication. You've practiced uploading data, selecting chart types, adding annotations, and exporting your finished visualization. Remember, Datawrapper's strength lies in its simplicity and speed, allowing you to create professional-looking charts quickly. The more you make graphics, the more you'll find Datawrapper to be a valuable tool for rapidly visualizing data and creating graphics that can be easily embedded in your stories or shared with your audience.
 
 ## Terms to Know
 
