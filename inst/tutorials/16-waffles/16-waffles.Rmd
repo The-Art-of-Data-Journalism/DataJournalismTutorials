@@ -10,6 +10,7 @@ runtime: shiny_prerendered
 description: >
   Making quick graphics for reporting.
 ---
+
 ```{r setup, include=FALSE}
 library(learnr)
 library(gradethis)
@@ -19,6 +20,7 @@ library(waffle)
 knitr::opts_chunk$set(echo = FALSE)
 tutorial_options(exercise.completion=FALSE)
 ```
+
 ```{r load-data, message=FALSE, warning=FALSE}
 house <- c("Republicans" = 220, "Democrats" = 212, "Vacant" = 3)
 
@@ -62,58 +64,102 @@ if (stateName$State %in% mostpartisan$state) {
 }
 
 ```
+
 ## The Goal
 
 In this lesson, you'll learn how to create waffle charts, an effective alternative to pie charts for visualizing proportions. By the end of this tutorial, you'll understand how to use the waffle library in R to construct single and comparative waffle charts. You'll practice creating these charts with real data from the US Census Bureau, learning how to adjust chart parameters for clarity and how to handle uneven data comparisons. This skill will enable you to present proportional data in a clear, visually appealing format that's easier to interpret than traditional pie charts.
 
 ## Why Visualize Data?
 
-Pie charts are the devil. They should be an instant F in any data visualization class. The problem with them? How carefully can you evaluate angles and area? Unless they are blindingly obvious and only a few categories, not well. If you've got 25 categories, how can you tell the difference between 7 and 9 percent? You can't.
+Show me someone who has a job in data visualization, and I'll show you someone who has Edward Tufte's *The Visualization of Quantitative Information* on their bookshelf. It's one of the most popular, and most influential books on data visualization ever written. As such, it's one of the most referenced, and most criticized, books on the subject. If visualizing data is interesting to you, you have to read it.
 
-So let's introduce a better way: The waffle chart. Why a waffle chart? Because it's made up of small squares, just like a waffle. Some call it a square pie chart. I personally hate that. Waffles it is. 
+What will you find? A clearly articulated argument of what makes a data graphic good. So clearly articulated that some call it stifling, rigid, inflexible. Some of his commandments can be taken to extremes, where instead of intelligent and clear graphical excellence, as he describes it, you get something so esoteric it doesn't make sense.
 
-A waffle chart is very similar to a stacked bar chart. **A waffle chart is designed to show you parts of the whole -- proportionality**. How many things make up the whole. It will also show magnitude, just like a stacked bar. 
+But once you realize Tufte -- in spite of his unambiguous language -- is more like the pirate's code in Pirate's of the Caribbean (more of a guideline than a rule), then you'll see the genius of it all.
 
-What's the difference? 
+Indeed, page 1, part 1, gives you a taste of his direct style.
 
-The truth is, there really isn't one. If I had to stand before a judge and come up with an answer or go to jail, I'd say that a stacked bar chart can get more things in it -- more counties, more states, more schools, etc. The waffle chart demands focus -- which you'll see in a minute -- and so you can really only handle a small number of waffle charts at once. Two is great. Three is fine. Five is pushing it. Ten has to be something really special. But with a stacked bar, 10 is easily doable. 
+"EXCELLENCE in statistical graphics consists of complex ideas communicated with clarity, precision, and efficiency. Graphical displays should
 
-What that boils down to is that a waffle is a visually different form that accomplishes the same goal as a stacked bar chart, but works best when there's only a couple of things to compare. A two-bar stacked bar chart would look silly. A two-stack waffle chart would look great. 
+-   show the data
+-   induce the viewer to think about the substance rather than about methodology, graphic design, the technology of graphic production, or something else
+-   avoid distorting what the data have to say
+-   present many numbers in a small space
+-   make large data sets coherent
+-   encourage the eye to compare different pieces of data
+-   reveal the data at several levels of detail, from a broad overview to the fine structure
+-   serve a reasonably clear purpose: description, exploration, tabulation, or decoration
+-   be closely integrated with the statistical and verbal descriptions of a data set. "
+
+If you can do all that, you're on a great path. Easy right? Not exactly. Doing some of this is easy with the tools we have. Some of this requires a lot of thought.
+
+Which brings us to today. Today we come not to praise the pie chart but to bury it. They're terrible, and people abuse them horribly. Using Tufte's own words, pie charts regularly fail to show the data, not distort it and are truly horrible at making large datasets coherent.
+
+This can lead to what Tufte calls failures of Graphical Integrity. Tufte insists that the early years of graphics were plagued with designers who used them to lie -- intentionally or not -- by covering up bad data or bad results with charts. He credits no less than John Tukey for making graphics respectable again in the late 1960s.
+
+I'm here to argue that pie charts are the tool of the liar. But showing proportion of a whole is a very important job for a graphic. Fortunately, there are better tools. That tool is called the waffle chart, and we introduce those here.
+
+As you're working today, keep Tufte's six principles of graphical integrity in mind:
+
+"Graphical integrity is more likely to result if these six principles are followed:
+
+-   The representation of numbers, as physically measured on the surface of the graphic itself, should be directly proportional to the numerical quantities represented.
+-   Clear, detailed, and thorough labeling should be used to defeat graphical distortion and ambiguity. Write out explanations of the data on the graphic itself. Label important events in the data.
+-   Show data variation, not design variation.
+-   In time-series displays of money, deflated and standardized units of monetary measurement are nearly always better than nominal units.
+-   The number of information-carrying (variable) dimensions depicted should not exceed the number of dimensions in the
+-   Graphics must not quote data out of context."
 
 ## The Basics
 
+Pie charts are the devil. They should be an instant F in any data visualization class. The problem with them? How carefully can you evaluate angles and area? Unless they are blindingly obvious and only a few categories, not well. If you've got 25 categories, how can you tell the difference between 7 and 9 percent? You can't.
+
+So let's introduce a better way: The waffle chart. Why a waffle chart? Because it's made up of small squares, just like a waffle. Some call it a square pie chart. I personally hate that. Waffles it is.
+
+A waffle chart is very similar to a stacked bar chart. **A waffle chart is designed to show you parts of the whole -- proportionality**. How many things make up the whole. It will also show magnitude, just like a stacked bar.
+
+What's the difference?
+
+The truth is, there really isn't one. If I had to stand before a judge and come up with an answer or go to jail, I'd say that a stacked bar chart can get more things in it -- more counties, more states, more schools, etc. The waffle chart demands focus -- which you'll see in a minute -- and so you can really only handle a small number of waffle charts at once. Two is great. Three is fine. Five is pushing it. Ten has to be something really special. But with a stacked bar, 10 is easily doable.
+
+What that boils down to is that a waffle is a visually different form that accomplishes the same goal as a stacked bar chart, but works best when there's only a couple of things to compare. A two-bar stacked bar chart would look silly. A two-stack waffle chart would look great.
+
 Waffle charts are not built into `ggplot`. You can do a lot with `ggplot` but there are a world of developers out there building tools that use ggplot in the background but extend the functionality to do things the main library can't do. The waffle library is one of those. Like all libraries outside of the mega libraries (like the `tidyverse`), the quality and stability can be up and down. Personally, I love the waffle library, in spite of its flaws.
 
-One of those flaws is that it's just easier to make your own data and bring it in than it is to try and use dataframes. And, while last year the library added `geom_waffle` to the party, it's just one of the ways to interact with it, and using the geom is substantially more difficult to fine tune. The end result -- waffle chart code looks very different from what you've done up to now, but the reality is, underneath it all, it's still using ggplot to draw the chart, no matter which way you go. 
+One of those flaws is that it's just easier to make your own data and bring it in than it is to try and use dataframes. And, while last year the library added `geom_waffle` to the party, it's just one of the ways to interact with it, and using the geom is substantially more difficult to fine tune. The end result -- waffle chart code looks very different from what you've done up to now, but the reality is, underneath it all, it's still using ggplot to draw the chart, no matter which way you go.
 
-To start, we load the `tidyverse` and `waffle` libraries. 
+To start, we load the `tidyverse` and `waffle` libraries.
 
 ```{r load-waffle, exercise=TRUE}
 library(tidyverse)
 library(waffle)
 ```
+
 ```{r load-waffle-solution}
 library(tidyverse)
 library(waffle)
 ```
+
 ```{r load-waffle-check}
 grade_this_code()
 ```
 
 We're going to try this waffle chart several different ways. The first way we're going to do it is completely without the tidyverse (at least, openly on the surface).
 
-The easiest way to do waffle charts is to make named vectors of your data and plug them in. To make a vector, we use the `c` or concatenate function. We did this all the way back in Lesson 1. 
+The easiest way to do waffle charts is to make named vectors of your data and plug them in. To make a vector, we use the `c` or concatenate function. We did this all the way back in Lesson 1.
 
 For this, we're going to look at the partisan breakdown of the US House of Representatives. The House, without editorializing, is a mess, precisely because it's almost evenly divided (history nerd note: The House is supposed to be a mess. It was designed that way by the Founders. This is nothing new). For any measure to pass the House, the majority party has to have all of it's members on board. They can't have people voting against. So what does that look visually?
 
-First, we'll make our named vector. The named vector pattern is "What Is This Thing" = number of that thing. So there's 220 Republican members of the House, 212 Democrats and 3 seats are vacant as of this writing. 
+First, we'll make our named vector. The named vector pattern is "What Is This Thing" = number of that thing. So there's 220 Republican members of the House, 212 Democrats and 3 seats are vacant as of this writing.
 
 ```{r load-data-exercise, exercise = TRUE}
 house <- c("Republicans" = 220, "Democrats" = 212, "Vacant" = 3)
 ```
+
 ```{r load-data-exercise-solution}
 house <- c("Republicans" = 220, "Democrats" = 212, "Vacant" = 3)
 ```
+
 ```{r load-data-exercise-check}
 grade_this_code()
 ```
@@ -122,7 +168,7 @@ So what does the breakdown look like visually?
 
 ### Exercise 1: Make a waffle chart
 
-The waffle library can break this down in a way that's easier on the eyes than a pie chart. We call the `waffle` function, add the name of the data for the House we created above, specify the number of rows (10 is a good start), give it a title and an x value label, and to clean up a quirk of the library, we've got to specify colors. Here, the colors are easy to specify because of the whole red state blue state business. You can specify colors using HTML hex codes if you want, but ggplot has built in color names that you can just use. Hex codes are useful when your groups are things like, say, sports teams where the very specific color helps identify them. 
+The waffle library can break this down in a way that's easier on the eyes than a pie chart. We call the `waffle` function, add the name of the data for the House we created above, specify the number of rows (10 is a good start), give it a title and an x value label, and to clean up a quirk of the library, we've got to specify colors. Here, the colors are easy to specify because of the whole red state blue state business. You can specify colors using HTML hex codes if you want, but ggplot has built in color names that you can just use. Hex codes are useful when your groups are things like, say, sports teams where the very specific color helps identify them.
 
 ```{r waffle, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
 waffle(
@@ -133,6 +179,7 @@ waffle(
         colors = c("red", "blue", "grey")
 )
 ```
+
 ```{r waffle-solution, exercise.reveal_solution = FALSE}
 waffle(
         house, 
@@ -142,13 +189,14 @@ waffle(
         colors = c("red", "blue", "grey")
 )
 ```
+
 ```{r waffle-check}
 grade_this_code()
 ```
 
 Now, this chart is attempting to put 435 dots on a chart, so they get kind small. Can we control that? The answer is: a little. How do we do that? Division.
 
-### Exercise 2: Divide by 
+### Exercise 2: Divide by
 
 The Waffle library has a neat feature that you can automatically turn each square into a factor of whatever number you want by just dividing your vector by a number. Want one dot to equal 10 members of Congress? Divide your vector name by 10. Note, however -- there's three vacancies. If you divide by 10, you won't see them because 3/10 is .3 which is less than one, so it won't appear. Let's solve that by dividing by 3.
 
@@ -161,6 +209,7 @@ waffle(
         colors = c("red", "blue", "grey")
 )
 ```
+
 ```{r waffle2-solution, exercise.reveal_solution = FALSE}
 waffle(
         house/3, 
@@ -170,11 +219,12 @@ waffle(
         colors = c("red", "blue", "grey")
 )
 ```
+
 ```{r waffle2-check}
 grade_this_code()
 ```
 
-And now you have a waffle chart that shows the partisan breakdown of the People's House. A very good question to ask yourself right now -- is it a *good* chart? What story is it telling? Is that clear? Here's another question -- do we need this chart to tell this story? The house is nearly evenly divided. We've made a chart, dividing by 3, where it would take a beat or two for you to see that there's almost exactly the same number of dots for each party. Do we need to represent that visually? 
+And now you have a waffle chart that shows the partisan breakdown of the People's House. A very good question to ask yourself right now -- is it a *good* chart? What story is it telling? Is that clear? Here's another question -- do we need this chart to tell this story? The house is nearly evenly divided. We've made a chart, dividing by 3, where it would take a beat or two for you to see that there's almost exactly the same number of dots for each party. Do we need to represent that visually?
 
 I would say no. If your chart doesn't show some kind of difference -- tell some kind of story -- then a sentence in your story will do the same job with less code and with the same impact.
 
@@ -182,7 +232,7 @@ I would say no. If your chart doesn't show some kind of difference -- tell some 
 
 What does it look like if we try to use a dataframe instead of a named vector? And then what about geom_waffle?
 
-The first thing that you need to know is that for this to work, your data needs to be long data, and you want as little of it as you can get. 
+The first thing that you need to know is that for this to work, your data needs to be long data, and you want as little of it as you can get.
 
 ```{r storysetup, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
 if (stateName$State == "Nebraska") {
@@ -214,9 +264,11 @@ Let's take a quick look at it. It won't take long -- it's one row of data. FYI: 
 ```{r head-data, exercise=TRUE, exercise.setup = "load-data"}
 head(____)
 ```
+
 ```{r head-data-solution, exercise.reveal_solution = FALSE}
 head(xgr)
 ```
+
 ```{r head-data-check}
 grade_this_code()
 ```
@@ -233,6 +285,7 @@ senate <- xgr |>
   )
 
 ```
+
 ```{r waffle4-solution, exercise.reveal_solution = FALSE}
 senate <- xgr |> 
   select(state, senate_dem, senate_rep, senate_other, senate_vacant) |>
@@ -242,6 +295,7 @@ senate <- xgr |>
     values_to = "members"
   )
 ```
+
 ```{r waffle4-check}
 grade_this_code()
 ```
@@ -251,22 +305,24 @@ Now take a look at `senate`:
 ```{r head2-data, exercise=TRUE, exercise.setup = "load-data"}
 head(____)
 ```
+
 ```{r head2-data-solution, exercise.reveal_solution = FALSE}
 head(senate)
 ```
+
 ```{r head2-data-check}
 grade_this_code()
 ```
 
-Now, we could use the `waffle` function here exactly like we did with the house vector before, but we're going to grow a bit and use `geom_waffle`. 
+Now, we could use the `waffle` function here exactly like we did with the house vector before, but we're going to grow a bit and use `geom_waffle`.
 
 ### Exercise 3: geom_waffle
 
 `geom_waffle` works similarly to other geoms we've worked with. This time, in the `aes`, instead of `x` or `y`, we're using `fill` and `values`. Fill is going to be what makes the colors of the boxes. In our case -- `party`. Then, values is the number column. What did we call that?
 
-Outside of the `aes`, you'll see some additional stuff we need to make this look similar to our previous work. First -- instead of `rows` it's now `n_rows`. The `size` here is the size of the whitespace between the boxes. The `color` here is the color of that border around the boxes. 
+Outside of the `aes`, you'll see some additional stuff we need to make this look similar to our previous work. First -- instead of `rows` it's now `n_rows`. The `size` here is the size of the whitespace between the boxes. The `color` here is the color of that border around the boxes.
 
-To add the colors, we have to use `scale_fill_manual` which is a way of manually assigning colors to each item in the legend, in the order they appear. What does `theme_void()` do? It removes all the default backgrounds, labels, axis ticks, gridlines -- everything. 
+To add the colors, we have to use `scale_fill_manual` which is a way of manually assigning colors to each item in the legend, in the order they appear. What does `theme_void()` do? It removes all the default backgrounds, labels, axis ticks, gridlines -- everything.
 
 ```{r waffle5, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
 ggplot() + 
@@ -280,6 +336,7 @@ ggplot() +
   scale_fill_manual(values = c("blue", "orange", "red", "grey")) +
   theme_void()
 ```
+
 ```{r waffle5-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
   geom_waffle(
@@ -292,11 +349,12 @@ ggplot() +
   scale_fill_manual(values = c("blue", "orange", "red", "grey")) +
   theme_void()
 ```
+
 ```{r waffle5-check}
 grade_this_code()
 ```
 
-Now we have a similar -- but not quite exact -- copy of what we did with the House, except now for your state's senate. Which party has the majority? Is that clear from your chart?  
+Now we have a similar -- but not quite exact -- copy of what we did with the House, except now for your state's senate. Which party has the majority? Is that clear from your chart?
 
 ### Exercise 4: Letting geom_waffle shine
 
@@ -308,22 +366,23 @@ glue("Behind the scenes, I've created a dataframe called `xgrs` that has the mos
 
 So how does yours compare?
 
-The trick here is using something called faceting. Faceting makes lots of little charts based on a category -- like a state, or year, or something like that. With `geom_waffle` before, we made one waffle with one state. With faceting, we can make a waffle for *each* state, faceting on the state name. 
+The trick here is using something called faceting. Faceting makes lots of little charts based on a category -- like a state, or year, or something like that. With `geom_waffle` before, we made one waffle with one state. With faceting, we can make a waffle for *each* state, faceting on the state name.
 
 Let's take a quick peek at `xgrs` before we try to chart this.
 
 ```{r head3-data, exercise=TRUE, exercise.setup = "load-data"}
 head(____)
 ```
+
 ```{r head3-data-solution, exercise.reveal_solution = FALSE}
 head(xgrs)
 ```
+
 ```{r head3-data-check}
 grade_this_code()
 ```
 
 Just like our previous dataframe, there's a `party` and a `members` column. What we need to `facet_wrap` -- that's the `state`.
-
 
 ```{r waffle6, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
 ggplot() +
@@ -338,6 +397,7 @@ ggplot() +
   scale_fill_manual(values = c("blue", "orange", "red", "grey")) +
   facet_wrap(~____, nrow=1, strip.position = "bottom")
 ```
+
 ```{r waffle6-solution, exercise.reveal_solution = FALSE}
 ggplot() +
   geom_waffle(
@@ -351,25 +411,26 @@ ggplot() +
   scale_fill_manual(values = c("blue", "orange", "red", "grey")) +
   facet_wrap(~state, nrow=1, strip.position = "bottom")
 ```
+
 ```{r waffle6-check}
 grade_this_code()
 ```
 
-Note there's a few extra bits in `facet_wrap` that helps us here. First -- `nrow`. By now, with similar things we've done, that should make sense to you. It means the facets all end up in 1 row. The `strip.position` part just says where to put the label for each facet -- that's the state name. 
+Note there's a few extra bits in `facet_wrap` that helps us here. First -- `nrow`. By now, with similar things we've done, that should make sense to you. It means the facets all end up in 1 row. The `strip.position` part just says where to put the label for each facet -- that's the state name.
 
-What do we see here? Well, we have some work to do to bring this to publication. There's a bunch of background stuff -- tick lines and grids and axis labels that could all go. You can't read the state's completely. But those are all fixable later with things we'll learn down the road. 
+What do we see here? Well, we have some work to do to bring this to publication. There's a bunch of background stuff -- tick lines and grids and axis labels that could all go. You can't read the state's completely. But those are all fixable later with things we'll learn down the road.
 
 There are much bigger questions you should be thinking about now. Critical questions abound, questions you are going to have to confront regularly when making graphics:
 
-1. What story does this tell? 
-2. Is that story clear?
-3. Is this the best way to tell this story? 
+1.  What story does this tell?
+2.  Is that story clear?
+3.  Is this the best way to tell this story?
 
 If the answer is no -- to any of these, but especially 2 -- then you're going to have to start thinking about changing course. Does this chart tell a story? It's pretty clear there are some very lop-sided senates in the US. Is your state one of them?
 
-**Just because you wrote code to make a graphic doesn't mean you have a graphic.** In journalism, the story is always the most important part. If it's not clear, if a reader who knows nothing about partisanship in America can't look at this and know what you're trying to communicate immediately, you need to keep working. That might be more fussing with this one. That might be dumping it entirely and trying something else. 
+**Just because you wrote code to make a graphic doesn't mean you have a graphic.** In journalism, the story is always the most important part. If it's not clear, if a reader who knows nothing about partisanship in America can't look at this and know what you're trying to communicate immediately, you need to keep working. That might be more fussing with this one. That might be dumping it entirely and trying something else.
 
-Fiddling with this one, using tricks we won't get into for quite a while, I was able to get to this. 
+Fiddling with this one, using tricks we won't get into for quite a while, I was able to get to this.
 
 ```{r fixdd, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data"}
 ggplot() +
@@ -399,12 +460,12 @@ Throughout this lesson, you've learned how to create and customize waffle charts
 
 ## Terms to Know
 
-- Waffle chart: A chart type that represents data as squares in a grid, where each square represents a proportion of the whole.
-- Vector: In R, a basic data structure that holds elements of the same type in a specific order.
-- `waffle()` function: The main function in the `waffle` library used to create a single waffle chart.
-- `geom_waffle()` function: A `ggplot` geom that makes waffle charts, either with a named vector or with a dataframe.
-- Concatenate (`c()`): An R function used to create vectors by combining elements.
-- `rows` parameter: In waffle charts, determines the number of rows in the grid of squares.
-- `xlab`: A parameter in the waffle() function used to label the x-axis, often explaining what each square represents.
-- `colors` parameter: Used in waffle charts to specify the colors for each category in the data.
-- Division in waffle charts: A technique used to reduce the number of squares by making each square represent multiple units of data.
+-   Waffle chart: A chart type that represents data as squares in a grid, where each square represents a proportion of the whole.
+-   Vector: In R, a basic data structure that holds elements of the same type in a specific order.
+-   `waffle()` function: The main function in the `waffle` library used to create a single waffle chart.
+-   `geom_waffle()` function: A `ggplot` geom that makes waffle charts, either with a named vector or with a dataframe.
+-   Concatenate (`c()`): An R function used to create vectors by combining elements.
+-   `rows` parameter: In waffle charts, determines the number of rows in the grid of squares.
+-   `xlab`: A parameter in the waffle() function used to label the x-axis, often explaining what each square represents.
+-   `colors` parameter: Used in waffle charts to specify the colors for each category in the data.
+-   Division in waffle charts: A technique used to reduce the number of squares by making each square represent multiple units of data.
