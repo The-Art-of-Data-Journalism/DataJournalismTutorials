@@ -97,7 +97,27 @@ In this lesson, you'll learn how to create line charts to visualize change over 
 
 ## Why Visualize Data?
 
-More to come.
+While often incorrectly credited with creating graphical forms, there are few on earth who can claim more credit for popularizing certain forms than William Playfair. 
+
+Born in 1759 as the fourth son of a Scottish clergyman, Playfair was a millright apprentice for a while, a draughtsman later, an inventor of no note and a not-very-successful businessman. But starting in 1786, aged 27, he started to make a living as a writer. His stock-in-trade were such thrilling books as The Commercial and Political Atlas (all three editions!), Lineal Arithmetic and An Inquiry into the Permanent Causes of the Decline and Fall of Powerful and Wealthy Nations. 
+
+So why are we talking about these dry texts centuries later? Because they had charts in them. 
+
+```{r, echo=FALSE, out.width = "100%"}
+knitr::include_graphics(rep("images/playfair.png"))
+```
+
+Charts were not common to see in print, and they weren't widely used as a means of improving understanding for a general reader. They did exist. But Playfair popularized their use and wrote often about using them to help people understand complex topics. In 1786, he wrote that busy people need visual aids so they can absorb information "without the fatigue and trouble of studying the particulars of which it is composed." 
+
+Imagine how Playfair would feel about modernity if people in 1786 are overwhelmed with information.
+
+The graphical form that Playfair enters the most discussions about is the line chart, which we learn about in this chapter. The line chart shows change over time, and gives a reader a chance to absorb those changes between entities and time. Playfair wrote in 1805 that such charts even helped him understand what he was writing about better than all of his studies. 
+
+"I first drew the Chart in order to clear up my own ideas on the subject, finding it very troublesome to retain a distinct notion of the changes that had taken place," Playfair wrote in a footnote in An Inquiry into the Permanent Causes of the Decline and Fall of Powerful and Wealthy Nations. "I found it answer(ed) the purpose beyond my expectation, by bringing into one view the result of details that are dispersed over a very wide and intricate field of universal history; facts sometimes connected with each other, sometimes not, and always requiring reflection each time they were referred to. 
+
+"I found the first rough draft (gave) me a better comprehension of the subject, than all that I had learnt from occasional reading, for half of my lifetime; and, on the supposition that what was of so much use to me, might be of some to others, I have given it with a tolerable degree of accuracy."
+
+May we all make charts that improve understanding that much.
 
 ## The Basics
 
