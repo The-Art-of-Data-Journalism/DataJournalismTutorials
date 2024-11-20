@@ -109,7 +109,23 @@ In this lesson, you'll learn how to work with dates in R, a critical skill for d
 
 ## What is Data Journalism?
 
-More to come here. 
+Yanqi Xu, a reporter at the Flatwater Free Press in Omaha, Neb., started her road into data journalism through interactives. Starting out in grad school at the University of Missouri, it was multimedia and charts that moved and that you could click on that hatched an interest in code and data. 
+
+The real thunderclap moment for her came in a data journalism class -- her "third time trying to learn R."
+
+"And I realized, 'Oh, my God, like, there are so many problems I will be able to solve if I know how to, you know, manipulate strings, for example, clean text, and just use that, make a pivot table,'" she said. 
+
+One of Xu's first stories was a story based largely around dates. The basic premise of the story: [Members of the parole board -- appointed by the governor -- weren't showing up for work.](https://flatwaterfreepress.org/the-full-nebraska-parole-board-appears-at-less-than-half-of-hearings-when-members-miss-votes-fewer-get-paroled/) In fact, the full board appeared in only half of meetings. The other half? Appointees making $85,000 in taxpayer-funded salaries didn't show. 
+
+Since the story ran, legislators have passed new rules requiring them to be present. 
+
+The story started with spreadsheets of voting records made by people. What I mean by that is that each row wasn't a complete record. A human could look at the spreadsheet, see a date on the first row, and interpret that the date applied to all rows. Same for other bits of information. But as you've learned -- for data to be analyzed, each row must contain complete, and consistent data. 
+
+Xu spent hours reformatting information, transforming the structure of the data, and melding it back together. One of the first job was standardizing dates. 
+
+The tools she used are the same you'll learn here. And don't worry -- she doesn't remember the exact details of each date function either. She does what lots of people do: Make a cheatsheet.
+
+"I actually have all the strings, common formats, saved in my notes that, you know, it's my cheatsheet almost," she told me. "So I save it, and I don't have to remember anything. And the truth is, I'm not going to remember everything."
 
 ## The Basics
 
