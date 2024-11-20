@@ -122,18 +122,37 @@ In this lesson, you'll learn how to create basic bar charts using ggplot2, a pow
 
 ## Why Visualize Data?
 
-Darla Cameron, now the Chief Product Officer at the Texas Tribune, has worked in visual journalism for more than 15 years with stops in Florida, Washington DC and now Texas. She's been at ground zero for an awakening in journalism that started in the 80s, got turbocharged by the internet and now seems like it was always so: journalism can be presented graphically. And for some stories, it's vastly better to do it with graphics. 
+The Allegory of the Cave, from Plato's Republic, is one of the most talked about bits of philosophy in all of human history. And, plain and simple, it's about how we all go through life as prisoners of ignorance, with an imperfect understanding of the world, as if we're looking at a shadow on a wall instead of the real thing. If we are lucky, we can be freed of this prison and look at the world in the light of enlightenment -- where instead of shadow, we see the object. But that process can be distressing, painful even. Some people may even prefer the shadows and their imperfect understanding over the truth. Others become obsessed with enlightenment to the detriment of all else.
 
-"Visual journalism is important because humans communicate visually. That's how we learn to read. That's how we learn to read our parents' faces when we're babies," Cameron said. "We are really good at understanding visual cues and visual context. So as visual journalists, we have this superpower because we can leverage that,
-this thing that's so innate inside people's brains, and we can tell them a story with that. It's amazing. It's so cool."
+In Plato's dialogue, he walks his conversation partner along, suggesting that it is normal to believe that once one is on the path to enlightenment -- once one has seen the world not through shadows -- the temptation will be to stay in the light, never to return to the cave with your former prisoners. But that's not the ideal, according to Plato. Where some would dedicate their lives to enlightenment, and others would prefer to live their days in the darkness of the cave, the ideal in a society is the one who ascends to enlightenment, only to return to the cave, to be with the prisoners there and help them seek their own enlightenment. For that person will understand what the person looking at the shadow sees, but will know the real truth. 
 
-With this tutorial, you're going to start down the path of turning data into visuals. In my opinion, data journalism and data visualization are two disciplines that blur together so substantially that you shouldn't learn one without learning the other. Learning what makes a better narrative versus a better graphic is a critical skill, one that will make you more valuable in any enterprise that tries to tell stories with data. 
+This all comes from a work called The Republic, where Plato was talking about ideal leaders of the state. But I think this allegory says a lot about data journalism. 
 
-Or, as Cameron puts it, being able to communicate visually gives you a superpower.
+Data journalists are prisoners, like everyone else. We are not special. We sit, watching the shadows with imperfect understanding. What maybe separates us is that we are drawn to enlightenment. We seek the light. Our tools of enlightenment? Data, of course, but that is not enough. Data itself is a form of shadow -- a representation of reality, not reality itself. True enlightenment -- in the journalistic sense -- requires reporting. It requires you to go into the world and talk to people. It requires you to seek more light. 
 
-"How do you know that somebody's going to read a long narrative?" she said. "You don't. So that's why we need to be thinking about visuals in terms of how we communicate information. And I think it gives, it's like a superpower -- that you can tap into the part of people's brains that can understand information better when they learn it visually. We're visual thinkers. It's so innate."
+And then you must return to the people in the cave. 
 
-We're going to start today with bar charts. They're very basic -- some would even say boring -- but very effective. The most important part for you to learn, going forward, is not the code. The code, once you learn the pattern, is very easy and very repetitive. It's not the most important part. The most important part is what does this form of visualization communicate: What does it show? What kind of difference is it good at highlighting? What does it invite a reader to do with it? How much exploration does it encourage? And what kind? Each form of visualization -- the shapes, the colors, the choices -- emphasizes a different thing. Knowing what is good at what is *the* critical skill of the next dozen tutorials.
+> "Wherefore each of you, when his turn comes, must go down to the general underground abode, and get the habit of seeing in the dark. When you have acquired the habit, you will see ten thousand times better than the inhabitants of the den, and you will know what the several images are, and what they represent, because you have seen the beautiful and just and good in their truth. And thus our State, which is also yours, will be a reality, and not a dream only, and will be administered in a spirit unlike that of other States, in which men fight with one another about shadows only and are distracted in the struggle for power, which in their eyes is a great good."
+
+One passage from the Republic, ascribed to Plato, haunts me. 
+
+> "And must there not be some art which will effect conversion in the easiest and quickest manner; not implanting the faculty of sight, for that exists already, but has been turned in the wrong direction, and is looking away from the truth?"
+
+After this, Plato goes on ... and never describes the art which he refers to here. He goes on to talk about intelligence and wisdom and how some virtues are able to be learned and practiced versus being innate, but he never comes back to this art.
+
+Might I be so humble as to suggest one? Data visualization. 
+
+To be clear, I am not going to argue that data visualization is the light in and of itself. Data is a form of shadow -- it is not the real world, but a reflection of it. Data visualization then, is a product built on top of shadow. We can't lose sight of this fact.
+
+I will make this argument: data visualization is like an HD shadow. It's a 4K shadow. Is it the real world, bathed in light? No. It is a representation of the world. But it's far clearer than a shadow on a wall cast by a man walking by a fire. 
+
+You might even call it "some art which will effect conversion in the easiest and quickest manner."
+
+Data visualization, when done well, boils down the essence of a complex issue into shapes and colors that draw the eyes and, by extension, the mind, to something of interest. Similar to Plato's allegory, that process of seeing shape and color brings you to understanding. That process can be uncomfortable, just like the process of enlightenment. And showing good data visualization to a person in darkness is giving them much more clarity about their world than they had before. 
+
+With this tutorial, you're going to start down the path of turning data into visuals. In my opinion, data journalism and data visualization are two disciplines that blur together so substantially that you shouldn't learn one without learning the other.
+
+We're going to start today with bar charts. They're very basic -- some would even say boring -- but very effective. The most important part for you to learn, going forward, is not the code. The code, once you learn the pattern, is very easy and very repetitive. **It's not the most important part**. The most important part is *what does this form of visualization communicate*: What does it show? What kind of difference is it good at highlighting? What does it invite a reader to do with it? How much exploration does it encourage? And what kind? Each form of visualization -- the shapes, the colors, the choices -- emphasizes a different thing. Knowing what is good at what is *the* critical skill of the next dozen tutorials.
 
 <div class="alert alert-info">
 <h4 class="alert-heading">Key Concept</h4> 
