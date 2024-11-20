@@ -133,6 +133,38 @@ In this lesson, you'll learn how to create stacked bar charts, a powerful visual
 
 ## Why Visualize Data?
 
+If you study data science long enough, you're going to come across the name John W. Tukey. Tukey was a statistician at Princeton, where he got his PhD before World War II and returned to after the war. His biography is fascinating. Among the algorithms and statistical tests he's credited with creating, he also first published the word *software*. For 20 years, he helped design NBC News' polls to predict elections. He consulted widely and wrote extensively.
+
+One thing he is most known for, in the data science world, is the concept of Exploratory Data Analysis, an idea data journalism owes a lot of debts to. What is EDA? The Preface of his book Exploratory Data Analysis, written in 1977 starts with this:
+
+> This book is based on an important principle: It is important to understand what you CAN DO before you learn to measure how WELL you seem to have DONE it.
+
+In the next paragraph, he goes further:
+
+> This book is about exploratory data analysis, about looking at data to see what it seems to say. It concentrates on simple arithmetic and easy-to-draw pictures. It regards whatever appearances we have recognized as partial descriptions, and tries to look beneath them for new insights. 
+
+That seems like a pretty good definition of data journalism. 
+
+Exploratory Data Analysis, the book, is not for the faint of heart. Most of the foundational texts of data science come with some flourish -- a little philosophy and some explanation to go with your technique. Not Tukey. His style is direct, brutally so. It moves with a purpose, from concept, to example, to problems, to review questions, with very little fat. One person who saw him lecture described the words in his lecture as "not many, like overweight parcels, delivered at a slow unfaltering pace."
+
+Exploratory Data Analysis is also a monument of its time. To read it today, you have to understand that computers were rare, exceedingly expensive, and monstrously complicated. Most people in the world had never seen one in person in 1977. So everything he describes is all by hand.
+
+"The first thing we need to do is separate, in our mind, what it takes to make plotting easy from what it takes to make plotting effective," Tukey wrote. "The lines ruled on graph paper help to make plotting easy, but they do not make plotting effective for seeing what is going on -- instead they get in the way of seeing what we ought to see."
+
+Graph paper. Most students today would struggle to find graph paper. Tukey was a huge fan (he even drops his favorite graph paper company in the text). He even gives tips on how to save graph paper. 
+
+"If we want to see what our plots ought to tell us, there is no substitute for the use of tracing paper (or acetate)," he wrote. "If we slip a well-printed sheet of graph paper just below the top sheet of a pad of tracing paper, we can plot on that top sheet of tracing paper almost as easily as if it were itself ruled. Then, when we have the points plotted, some boundary or reference lines drawn, and a few scale points ticked, we can take away the graph sheet and look at the points undisturbed by a grid. We often gain noticeably in insight by doing this. (And we have had to pay for a sheet of tracing paper rather than for a sheet of graph paper.)"
+
+Today, computers are common, and the power to make charts is at your fingertips. The authors of `ggplot` incorporated the lessons of Tukey into their software. Indeed, one of the statistical plots he is credited for inventing -- the boxplot -- is a geom in `ggplot`. 
+
+But make no mistake, what we are doing with computers here is exactly what Tukey advised students to do with Exploratory Data Analysis and paper. 
+
+"We almost always want to look at numbers. We do not always have graph paper at hand," he wrote. 
+
+"There is no excuse for failing to plot and look."
+
+## The Basics
+
 In the last chapter, we looked at the humble bar chart, which is very good at showing how much something is in relation to other things in the chart. It shows magnitude. Today, we're adding a wrinkle to the bar chart that is going to still show magnitude, but now it's going to show composition of that magnitude. It's called the stacked bar chart, and it's very good at showing not only how much of something there is compared to other things, but how much of the things that make up the whole there are. 
 
 Let's use an example that should feel close to home: grades. It's different at every university, but most students take somewhere in the neighorhood of 40 classes. Some students -- like yours truly -- are bad students and end up taking a few more (again). Some students are on the ball and came in with college credit and don't have to take as many classes. But it's all somewhere in that neighborhood. 
@@ -140,8 +172,6 @@ Let's use an example that should feel close to home: grades. It's different at e
 With a stacked bar chart, you could look at not only how *many* classes each student took, but what was the grade breakdown they had in those classes. Imagine a bar, broken down into parts. Here's the A part, the B part, the C part, the D part and the F part. Your super nerds who need to go outside and touch some grass are going to have a very big A part and maybe very little of anything else.  Your average student will have some As, some Bs, maybe a C or two and not much else. Terrible students like your author will have some As, some Bs, some Cs, some Ds and a light smattering of Fs that had to be taken over again. What can I say? Ever meet someone on campus who really should have gone somewhere else and grown up a few years before trying to go to college? That was me. 
 
 The point is, how every student gets to graduation day is different. The stacked bar will show that difference far better than a regular bar chart.
-
-## The Basics
 
 To make a stacked bar chart work, you need long data. Recall that we ran into this problem in the Census chapter, where we learned the difference between long data and wide data. To review, using our student grades example, wide data would be something like this:
 
