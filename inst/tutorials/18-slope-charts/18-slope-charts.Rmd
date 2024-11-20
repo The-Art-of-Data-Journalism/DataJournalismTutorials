@@ -36,7 +36,15 @@ In this lesson, you'll learn how to create slope charts, a powerful tool for vis
 
 ## Why Visualize Data?
 
-More to come.
+Darla Cameron, now the Chief Product Officer at the Texas Tribune, has worked in visual journalism for more than 15 years with stops in Florida, Washington DC and now Texas. She's been at ground zero for an awakening in journalism that started in the 80s, got turbocharged by the internet and now seems like it was always so: journalism can be presented graphically. And for some stories, it's vastly better to do it with graphics.
+
+"Visual journalism is important because humans communicate visually. That's how we learn to read. That's how we learn to read our parents' faces when we're babies," Cameron said. "We are really good at understanding visual cues and visual context. So as visual journalists, we have this superpower because we can leverage that, this thing that's so innate inside people's brains, and we can tell them a story with that. It's amazing. It's so cool."
+
+Learning what makes a better narrative versus a better graphic is a critical skill, one that will make you more valuable in any enterprise that tries to tell stories with data.
+
+Or, as Cameron puts it, being able to communicate visually gives you a superpower.
+
+"How do you know that somebody's going to read a long narrative?" she said. "You don't. So that's why we need to be thinking about visuals in terms of how we communicate information. And I think it gives, it's like a superpower -- that you can tap into the part of people's brains that can understand information better when they learn it visually. We're visual thinkers. It's so innate."
 
 ## The Basics
 
