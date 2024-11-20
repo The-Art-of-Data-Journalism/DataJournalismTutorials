@@ -85,7 +85,7 @@ collegerows <- nrow(colleges)
 ```
 ## The Goal
 
-In this lesson, you'll learn how to create dumbbell charts, a powerful tool for visualizing the difference between two related values. By the end of this tutorial, you'll understand when to use dumbbell charts, how to prepare your data for this type of visualization, and how to create and customize dumbbell charts using ggplot2 and the ggalt package. You'll practice filtering data, reordering chart elements, and adding color to enhance the visual story. These skills will enable you to effectively communicate comparisons and gaps in your data, a crucial ability for data journalists looking to highlight meaningful differences.
+In this lesson, you'll learn how to create dumbbell charts, a powerful tool for visualizing the difference between two related values. By the end of this tutorial, you'll understand when to use dumbbell charts, how to prepare your data for this type of visualization, and how to create and customize dumbbell charts using ggplot2 and the `ggalt` package. You'll practice filtering data, reordering chart elements, and adding color to enhance the visual story. These skills will enable you to effectively communicate comparisons and gaps in your data, a crucial ability for data journalists looking to highlight meaningful differences.
 
 ## Why Visualize Data?
 
