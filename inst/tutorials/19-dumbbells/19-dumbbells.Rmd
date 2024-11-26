@@ -89,7 +89,17 @@ In this lesson, you'll learn how to create dumbbell charts, a powerful tool for 
 
 ## Why Visualize Data?
 
-More to come
+Coulter Jones has worked in tiny newspapers, trade publications and in public radio. He's also worked at two of the largest news organizations in the world in Bloomberg News and the Wall Street Journal. In smaller places, it's much more common for someone with some data skills to take a graphic all the way to publication. But Bloomberg and the WSJ have graphics staffs larger than most newspapers these days. There's zero chance of Jones turning some data he has into a graphic that faces the public.
+
+And yet, he makes graphics all the time.
+
+"I would say almost every time I do an analysis, right?" he said. 
+
+As a data analyst, one of the most important things you can do -- and one of the easiest once you get some practice -- is to convert your data into a picture. You learned this from Tukey. You learned this from Playfair. You learned this from Tufte. Data journalists do this all the time, and it's one of the best reasons to learn R. 
+
+"One of the things that I did not appreciate at first, but then like quickly learned to love about R is like, oh, this is a visual platform too," Jones said. "So I can very easily just do histogram. I can do like a two factor line or point, sort of like show me age and sex or something like that.
+
+"If you just chart it, you can sometimes like just see the story immediately."
 
 ## The Basics.
 
