@@ -41,11 +41,17 @@ In this lesson, you'll learn how to pull spreadsheets into dataframes, a common 
 
 Ask just about any data journalist what tool they started with and you'll almost universally get the same answer: The spreadsheet. For the old timers, spreadsheets were like magic back when computers were relatively new and the idea of using data to do journalism was a form of punk rock -- rebellious almost. 
 
-More to come here.
+Coulter Jones, now a data reporter at Bloomberg News, started his data journalism career in college, where he learned spreadsheets in a class.
 
-## The Basics
+"When you're in college or you're around people who are doing this, it's easy to compare yourself to people more advanced and feeling like, I don't know what I'm doing," he said. "And then you would work with colleagues who you literally see them counting paper or going through and doing like a control F or something, you know, and it's like, what are you doing?
 
-Spreadsheets are everywhere in business and government. They're relatively easy to use -- you can learn 80-90 percent of what you need to learn in a day -- and extremely flexible for something organized into rows and columns. As spreadsheets have evolved, developers have added ways to add color and type and even special kinds of rows and columns that wouldn't be possible in R. That has given a lot of spreadsheet users delusions of grandeur, who now want to create pretty spreadsheets instead of useful spreadsheets. 
+"And then you sort of realize that like almost every story is about the most or the least. I mean, it's that basic. It's like, who did the most? Where are the most fines going? Who raised the most money this campaign cycle?"
+
+It sounds simple, but those kinds of basic questions drove a project Jones worked on that won a Pulitzer Prize in 2023 about federal officials trading stocks in companies they regulated. The first questions editors had? Who owns certain stocks? (A simple filter). Who has the most money? (A group by and summarize)
+
+Spreadsheets are everywhere in business and government. They're relatively easy to use -- you can learn 80-90 percent of what you need to learn in a day -- and extremely flexible for something organized into rows and columns. As spreadsheets have evolved, developers have added ways to add color and type and even charts made with few clicks. 
+
+That has given a lot of spreadsheet users delusions of grandeur, who now want to create pretty spreadsheets instead of useful spreadsheets. 
 
 It's very likely in your time as a data journalist you'll have to use spreadsheets. If you've ever been to a NICAR conference, you'll note there's dozens of spreadsheet classes teaching skills going on all the time. The reason this textbook doesn't involve spreadsheets, outside of this lesson, is because they're out of step with modern data science and modern journalism. 
 
@@ -53,9 +59,13 @@ Modern data science/data journalism requires transparency. What does that mean? 
 
 Can you do that with a spreadsheet? My argument is no. There's no way to audit your work, there's no way to reliably show how you did what you did step by step. A good faith argument is that it can be done, it's just very hard. If you miss a step, your analysis will appear wrong to someone coming behind. 
 
+"There's a difference between doing a quick daily story where you're just doing a pivot table or something and you write it and it's done and it's a one point thing and you're fine versus like a longer term project or investigation and you go through that fact check and someone says, well, why are we using this number and not this other one?" Jones told me. 
+
 So how can you apply modern data science/data journalism principles in a world still awash in spreadsheets? You can pull that spreadsheet into R. 
 
-How do you do that? Well, depending on the sheet, it might be *very* easy. But if they've tried to make it pretty, it can get a little worse. 
+## The Basics
+
+How do you pull a spreadsheet into R? Well, depending on the sheet, it might be *very* easy. But if the data provider you are working with tried to make it pretty, it can get a little worse. 
 
 One near-universal truth you should keep in mind as you get better at programming: If you have a problem, someone else probably had it first and they very likely made a library that solves that problem. Do you think there are developers in the world who wanted to pull a spreadsheet into R? Indeed there has been. 
 
