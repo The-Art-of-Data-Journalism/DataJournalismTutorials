@@ -27,7 +27,24 @@ In this lesson, you'll learn about the critical role of text elements in creatin
 
 ## Why Visualize Data
 
-More to come
+In 2016, a group of Harvard and MIT researchers set out to answer a set of what seems like simple questions: What gets people's attention when looking at a chart? And what do they remember? 
+
+The answer surprises people who have never made charts before. Because the answer is, at least at first, the headline on the chart.
+
+That's right: Words. Not shapes or colors. Words. When you track people's eyes, that's where they go first, more often than not. 
+
+"When participants were shown visualizations with titles during encoding, the titles were fixated 59% of the time," according to [Borkin et. al](http://olivalab.mit.edu/Papers/07192646.pdf). "Correspondingly, during the recall phase of the experiment, titles were the element most likely
+to be described if present."
+
+So not only is the title the thing people are looking at first, it's the title that acts as an anchor to memory. 
+
+In short: the headline (or title depending on who you are asking) is incredibly important. In video storytelling, there's an old saying: If you have bad audio, you have bad video. A similar saying here could be this: if you have a bad title, you have a bad graphic.
+
+In fact, [researchers at the University of Illinois in 2018](https://www.zcliu.org/vistitles/CHI18-VisTitles.pdf) found that if you give people a chart, and you give one group a title that frames it positively and another group that frames it negatively, their interpretation of the chart will be influenced by the headline. In other words, give people a graph showing the volume of water is 50 percent. One is given a title that says something to the effect of half full, the other gets half empty, and both will walk away with very different feelings about exactly the same data.
+
+Designers have always known that text is important, they just never had the science to back them up. No less than William Playfair in 1801 wrote "that those who do not, at the first sight, understand the manner of inspecting the Charts, will read with attention the few lines of directions facing the first Chart, after which they will find all the difficulty entirely vanish, and as much information may be obtained in five minutes as would require whole days to imprint on the memory."
+
+Just be careful what you're imprinting.
 
 ## The Basics
 
