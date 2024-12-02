@@ -92,6 +92,20 @@ In this lesson, you'll learn how to create informative and visually appealing ta
 
 ## Why Visualize Data?
 
+There are few graphical forms of data more criticized than the data table. For a long time, there were all there was. And they were used heavily -- and not particularly creatively. And people knew it wasn't good.
+
+"Information, that is imperfectly acquired, is generally as imperfectly retained; and a man who has carefully investigated a printed table, finds, when done, that he has only a very faint and partial idea of what he has read; and that like a figure imprinted on sand, is soon totally erased and defaced," Playfair wrote in 1786. 
+
+Fast forward nearly 200 years, Tufte gives a little more room and grace to the table, but only under limited circumstances. And he has no love for pie charts.
+
+"Tables are clearly the best way to show exact numerical values, although the entries can also be arranged in semi-graphical form," Tufte wrote. "Tables are preferable to graphics for many small data sets. A table is nearly always better than a dumb pie chart; the only worse design than a pie chart is several of them, for then the viewer is asked to compare quantities located in spatial disarray both within and between pies, as in this heavily encoded example from an atlas. Given their low data-density and failure to order numbers along a visual dimension, pie charts should never be used."
+
+So a table is better than a pie chart, which should never be used. Got it. 
+
+But now more than 40 years after Tufte first published The Visual Display of Quantitative Information, tables have evolved a bit further. Tables are still excellent at showing exact numerical values, but now we can incorporate more. Color, gradients, even graphics in each row. 
+
+Let's explore.
+
 ## The Basics
 
 A table is the most simple form of data presentation. Tables have been around for millenia. We've improved in them since, so we're not making a table. We're making a table with features. 
