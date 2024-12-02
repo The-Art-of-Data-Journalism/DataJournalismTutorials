@@ -28,7 +28,25 @@ In this lesson, you'll learn how to apply professional finishing touches to your
 
 ## Why Visualize Data?
 
-More to come.
+If you're a student of journalism, and you've taken your studies seriously, you've hopefully learned by now that often the most direct path to better writing is taking stuff out.
+
+Focus on the main message. The point. The "give a shit factor" an old editor of mine used to call it. Then ruthlessly remove everything that doesn't focus directly on that. 
+
+A graphic is no different. 
+
+"Just as a good editor of prose ruthlessly prunes out unnecessary words, so a designer of statistical graphics should prune out in that fails to present fresh data-information," Tufte wrote in his 1983 work The Visual Display of Quantitative Information. "Although nothing can replace a good graphical idea applied to an interesting set of numbers, editing and revision are essential to sound graphical design work as they are to writing." 
+
+Tufte's worldview on graphics can be described as minimalist. If it wasn't absolutely essential to the graphic, remove it. He wrote an entire chapter aiming his criticism at what he called Chartjunk -- unnecessary textures, flourishes, images and other distractions that took attention away from the data. 
+
+He summarized his worldview thusly:
+
+> Above all else show the data. Maximize the data-ink ratio. Erase non-data-ink. Erase redundant data-ink. Revise and edit.
+
+At the time -- when computers were hard to come by and charts were ultimately printed to be consumed -- much of Tufte made sense. Anything extraneous to a chart cost money and time. But as time moved on, criticism of Tufte's militant minimalism started to grow. 
+
+We find ourselves in a visual age. The internet is very visual. Our social media is largely built around images and video. For graphics to break through the visual noise, information designers argue now that a bit of art, a bit of creativity, is needed. You don't break Tufte's rules -- you bend them a little.
+
+The difference between a beginner and a professional graphic is a series of choices. They are the finishing touches that make all the differences. They'll be defined by what we include ... and what we remove. 
 
 ## The Basics
 
