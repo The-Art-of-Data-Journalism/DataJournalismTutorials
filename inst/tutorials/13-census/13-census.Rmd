@@ -56,9 +56,38 @@ In this lesson, you'll learn how to access and work with U.S. Census data using 
 
 ## What is Data Journalism?
 
+Cathy Wos, a former research librarian at the Tampa Bay Times, used to start every meeting we had about Census 2000 coverage with this: "The Census is neither timely nor accurate. Discuss."
+
+We'd have a giggle and would move on to what we needed to talk about. But she was 100 percent right. And also missing the point (intentionally, in her defense). 
+
+But wait, if something is neither timely nor accurate, what possibly could journalists ever want to do with it? 
+
+Let's first explore this notion. If you're unfamiliar, the Census is mandated by the Constitution of the United States (Article I, Section 2, Clause 3 for the real nerds). It says, and courts have re-affirmed in the face of much better technology and methods, that the Constitution plainly says the federal government, every 10 years, will count every single person in the country. The term of art is "actual enumeration", two words that have spawned a *lot* of argument over the decades. 
+
+Why is it there? And why were the framers so concerned with accuracy that they mandated an actual count of people? Because that's how representation in the House of Representatives gets determined. More people in your state? More representatives to Congress for you. An enormous amount of political power is determined by the Census, but it goes far beyond that. The billions of dollars of federal spending that happens every year? A healthy chunk of it is determined by populations and demographics of that population. How does the federal government know where to send it? You guessed it -- the Census. 
+
+So why isn't it timely or accurate? Stop thinking complicated, because the answer is it's very simple: It takes a long time to count that many people.
+
+In 2020, every household in America received a Census form in the mail. If you're really thinking critically, you can stop right here and point out an obvious point of error. What about people who don't have a home? What about people between homes? What about chronically homeless people? What about people who move a lot and wouldn't particularly like to talk to a federal worker asking questions, like undocumented farm workers? The Census says nothing about citizenship, so the Census Bureau has to try and count *everyone*. 
+
+Everyone got that form in late 2019. They were supposed to fill it out and send it back, filling it in for how it would be true on Census Day, which is officially April 1. So on April 1, how many people are in your house? How old are they? What race are they? What ethnicity are they? And so on. 
+
+Even if we pretend for a minute that on April 1, 2020, between mail-in forms and Census takers going door to door to follow up, the Census is 100 percent accurate on that day. That has never once happened in history, and never will, but let's pretend for a second. What happens on April 2? 
+Life moves on. Babies are born. Old people die. People move. People fall in love. Criminals go to prison. People graduate from college, get jobs, buy houses -- American Dream type stuff. It happens every single day. And the further away from April 1 you get, the more it happens. 
+
+How can this possibly be useful?
+
+The truth is, in the aggregate, things don't change that fast. Individual lives change every day. Populations change slowly. People are born, people die, and the median age of a city stays roughly the same, or changes very slowly over a long period of time. Two people fall in love and go to the courthouse to get married in a whirlwind of feel-good hormones. In that same courthouse, two other people are getting divorced with a very, very different set of neuro-chemicals. Broadly speaking, how many households are married vs un-married hasn't changed, and changes slowly. 
+
+And, as such, the Census remains the best look at demographics we're going to get. The data is clean, rigorously checked, ridiculously documented, widely used and ... completely free. For data journalists, it's a foundational skill -- any time you want a rate instead of a number, there's a good chance the base of that rate is going to come from the Census Bureau. 
+
+One problem? The Census Bureau doesn't go dark after pumping out the decennial Census. They're the federal government's most prolific data publisher. Just learning all the ins and outs of the decennial Census takes months to years of work. Then you have all the rest. 
+
+There's no option other than to jump into a giant pool and start swimming.
+
 ## The Basics
 
-There is truly an astonishing amount of data collected by the US Census Bureau. First, there's the Census that most people know -- the every 10 year census. That's the one mandated by the Constitution where the government attempts to count every person in the US. It's a mind-boggling feat to even try, and billions get spent on it. That data is used first for determining how many representatives each state gets in Congress. From there, the Census gets used to divide up billions of dollars of federal spending. 
+There is truly an astonishing amount of data collected by the US Census Bureau. First, there's the Census that most people know -- the every 10 year census. That's the one mandated by the Constitution where the government attempts to count every person in the US. It's a mind-boggling feat to even try, and billions get spent on it.
 
 Then, starting in 2005, the Census Bureau launched the American Community Survey. Think of it like a rolling census, where in stead of every 10 years, new data is being gathered all the time. The difference? The ACS is a survey -- a random sample of the population -- not a head count. Even in the every 10 year Census, every person only had to answer the same six questions about race, age and housing. A smaller number -- a sample -- got a more detailed set of questions. With the ACS, those detailed questions about everything from race and ethnicity to education and employment and commuting to work are updated constantly. It's a massive amount of demographic information. 
 
