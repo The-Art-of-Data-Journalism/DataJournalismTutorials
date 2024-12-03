@@ -37,17 +37,30 @@ In this lesson, you'll learn how to create bubble charts, which add a third dime
 
 ## Why Visualize Data?
 
-More to come.
+Here is the real talk: Bubble charts are hard. 
 
-## The Basics
-
-Here is the real talk: Bubble charts are hard. The reason they are hard is not because of the code, or the complexity or anything like that. They're a scatterplot with magnitude added -- the size of the dot in the scatterplot has meaning. The hard part is seeing when a bubble chart works and when it doesn't. 
+The reason they are hard is not because of the code, or the complexity or anything like that. They're a scatterplot with magnitude added -- the size of the dot in the scatterplot has meaning. The hard part is seeing when a bubble chart works and when it doesn't. 
 
 If you want to see it work spectacularly well, [watch a semi-famous Ted Talk](https://www.youtube.com/watch?v=hVimVzgtD6w) by Hans Rosling from 2006 where bubble charts were the centerpiece. It's worth watching. It'll change your perspective on the world. No seriously. It will.
 
-And since then, people have wanted bubble charts. And we're back to the original problem: They're hard. There's a finite set of circumstances where they work. 
+That TED Talk, and the software his son created that you can see doing the visuals for his talk, turned a public health professor from Sweden into a bit of a global celebrity, to a very nerdy group of people. Rosling, with his son and daughter, started the Gapminder Foundation to further develop the software, which in 2007 was bought by Google. Time Magazine named him one of the 100 most influential people in 2012. Harvard University and the United Nations gave him awards. He wrote books about his worldview -- that we as a society vastly underestimate the progress the world has made across a number of different issues. A cottage industry of critics -- He's naive! He's a pollyanna! -- and defenders popped up, as it does when you have an enormous amount of attention on you. 
 
-Let's try to make one. 
+All because a professor used bubble charts in a talk on YouTube.
+
+In a 2005 paper about their idea to use software to visualize global health and development data, the Roslings (Hans and his two children) wrote that "The representation of time by movement in scattergrams with carefully designed interfaces has proven to bring statistics beyond the eye to hit the brain."
+
+But even they weren't sure it would actually work. But they had a vision. This graphic appeared in a paper published by the Organization for Economic Co-operation and Development -- the OECD. 
+
+![](images/bubbles.png){width="100%"}
+Free! Aha! Wow!
+
+But Rosling's talks -- and his relentless enthusiasm for the data as it really is -- were infectious. And since then, people have wanted bubble charts. 
+
+And we're back to the original problem: They're hard. 
+
+## The Basics
+
+To show how hard they are, let's try to make one. It should be quickly obvious to you that the code isn't the hard part. 
 
 To make a bubble chart, you're making a scatterplot, just like we did in the previous exercise. Then you're adding one more element -- the size of the dot. 
 
