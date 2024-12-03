@@ -41,7 +41,28 @@ In this lesson, you'll learn how to create and interpret scatterplots, a powerfu
 
 ## Why Visualize Data?
 
-More to come
+One of the more interesting thinkers about data visualization on planet earth today is Alberto Cairo. He is the Knight chair in visual journalism at the School of Communication at the University of Miami. He's written four books in English about data visualization -- The Functional Art (2013), the Truthful Art (2016), How Charts Lie (2019) and The Art of Insight (2023). If you're serious about data visualization, you own these books and if he is speaking somewhere near you, you go and you listen. 
+
+I was hooked early by Cairo's vision for data visualization -- and the kind of person who does the work -- from the first chapter of The Functional Art. Specifically, he wrote that "the life of a visual communicator should be one of systematic and exciting intellectual chaos." I felt like my own read-anything-that-catches-my-attention lifestyle was all okay now. Intellectual curiosity -- spread far and wide -- leads to inspiration, which leads to all kinds of interesting things. 
+
+For me -- your humble author -- Tufte and Cairo are two voices in my head when I am trying to make something out of data. They're fighting for the soul of my idea. On the one side, there is comfort in rules that simplify and dictate forms and functions. On the other is Cairo, talking about art and creativity and how rules can squash something great into something mediocre. 
+
+What do I mean by this? And what do I mean by Cairo being one of the most fascinating thinkers about data visualization?
+
+In August 2023, Cairo made an appearance on the Real World Data Science podcast to talk about his not-yet-released book The Art of Insight. In it, he talked about how visualization is like language in that it has dialects. The dialects of data viz are the places that use them -- journalism, science, industry, art, and others. The rules for how we write in journalism, for example, are vastly different from how we write in the sciences. So why are we trying to create rigid rules for all data visualization? 
+
+"There are really no universal rules in data visualization: they are parochial rules that are applicable to different to the different dialects," Cairo said. "But it is wrong --
+it is a mistake -- to apply the standards of one of the dialects of data visualization to a completely different dialect of data visualization." 
+
+And, not just that, the "rules" are kind of a mishmash of empirical research and opinions. 
+
+"There are a few things that could be considered rules," he said. "For example we know that if you want to compare numbers a bar graph is usually superior to a pie chart, for example. We know that there's empirical evidence behind that so you can sort of like derive a principle out of that, right, but beyond those very basic things there really not many rules."
+
+What do we have? Guidelines. Inherited wisdom. Historical examples. And you should learn them, Cairo said, along with the perception and cognition research that can guide us. 
+
+"But after you do that all that matters is the choices that you make with the knowledge that you have and with the guesses that you can make," he said.
+
+Today we're working with what I believe is the most versatile and interpretive graph type around -- the scatterplot. What makes the scatterplot so great? You use it to compare two dimensions of data -- so your x and y are both numbers. That means the space and the arrangement of dots in it is meaningful. If they cluster together? That means something. If they arrange along a path going up and to the right? Meaningful. Down and right? Meaningful. You can even turn the space into quadrants -- above and below average on your two dimensions of data -- and where dots appear means something. And, unlike many other graphical types, scatterplots are better, in my opinion, when there is *more* data. A scatterplot with just a few points isn't a very compelling scatterplot. A scatterplot with *thousands* can be.  
 
 ## The Basics
 
