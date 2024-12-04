@@ -38,17 +38,37 @@ In this lesson, you'll learn how to create and interpret beeswarm plots, a power
 
 ## Why Visualize Data?
 
-More to come
+As we've moved along through learning data visualization basics, you've hopefully picked up on the fact that data visualization lives in this paradox of being centuries old and yet feels like new. There's new data, and new forms of visualization happening all the time, yet we're still learning why it all works. 
+
+In 1984, William S. Cleveland and Robert McGill, two statisticians at Bell Labs, attempted to lay out a theory of graphical perception in the Journal of the American Statistical Association. In short, they wanted a theory of why does this all work? Why do people see the story in data from graphics? And what they wrote remains one of the foundational works to this day.
+
+Cleveland and McGill theorized that there were 10 perceptual tasks that people use to make meaning of a chart. The tasks are elemental, used alone or in combination and aren't necessarily distinct. 
+
+They are perceiving position on a common scale, position on non-aligned scales, length, direction, angle area, volume, curvature and shading/color. 
+
+Note of how 1984 this paper is: I added color to the list. Why didn't Cleveland and McGill add color? "To avoid the nuisance and expense of color reproduction." Because in 1984, printing things in color was hard and expensive. 
+
+But their ideas remain very modern.
+
+Their 10 perceptual tasks form the basis of their premise: "A graphical form that involves elementary perceptual tasks that lead to more accurate judgements than another graphical form (with the same quantitative information) will result in a better organization and increase the chances of a correct perception of patterns and behavior."
+
+If you start to think about it, you start to see why some of the graphical forms we've been working with work with certain kinds of data. You understand also where Tufte gets his hard rules and where the space for Cairo's more expansive view of what can be done fits in. 
+
+The goal of any graphic has to be understanding. And if that's the case, then knowing how people perceive things can only help. 
+
+The form we're using today is the beeswarm plot. It's the love child of a bar chart and a scatterplot. It helps show numbers that can be put on a number line -- say, the x axis -- but there's a bunch of observations around the average. That alone -- one line, bunch of dots -- does a great job of illustrating the averages. But what happens when you have several groups, with different averages and different densitites around the average? 
+
+That's when you need a beeswarm. 
 
 ## The Basics
 
-If you're a college student on a campus right now, there is someone near you, likely with a very important sounding title and a sizable paycheck to go with it who is worried about something called The Enrollment Cliff. What is this scary sounding thing? It's a topic of intense discussion and debate in higher education and it goes a little something like this: In 2025(ish), we will hit peak high school graduates. The number of high school graduates has been going up for decades. But as of 2025, no longer. It'll drop. By some estimates, there will be 400,000 fewer college-bound high school graduates by 2030. That might not seem like a lot when you figure there's 345 million people in the United States, but that 400,000 student decline would be 4/5ths of the undergrads at the 18 Big Ten campuses. 
+If you're a college student on a campus right now, there is someone near you, likely with a very important sounding title and a sizable paycheck to go with it who is worried about something called The Enrollment Cliff. What is this scary sounding thing? It's a topic of intense discussion and debate in higher education and it goes a little something like this: In 2025(ish), we will hit peak high school graduates. The number of high school graduates has been going up for decades. But as of 2025, no longer. It'll drop. By some estimates, there will be 400,000 fewer college-bound high school graduates by 2030. That might not seem like a lot when you figure there's 345 million people in the United States, but that 400,000 student decline would be 4/5ths of the undergrads at the 18 Big Ten campuses *combined*. 
 
-This decline is not going to be felt equally. And it's already being felt. More than 100 schools have closed, merged or been consolidated into other schools since 2016. Hundreds more schools have seen steep declines in enrollment, threatening their existence. At the same time, most flagship campuses are growing. 
+This decline is not going to be felt equally. And it's already being felt. More than 100 schools have closed, merged or been consolidated into other schools since 2016. Hundreds more schools have seen steep declines in enrollment, threatening their existence. At the same time, most flagship campuses (like our aforementioned Big Ten schools) are growing. 
 
-So who is going to feel the pain from the enrollment cliff the most? We don't know exactly, but we can use the data we've been looking at and a new chart type called a beeswarm plot to raise some questions about some schools.
+So who is going to feel the pain from the enrollment cliff the most? We don't know exactly, but we can use the data we've been looking at and the beeswarm plot to raise some questions about some schools.
 
-what is a beeswarm plot? Think of it like the child of the bar chart and the scatterplot. It looks like Mother Scatterplot in that every row of data is a dot on the chart. But it looks like Father Bar Chart because the dots are organized on a number line and contained in an invisible rectangle. What is it good for? Beeswarms are excellent at showing how a group of things are distributed along a number. 
+What is a beeswarm plot? Remember what came up before: It's the child of the bar chart and the scatterplot. It looks like Mother Scatterplot in that every row of data is a dot on the chart. But it looks like Father Bar Chart because the dots are organized on a number line and contained in an invisible rectangle. What is it good for? Beeswarms are excellent at showing how a group of things are distributed along a number line. 
 
 Like bar charts, they are limited in how many bars they can show. And unlike scatterplots, they are a bit constrained by how many dots they can show. They work well when there's less than 10 categories (bars) grouping them together and the numbers are spread out, not clustered on some artificial boundary. 
 
