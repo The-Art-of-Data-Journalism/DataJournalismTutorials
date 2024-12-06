@@ -98,7 +98,9 @@ natchng <- biggest$BIRTHS2023 - biggest$DEATHS2023
 ```
 ## The Goal
 
-This introductory lesson aims to familiarize you with the fundamental concepts of R programming in the context of data journalism. The primary goal is to help learners understand the basic syntax of R, its function as a calculator, and the crucial concept of variables. By the end of this tutorial, you should be comfortable with simple mathematical operations in R, understand the importance of order in calculations (PEMDAS), and grasp the basics of creating and using variables to store both numeric and string data.
+```{r intro, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
+glue("Welcome, student from {stateName$State}. This introductory lesson aims to familiarize you with the fundamental concepts of R programming in the context of data journalism. The primary goal is to help learners understand the basic syntax of R, its function as a calculator, and the crucial concept of variables. By the end of this tutorial, you should be comfortable with simple mathematical operations in R, understand the importance of order in calculations (PEMDAS), and grasp the basics of creating and using variables to store both numeric and string data.") 
+```
 
 ## What is Data Journalism?
 
