@@ -17,4 +17,4 @@ Transform from a data novice to a data storyteller. This comprehensive course te
 - **Journalism Focus**: Learn to tell stories, not just crunch numbers
 - **Industry Standard Tools**: Learn R, the tidyverse, and ggplot2
 
-Get started with [installations](https://the-art-of-data-journalism.github.io/installations.html) and making your tutorials [local to you]https://the-art-of-data-journalism.github.io/localization.html). 
+Get started with [installations](https://the-art-of-data-journalism.github.io/installations.html) and making your tutorials [local to you](https://the-art-of-data-journalism.github.io/localization.html). 
