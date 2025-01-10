@@ -118,9 +118,9 @@ But that's not a worry.
 
 Ask any data journalist about how they learned, and they'll all tell you they started from square one. MaryJo Webster, the data editor at the Star Tribune in Minneapolis, has been a journalist in the Twin Cities for more than 20 years. When she started as a professional, she had no data skills.
 
-"I didn't even know spreadsheets existed when I was a beginner reporter," she said. "And I was covering the police beat, and I had to write about the city budget, and the police department's budget looked like it was going up a lot. And so I had done the percentage change calculation year over year and saw that it was very high. Then I wanted to be able to say, how does that compare to all the other departments in the city?"
+"I didn't even know spreadsheets existed when I was a beginner reporter," she said. "I was covering the police beat, and I had to write about the city budget, and the police department's budget looked like it was going up a lot. So I had done the percentage change calculation year over year and saw that it was very high. Then I wanted to be able to say, how does that compare to all the other departments in the city?"
 
-What did she do? She pulled out a calculator and started doing the calculations one by one. As she was doing this, a colleague walked by and suggested a spreadsheet. He showed her how to write a formula that would calculate one percent change, and then how to apply that formula to every city department. Boom -- hours of tedious calculations done in one click.
+What did she do? She pulled out a calculator and started doing the calculations one by one. As she was doing this, a colleague walked by and suggested a spreadsheet. He showed her how to write a formula that would calculate percent change, and then how to apply that formula to every city department. Boom -- hours of tedious calculations done in one click.
 
 "My jaw was on the floor going, what?" Webster said. "That was amazing to me."
 
@@ -134,7 +134,7 @@ For now, we're going to use windows in this page like console windows. You'll ty
 
 To be clear: Everyone makes mistakes. Everyone makes dumb mistakes. Everyone overlooks dumb mistakes for hours only to be shown the missing comma. *You aren't dumb*. You're like every single person who has ever tried to learn how to code.
 
-One of the most difficult hurdles for beginning students of mathematics to get over is notation. If you miss a day, tune out for a class, or just never get around to asking what something means, you'll be lost. So lets just cover some bases and make sure we all understand some ultra-basic notation.
+One of the most difficult hurdles for beginning students of mathematics to get over is notation. If you miss a day, tune out for a class, or just never get around to asking what something means, you'll be lost. So let's just cover some bases and make sure we all understand some ultra-basic notation.
 
 You might laugh at these, but someone reading them is looking up Gods on Wikipedia to thank. So do yourself a favor and refresh.
 
@@ -149,13 +149,13 @@ You might laugh at these, but someone reading them is looking up Gods on Wikiped
 
 One of the most important and often overlooked concepts in basic math is the order that you do the calculations. When you have something like `5+5*5^2`, which gets done first?
 
-In math, and in code, order matters. If you must do A before you do B, then A needs to appear before and run before B. So you need to keep track of when things happen.
+In math, and in code, order matters. If you must do A before you do B, then A needs to appear before and run before B. You need to keep track of when things happen.
 
 Thankfully, math teachers have provided us an easy to remember mnemonic that you probably learned in sixth grade and tried to forget until now.
 
 **PEMDAS** -- **P**arenthesis, **E**xponents, **M**ultiplication, **D**ivision, **A**ddition, **S**ubtraction
 
-What that means is when you look at a mathematical formula, you do the calculations in the order PEMDAS tells you. Something in parenthesis? Do that first. Is there an exponent? Do that next. Multiplication or division? It's next and so forth. Knowing PEMDAS will save you from stupid mistakes down the road.
+What that means is when you look at a mathematical formula you do the calculations in the order PEMDAS tells you. Something in parenthesis? Do that first. Is there an exponent? Do that next. Multiplication or division? It's next and finally addition and subtraction. Knowing PEMDAS will save you from stupid mistakes down the road.
 
 ### Exercise 1: Using R like a calculator
 
@@ -173,15 +173,15 @@ What that means is when you look at a mathematical formula, you do the calculati
 grade_this_code()
 ```
 
-Congrats, you've run some code. It's not very complex, and you knew the answer before hand (maybe, probably), but you get the idea.
+Congrats, you've run some code. It's not very complex, and you knew the answer beforehand (maybe, probably), but you get the idea.
 
 ### Exercise 2: A more complicated example
 
 ```{r counties, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
-glue("Let's put you in Mary Jo Webster's shoes. Your editor has asked you to look at the latest rounds of population estimates for {countyLanguage[2]} in {stateName$State}. There's {counties} {countyLanguage[2]} in {stateName$State}, and as much as I want to make you do all of them, let's just focus on the most populated: {biggest$CTYNAME}.") 
+glue("Let's put you in Mary Jo Webster's shoes. Your editor has asked you to look at the latest rounds of population estimates for {countyLanguage[2]} in {stateName$State}. There are {counties} {countyLanguage[2]} in {stateName$State}, and as much as I want to make you do all of them, let's just focus on the most populated: {biggest$CTYNAME}.") 
 ```
 
-What you need to know, and what Mary Jo learned that day when she discovered data journalism, is the formula for percent change. Why are we using percent change? How can you compare Los Angeles County in California -- the largest by population in the country, and would be the 11th most populous state if it seceeded -- to Loving County, Texas, the smallest county in the US, with about 40 people in it? If 10 people move out of LA, no one is going to notice. If 10 people move out of Loving County, that's catastrophic. To compare them, you have to put them on a level playing field. We do that with percent change. 
+What you need to know, and what Webster learned that day when she discovered data journalism, is the formula for percent change. Why are we using percent change? How can you compare Los Angeles County in California -- the largest by population in the country, and would be the 11th most populous state if it seceeded -- to Loving County, Texas, the smallest county in the United States, with about 40 people in it? If 10 people move out of LA, no one is going to notice. If 10 people move out of Loving County, that's catastrophic. To compare them, you have to put them on a level playing field. We do that with percent change. 
 
 The formula for percent change is easy. It's (new - old)/old. You take the most recent data you have, subtract the number from the oldest time period you're looking at, and the divide it by that same oldest number. 
 
@@ -290,7 +290,7 @@ To make a notebook, go up to the top left of your R Studio window and you'll see
 
 You'll notice, in your notebook, a lot of automatically generated text. We do not want that. So you'll need to select it all - command A on a Mac, control A on Windows - and hit delete. You should have a blank page now.
 
-Text -- explanations -- go between code chunks. So At first, just write a sentence.
+Text -- explanations -- go between code chunks. At first, just write a sentence.
 
 Then, you can click the green C in the tool bar and go to R or use the keyboard shortcut to add a chunk: Ctrl + Alt + I on Windows or Command + Option + I on Mac.
 
