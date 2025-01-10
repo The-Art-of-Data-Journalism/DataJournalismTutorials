@@ -99,7 +99,7 @@ In this lesson, you'll learn about the critical concept of "data smells" - commo
 
 ## What is Data Journalism?
 
-Chad Day, the Chief Elections Analyst at the Associated Press, starts every data analysis he does with what amounts to a fight. 
+Chad Day, the chief elections analyst at the Associated Press, starts every data analysis he does with what amounts to a fight. 
 
 "I think that I always look at the data as it's going to try to trick me. And I have to find all of the tricks that it's going to throw at me," he said. "And then I play to the strengths, right? Because you're going to identify a bunch of weaknesses that are in the data. And you don't want to base your analysis on those weaknesses unless your story is about the weaknesses in the data."
 
@@ -115,7 +115,7 @@ Any time you are given a dataset from anyone, you should immediately be suspicio
 
 Failure to give data the smell test [can lead you to miss stories and get your butt kicked on a competitive story](https://source.opennews.org/en-US/learning/handling-data-about-race-and-ethnicity/).
 
-Giving your data the smell test isn't new. Exploratory Data Analysis or EDA has been around for a long time -- John Tukey started pushing the idea in 1970 and wrote the text that would lay the groundwork for generations of data analysts in 1977 (I have a copy in my office!). But EDA treats data in an almost neutral way - it's almost naive. Data smells treats data with skepticism and distrust. With data smells, we're trying to find common mistakes in data because we have to know if they are there. [For more on data smells, read the GitHub wiki post that started it all](https://github.com/nikeiubel/data-smells/wiki/Ensuring-Accuracy-in-Data-Journalism). The common mistakes we're looking for are:
+Giving your data the smell test isn't new. Exploratory Data Analysis or EDA has been around for a long time -- John Tukey started pushing the idea in 1970 and wrote the text that would lay the groundwork for generations of data analysts in 1977 (I have a copy in my office!). But EDA treats data in an almost neutral way - it's almost naive. Data smells treat data with skepticism and distrust. With data smells, we're trying to find common mistakes in data because we have to know if they are there. [For more on data smells, read the GitHub wiki post that started it all](https://github.com/nikeiubel/data-smells/wiki/Ensuring-Accuracy-in-Data-Journalism). The common mistakes we're looking for are:
 
 -   Missing data
 -   Gaps in data
@@ -142,7 +142,7 @@ But some can be fixed quicker. But you won't know what needs fixed -- or even if
 
 Let's work on some examples the NTSB plane crash data, which we used in the last exercise. 
 
-First we'll need the tidyverse and lubridate. Your first step is always loading libraries and you'll need to run this step in nearly every single thing you do.
+First we'll need the Tidyverse and lubridate. Your first step is always loading libraries and you'll need to run this step in nearly every single thing you do.
 
 ```{r load-tidyverse, exercise=TRUE}
 library(tidyverse)
@@ -243,7 +243,7 @@ What does NA mean here? NA will be the last result in the table. Does it mean th
 
 ## Internal inconsistency
 
-Any time you are going to focus on something, you should check it for consistency inside the data set. So let's pretend you want to look at *who makes* the airplanes that crash. To be clear -- this is a bad idea. There are only a small number of manufacturers and counting the number that crashed is no different than looking at cars that crash. Does a lot of Fords and Chevys crashing mean they're unsafe? Or does it mean there's a *lot* of Fords and Chevys on the road in the US. 
+Any time you are going to focus on something, you should check it for consistency inside the data set. So let's pretend you want to look at *who makes* the airplanes that crash. To be clear -- this is a bad idea. There are only a small number of manufacturers and counting the number that crashed is no different than looking at cars that crash. Does a lot of Fords and Chevys crashing mean they're unsafe? Or does it mean there's a *lot* of Fords and Chevys on the road in the United States. 
 
 But, to illustrate the problem of internal consistency, we're going to do this. We're going to put the spotlight on the `Make` column. 
 
@@ -265,13 +265,13 @@ grade_this_code()
 
 Every state is going to be different here, but scroll through the first few pages of data. Do you notice anything? For data to be exact, each row must be the same. And by the same I mean EXACTLY the same. For example: CESSNA and Cessna are not the same. Cirrus and CIRRUS DESIGN GROUP are not the same. Piper, PIPER and PIPER AIRCRAFT INC are very much not the same thing in data world. Now, are they in real life? Yes. You and I can figure that out pretty quickly with just a tiny amount of brainpower. But data analysis requires things to be consistent and identical. And this column of data is not internally consistent.
 
-Can you accurately report on the number of accidents involving each manufacturer? Not yet you can (more on that soon!).
+Can you accurately report on the number of accidents involving each manufacturer? Not yet, but you can (more on that soon!).
 
 And that's what Data Smells are designed to do: stop you from going down a bad path.
 
 ## The Recap
 
-Throughout this lesson, you've learned how to apply the concept of "data smells" to critically examine a dataset. You've practiced using glimpse() to check for wrong data types, group_by() and tally() to identify missing data and gaps, and explored ways to spot internal inconsistencies in your data. Remember, these initial checks are crucial steps in any data analysis project. They help you understand the limitations of your data and prevent you from drawing incorrect conclusions. As you continue your journey in data journalism, always approach new datasets with healthy skepticism and use these techniques to validate your data before proceeding with more in-depth analysis.
+Throughout this lesson, you've learned how to apply the concept of "data smells" to critically examine a dataset. You've practiced using glimpse() to check for wrong data types, group_by() and tally() to identify missing data and gaps, and explored ways to spot internal inconsistencies in your data. Remember, these initial checks are crucial steps in any data analysis project. They help you understand the limitations of your data and prevent you from drawing incorrect conclusions. Approach new datasets with healthy skepticism and use these techniques to validate your data before proceeding with more in-depth analysis.
 
 ## Terms to Know
 

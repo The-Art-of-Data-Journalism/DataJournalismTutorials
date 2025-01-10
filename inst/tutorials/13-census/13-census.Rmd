@@ -1,5 +1,5 @@
 ---
-title: "Data Journalism Lesson 13: Getting Census data from an API"
+title: "Data Journalism Lesson 13: Getting census data from an API"
 output: 
   learnr::tutorial:
     progressive: true
@@ -52,52 +52,52 @@ originrows <- nrow(origin)
 ```
 ## The Goal
 
-In this lesson, you'll learn how to access and work with U.S. Census data using the tidycensus package in R. By the end of this tutorial, you'll understand how to retrieve population estimates from the Census API, manipulate the data into a usable format, and begin exploring the vast array of information available in the American Community Survey. You'll practice important data wrangling skills like filtering, binding rows, and pivoting data, while gaining insight into the structure and complexity of Census datasets. This knowledge will equip you to incorporate authoritative demographic data into your data journalism projects efficiently.
+In this lesson, you'll learn how to access and work with U.S. Census data using the tidycensus package in R. By the end of this tutorial, you'll understand how to retrieve population estimates from the Census API, manipulate the data into a usable format, and begin exploring the vast array of information available in the American Community Survey. You'll practice important data wrangling skills like filtering, binding rows, and pivoting data, while gaining insight into the structure and complexity of census datasets. This knowledge will equip you to incorporate authoritative demographic data into your data journalism projects efficiently.
 
 ## What is Data Journalism?
 
-Cathy Wos, a former research librarian at the Tampa Bay Times, used to start every meeting we had about Census 2000 coverage with this: "The Census is neither timely nor accurate. Discuss."
+Cathy Wos, a former research librarian at the Tampa Bay Times, used to start every meeting we had about Census 2000 coverage with this: "The census is neither timely nor accurate. Discuss."
 
 We'd have a giggle and would move on to what we needed to talk about. But she was 100 percent right. And also missing the point (intentionally, in her defense). 
 
 But wait, if something is neither timely nor accurate, what possibly could journalists ever want to do with it? 
 
-Let's first explore this notion. If you're unfamiliar, the Census is mandated by the Constitution of the United States (Article I, Section 2, Clause 3 for the real nerds). It says, and courts have re-affirmed in the face of much better technology and methods, that the Constitution plainly says the federal government, every 10 years, will count every single person in the country. The term of art is "actual enumeration", two words that have spawned a *lot* of argument over the decades. 
+Let's first explore this notion. If you're unfamiliar, the census is mandated by the Constitution of the United States (Article I, Section 2, Clause 3 for the real nerds). It says, and courts have re-affirmed in the face of much better technology and methods, that the Constitution plainly says the federal government, every 10 years, will count every single person in the country. The term of art is "actual enumeration," two words that have spawned a *lot* of argument over the decades. 
 
-Why is it there? And why were the framers so concerned with accuracy that they mandated an actual count of people? Because that's how representation in the House of Representatives gets determined. More people in your state? More representatives to Congress for you. An enormous amount of political power is determined by the Census, but it goes far beyond that. The billions of dollars of federal spending that happens every year? A healthy chunk of it is determined by populations and demographics of that population. How does the federal government know where to send it? You guessed it -- the Census. 
+Why is it there? And why were the framers so concerned with accuracy that they mandated an actual count of people? Because that's how representation in the House of Representatives gets determined. More people in your state? More representatives to Congress for you. An enormous amount of political power is determined by the census, but it goes far beyond that. The billions of dollars of federal spending that happens every year? A healthy chunk of it is determined by populations and demographics of that population. How does the federal government know where to send it? You guessed it -- the U.S. Census. 
 
 So why isn't it timely or accurate? Stop thinking complicated, because the answer is it's very simple: It takes a long time to count that many people.
 
-In 2020, every household in America received a Census form in the mail. If you're really thinking critically, you can stop right here and point out an obvious point of error. What about people who don't have a home? What about people between homes? What about chronically homeless people? What about people who move a lot and wouldn't particularly like to talk to a federal worker asking questions, like undocumented farm workers? The Census says nothing about citizenship, so the Census Bureau has to try and count *everyone*. 
+In 2020, every household in America received a census form in the mail. If you're really thinking critically, you can stop right here and point out an obvious point of error. What about people who don't have a home? What about people between homes? What about chronically homeless people? What about people who move a lot and wouldn't particularly like to talk to a federal worker asking questions, like undocumented farm workers? The census says nothing about citizenship, so the Census Bureau has to try and count *everyone*. 
 
 Everyone got that form in late 2019. They were supposed to fill it out and send it back, filling it in for how it would be true on Census Day, which is officially April 1. So on April 1, how many people are in your house? How old are they? What race are they? What ethnicity are they? And so on. 
 
-Even if we pretend for a minute that on April 1, 2020, between mail-in forms and Census takers going door to door to follow up, the Census is 100 percent accurate on that day. That has never once happened in history, and never will, but let's pretend for a second. What happens on April 2? 
-Life moves on. Babies are born. Old people die. People move. People fall in love. Criminals go to prison. People graduate from college, get jobs, buy houses -- American Dream type stuff. It happens every single day. And the further away from April 1 you get, the more it happens. 
+Even if we pretend for a minute that on April 1, 2020, between mail-in forms and census takers going door to door to follow up, the census is 100 percent accurate on that day. That has never once happened in history, and never will, but let's pretend for a second. What happens on April 2? 
+Life moves on. Babies are born. People die. People move. People fall in love. Criminals go to prison. People graduate from college, get jobs, buy houses -- American dream type stuff. It happens every single day. And the further away from April 1 you get, the more it happens. 
 
 How can this possibly be useful?
 
-The truth is, in the aggregate, things don't change that fast. Individual lives change every day. Populations change slowly. People are born, people die, and the median age of a city stays roughly the same, or changes very slowly over a long period of time. Two people fall in love and go to the courthouse to get married in a whirlwind of feel-good hormones. In that same courthouse, two other people are getting divorced with a very, very different set of neuro-chemicals. Broadly speaking, how many households are married vs un-married hasn't changed, and changes slowly. 
+The truth is, in the aggregate, things don't change that fast. Individual lives change every day. Populations change slowly. People are born, people die, and the median age of a city stays roughly the same, or changes very slowly over a long period of time. Two people fall in love and go to the courthouse to get married in a whirlwind of feel-good hormones. In that same courthouse, two other people are getting divorced with a very, very different set of neuro-chemicals. Broadly speaking, how many households are married vs. un-married hasn't changed, and changes slowly. 
 
-And, as such, the Census remains the best look at demographics we're going to get. The data is clean, rigorously checked, ridiculously documented, widely used and ... completely free. For data journalists, it's a foundational skill -- any time you want a rate instead of a number, there's a good chance the base of that rate is going to come from the Census Bureau. 
+And, as such, the census remains the best look at demographics we're going to get. The data is clean, rigorously checked, ridiculously documented, widely used and ... completely free. For data journalists, it's a foundational skill -- any time you want a rate instead of a number, there's a good chance the base of that rate is going to come from the Census Bureau. 
 
-One problem? The Census Bureau doesn't go dark after pumping out the decennial Census. They're the federal government's most prolific data publisher. Just learning all the ins and outs of the decennial Census takes months to years of work. Then you have all the rest. 
+One problem? The Census Bureau doesn't go dark after pumping out the decennial census. They're the federal government's most prolific data publisher. Just learning all the ins and outs of the decennial census takes months to years of work. Then you have all the rest. 
 
 There's no option other than to jump into a giant pool and start swimming.
 
 ## The Basics
 
-There is truly an astonishing amount of data collected by the US Census Bureau. First, there's the Census that most people know -- the every 10 year census. That's the one mandated by the Constitution where the government attempts to count every person in the US. It's a mind-boggling feat to even try, and billions get spent on it.
+There is truly an astonishing amount of data collected by the U.S. Census Bureau. First, there's the census that most people know -- the every 10 year census. That's the one mandated by the Constitution where the government attempts to count every person in the nation. It's a mind-boggling feat to even try, and billions get spent on it.
 
-Then, starting in 2005, the Census Bureau launched the American Community Survey. Think of it like a rolling census, where in stead of every 10 years, new data is being gathered all the time. The difference? The ACS is a survey -- a random sample of the population -- not a head count. Even in the every 10 year Census, every person only had to answer the same six questions about race, age and housing. A smaller number -- a sample -- got a more detailed set of questions. With the ACS, those detailed questions about everything from race and ethnicity to education and employment and commuting to work are updated constantly. It's a massive amount of demographic information. 
+Then, starting in 2005, the Census Bureau launched the American Community Survey. Think of it like a rolling census, where in stead of every 10 years, new data is being gathered all the time. The difference? The ACS is a survey -- a random sample of the population -- not a head count. Even in the every 10 year census, every person only had to answer the same six questions about race, age and housing. A smaller number -- a sample -- got a more detailed set of questions. With the ACS, those detailed questions about everything from race and ethnicity to education and employment and commuting to work are updated constantly. It's a massive amount of demographic information. 
 
-The Census Bureau has *dozens* of other programs that gather up data. Programs like the Small Area Health Insurance Estimates program, which estimates how many people in each county have health insurance. They survey jails, manufacturers, public pension programs, government finances and business formations **and I haven't even left the first page of the listing of Census programs. There's three more to go.**  
+The Census Bureau has *dozens* of other programs that gather up data. Programs like the Small Area Health Insurance Estimates program, which estimates how many people in each county have health insurance. They survey jails, manufacturers, public pension programs, government finances and business formations **and I haven't even left the first page of the listing of census programs. There's three more to go.**  
 
-Unfortunately, the Census is exceedingly complicated to work with. It takes time to practice with it and there is a huge amount of terminology and nuance that are far beyond this tutorial. The good news is, the Census has an API -- an application programming interface. What that means is we can get some data directly through the Census Bureau via calls over the internet using code we write. 
+Unfortunately, the census is exceedingly complicated to work with. It takes time to practice with it and there is a huge amount of terminology and nuance that are far beyond this tutorial. The good news is, the census has an API -- an application programming interface. What that means is we can get some data directly through the Census Bureau via calls over the internet using code we write. 
 
 Let's demonstrate. 
 
-We're going to use a library called `tidycensus` which makes calls to the Census API in a very tidy way, and gives you back tidy data. That means we don't have to go through the process of importing the data from a file, cleaning it up and making it a dataframe. I can't tell you how amazing this is, speaking from experience. My first experience with the Census was for the 2000 data. I was part of a team at the Tampa Bay Times that had to pull the data in, chop it up for reporters working on specific stories and send that data out to them and graphic artists to make charts and maps out of it. What we're going to do today took **hours** on that day in 2001 when the data officially dropped. Just getting the data took hours. You're going to do it in seconds. 
+We're going to use a library called `tidycensus` which makes calls to the Census API in a very tidy way, and gives you back tidy data. That means we don't have to go through the process of importing the data from a file, cleaning it up and making it a dataframe. I can't tell you how amazing this is, speaking from experience. My first experience with the census was for the 2000 data. I was part of a team at the Tampa Bay Times that had to pull the data in, chop it up for reporters working on specific stories and send that data out to them and graphic artists to make charts and maps out of it. What we're going to do today took **hours** on that day in 2001 when the data officially dropped. Just getting the data took hours. You're going to do it in seconds. 
 
 First, we'll need libraries. The two we need are the `tidyverse` as always and `tidycensus`. 
 
@@ -136,7 +136,7 @@ grade_this({
 })
 ```
 
-Behind the scenes, I've created estimates22 for you, which is identical to estimates23 except its ... a different year. The problem we now have is we have two dataframes instead of one, and way too much data. Let's look at our data first so we can see the problem before we fix it. Let's just run head on the 2023 estimates dataframe. 
+Behind the scenes, I've created estimates22 for you, which is identical to estimates23 except it's ... a different year. The problem now is we have two dataframes instead of one, and way too much data. Let's look at our data first so we can see the problem before we fix it. Let's just run head on the 2023 estimates dataframe. 
 
 ```{r head-data, exercise=TRUE, exercise.setup = "load-data"}
 head(____)
@@ -192,7 +192,7 @@ popest <- bind_rows(pop23, pop22)
 grade_this_code()
 ```
 
-Our next problem? We have data that's stacked, not side by side. To calculate the percent change in population, you need the 2023 population - the 2022 population / the 2022 population -- new - old / old. To do that, they have to be **columns**. You have **rows**. So how do we flip our data on it's side, so to speak, and turn each row for a county into two columns for a county? 
+Our next problem? We have data that's stacked, not side by side. To calculate the percent change in population, you need the 2023 population - the 2022 population / the 2022 population -- new - old / old. To do that, they have to be **columns**. You have **rows**. So how do we flip our data on its side, so to speak, and turn each row for a county into two columns for a county? 
 
 Good news: This is a pretty common problem to have. And because it's a pretty common problem, there's a function that does this. 
 
@@ -240,9 +240,9 @@ And now you're ready to add the percent change math, just like we did in previou
 
 ## Working with the ACS
 
-The decennial census and the American Community Survey data are considerably more difficult to work with. The data isn't particularly complex, there's just *lots* of it. And it takes some research to figure out what exactly you want to look at. `tidycensus` has some functions to help us with this, but even then it's not so easy to narrow in. Learning how to work with Census data takes time, but as a data journalist, Census numbers are one dataset you'll use over and over and over again. Why? So you can normalize things. You're always going to be looking at population-based rates of things, so you need to know what the population is in a place. The investment of time is worth it. 
+The decennial census and the American Community Survey data are considerably more difficult to work with. The data isn't particularly complex, there's just *lots* of it. And it takes some research to figure out what exactly you want to look at. `tidycensus` has some functions to help us with this, but even then it's not so easy to narrow in. Learning how to work with census data takes time, but as a data journalist, census numbers are one dataset you'll use over and over and over again. Why? So you can normalize things. You're always going to be looking at population-based rates of things, so you need to know what the population is in a place. The investment of time is worth it. 
 
-But to give you an idea of how hefty this data is, let's look at the ACS. We're going to use a function called `load_variables()` to tell us just what's in the ACS. But even that's not simple. The ACS is broken down into products -- 1 year, 3 year and 5 year. The more years, the smaller levels of geography you can get some information for. So, for instance, with 1-year ACS data, state's and counties are a given but small areas like neighborhoods aren't available. With 5-year data, those neighborhood sized areas become possible because the sample size has built up over 5 years. 
+But to give you an idea of how hefty this data is, let's look at the ACS. We're going to use a function called `load_variables()` to tell us just what's in the ACS. But even that's not simple. The ACS is broken down into products -- 1 year, 3 year and 5 year. The more years, the smaller levels of geography you can get some information for. So, for instance, with 1-year ACS data, states and counties are a given but small areas like neighborhoods aren't available. With 5-year data, those neighborhood sized areas become possible because the sample size has built up over 5 years. 
 
 Let's use the 5-year ACS from 2022, the most recent year 5-year ACS data is available for, as our example here. `tidycensus` shortens that to "acs5
 
@@ -269,7 +269,7 @@ grade_this_code()
 ```
 
 
-In this tutorial, you can only see the first 1000 rows. There's more than 28,000 variables in the ACS. How can you possibly find what you need? In a notebook, you can search the table. But what do you even search for? Where do you even start?
+In this tutorial, you can only see the first 1,000 rows. There's more than 28,000 variables in the ACS. How can you possibly find what you need? In a notebook, you can search the table. But what do you even search for? Where do you even start?
 
 ### Exercise 5: How do I find anything?
 
@@ -313,7 +313,7 @@ Now, you have the same problems you have with the estimates -- long data when yo
 
 ## The Recap
 
-Throughout this lesson, you've gained valuable skills for working with Census data in R. You've learned to use the tidycensus package to access population estimates, manipulate the data into a format suitable for analysis, and navigate the extensive variables available in the American Community Survey. You've practiced important data manipulation techniques like filtering, binding rows, and pivoting data from long to wide format. While this lesson has only scratched the surface of what's possible with Census data, you now have a solid foundation for further exploration. Remember, working with Census data can be complex, but the ability to access and analyze this rich demographic information is an invaluable asset for any data journalist.
+Throughout this lesson, you've gained valuable skills for working with census data in R. You've learned to use the tidycensus package to access population estimates, manipulate the data into a format suitable for analysis, and navigate the extensive variables available in the American Community Survey. You've practiced important data manipulation techniques like filtering, binding rows, and pivoting data from long to wide format. While this lesson has only scratched the surface of what's possible with census data, you now have a solid foundation for further exploration. Remember, working with census data can be complex, but the ability to access and analyze this rich demographic information is an invaluable asset for any data journalist.
 
 ## Terms to Know
 
@@ -325,4 +325,4 @@ Throughout this lesson, you've gained valuable skills for working with Census da
 - `pivot_wider()`: A `tidyr` function used to transform data from long format to wide format.
 - Long data: A data format where each row represents a unique combination of identifying variables, often resulting in multiple rows per subject.
 - Wide data: A data format where each row represents a unique subject, with multiple variables spread across columns.
-- `load_variables()`: A `tidycensus` function that retrieves information about available variables in Census datasets.
+- `load_variables()`: A `tidycensus` function that retrieves information about available variables in census datasets.

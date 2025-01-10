@@ -67,7 +67,7 @@ if (stateName$State %in% mostpartisan$state) {
 
 ## The Goal
 
-In this lesson, you'll learn how to create waffle charts, an effective alternative to pie charts for visualizing proportions. By the end of this tutorial, you'll understand how to use the waffle library in R to construct single and comparative waffle charts. You'll practice creating these charts with real data from the US Census Bureau, learning how to adjust chart parameters for clarity and how to handle uneven data comparisons. This skill will enable you to present proportional data in a clear, visually appealing format that's easier to interpret than traditional pie charts.
+In this lesson, you'll learn how to create waffle charts, an effective alternative to pie charts for visualizing proportions. By the end of this tutorial, you'll understand how to use the waffle library in R to construct single and comparative waffle charts. You'll practice creating these charts with real data from the U.S. Census Bureau, learning how to adjust chart parameters for clarity and how to handle uneven data comparisons. This skill will enable you to present proportional data in a clear, visually appealing format that's easier to interpret than traditional pie charts.
 
 ## Why Visualize Data?
 
@@ -93,7 +93,7 @@ Indeed, page 1, part 1, gives you a taste of his direct style.
 
 If you can do all that, you're on a great path. Easy right? Not exactly. Doing some of this is easy with the tools we have. Some of this requires a lot of thought.
 
-Which brings us to today. Today we come not to praise the pie chart but to bury it. They're terrible, and people abuse them horribly. Using Tufte's own words, pie charts regularly fail to show the data, not distort it and are truly horrible at making large datasets coherent.
+That brings us to today when we come not to praise the pie chart but to bury it. They're terrible, and people abuse them horribly. Using Tufte's own words, pie charts regularly fail to show the data, not distort it and are truly horrible at making large datasets coherent.
 
 This can lead to what Tufte calls failures of Graphical Integrity. Tufte insists that the early years of graphics were plagued with designers who used them to lie -- intentionally or not -- by covering up bad data or bad results with charts. He credits no less than John Tukey for making graphics respectable again in the late 1960s.
 
@@ -116,17 +116,17 @@ Pie charts are the devil. They should be an instant F in any data visualization 
 
 So let's introduce a better way: The waffle chart. Why a waffle chart? Because it's made up of small squares, just like a waffle. Some call it a square pie chart. I personally hate that. Waffles it is.
 
-A waffle chart is very similar to a stacked bar chart. **A waffle chart is designed to show you parts of the whole -- proportionality**. How many things make up the whole. It will also show magnitude, just like a stacked bar.
+A waffle chart is similar to a stacked bar chart. **A waffle chart is designed to show you parts of the whole -- proportionality**. How many things make up the whole. It will also show magnitude, just like a stacked bar.
 
 What's the difference?
 
 The truth is, there really isn't one. If I had to stand before a judge and come up with an answer or go to jail, I'd say that a stacked bar chart can get more things in it -- more counties, more states, more schools, etc. The waffle chart demands focus -- which you'll see in a minute -- and so you can really only handle a small number of waffle charts at once. Two is great. Three is fine. Five is pushing it. Ten has to be something really special. But with a stacked bar, 10 is easily doable.
 
-What that boils down to is that a waffle is a visually different form that accomplishes the same goal as a stacked bar chart, but works best when there's only a couple of things to compare. A two-bar stacked bar chart would look silly. A two-stack waffle chart would look great.
+What that boils down to is that a waffle chart is a visually different form that accomplishes the same goal as a stacked bar chart, but works best when there's only a couple of things to compare. A two-bar stacked bar chart would look silly. A two-stack waffle chart would look great.
 
 Waffle charts are not built into `ggplot`. You can do a lot with `ggplot` but there are a world of developers out there building tools that use ggplot in the background but extend the functionality to do things the main library can't do. The waffle library is one of those. Like all libraries outside of the mega libraries (like the `tidyverse`), the quality and stability can be up and down. Personally, I love the waffle library, in spite of its flaws.
 
-One of those flaws is that it's just easier to make your own data and bring it in than it is to try and use dataframes. And, while last year the library added `geom_waffle` to the party, it's just one of the ways to interact with it, and using the geom is substantially more difficult to fine tune. The end result -- waffle chart code looks very different from what you've done up to now, but the reality is, underneath it all, it's still using ggplot to draw the chart, no matter which way you go.
+One of those flaws is that it's just easier to make your own data and bring it in than it is to try and use dataframes. And, while last year the library added `geom_waffle` to the party, it's just one of the ways to interact with it, and using the geom is substantially more difficult to fine tune. The end result -- waffle chart code looks different from what you've done up to now, but the reality is, underneath it all, it's still using ggplot to draw the chart, no matter which way you go.
 
 To start, we load the `tidyverse` and `waffle` libraries.
 
@@ -144,11 +144,11 @@ library(waffle)
 grade_this_code()
 ```
 
-We're going to try this waffle chart several different ways. The first way we're going to do it is completely without the tidyverse (at least, openly on the surface).
+We're going to try this waffle chart several different ways. The first way is completely without the Tidyverse (at least, openly on the surface).
 
 The easiest way to do waffle charts is to make named vectors of your data and plug them in. To make a vector, we use the `c` or concatenate function. We did this all the way back in Lesson 1.
 
-For this, we're going to look at the partisan breakdown of the US House of Representatives. The House, without editorializing, is a mess, precisely because it's almost evenly divided (history nerd note: The House is supposed to be a mess. It was designed that way by the Founders. This is nothing new). For any measure to pass the House, the majority party has to have all of it's members on board. They can't have people voting against. So what does that look visually?
+For this, we're going to look at the partisan breakdown of the U.S. House of Representatives. The House, without editorializing, is a mess, precisely because it's almost evenly divided (history nerd note: The House is supposed to be a mess. It was designed that way by the Founders. This is nothing new). For any measure to pass the House, the majority party has to have all of its members on board. They can't have people voting against. So what does that look visually?
 
 First, we'll make our named vector. The named vector pattern is "What Is This Thing" = number of that thing. So there's 220 Republican members of the House, 212 Democrats and 3 seats are vacant as of this writing.
 
@@ -168,7 +168,7 @@ So what does the breakdown look like visually?
 
 ### Exercise 1: Make a waffle chart
 
-The waffle library can break this down in a way that's easier on the eyes than a pie chart. We call the `waffle` function, add the name of the data for the House we created above, specify the number of rows (10 is a good start), give it a title and an x value label, and to clean up a quirk of the library, we've got to specify colors. Here, the colors are easy to specify because of the whole red state blue state business. You can specify colors using HTML hex codes if you want, but ggplot has built in color names that you can just use. Hex codes are useful when your groups are things like, say, sports teams where the very specific color helps identify them.
+The waffle library can break this down in a way that's easier on the eyes than a pie chart. We call the `waffle` function, add the name of the data for the House we created above, specify the number of rows (10 is a good start), give it a title and an x value label, and to clean up a quirk of the library, we've got to specify colors. Here, the colors are easy to specify because of the whole red state blue state business. You can specify colors using HTML hex codes if you want, but ggplot has built in color names that you can just use. Hex codes are useful when your groups are like, say, sports teams where the very specific color helps identify them.
 
 ```{r waffle, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
 waffle(
@@ -198,7 +198,7 @@ Now, this chart is attempting to put 435 dots on a chart, so they get kind small
 
 ### Exercise 2: Divide by
 
-The Waffle library has a neat feature that you can automatically turn each square into a factor of whatever number you want by just dividing your vector by a number. Want one dot to equal 10 members of Congress? Divide your vector name by 10. Note, however -- there's three vacancies. If you divide by 10, you won't see them because 3/10 is .3 which is less than one, so it won't appear. Let's solve that by dividing by 3.
+The waffle library has a neat feature that you can automatically turn each square into a factor of whatever number you want by just dividing your vector by a number. Want one dot to equal 10 members of Congress? Divide your vector name by 10. Note, however -- there's three vacancies. If you divide by 10, you won't see them because 3/10 is .3 which is less than one, so it won't appear. Let's solve that by dividing by 3.
 
 ```{r waffle2, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
 waffle(
@@ -224,7 +224,7 @@ waffle(
 grade_this_code()
 ```
 
-And now you have a waffle chart that shows the partisan breakdown of the People's House. A very good question to ask yourself right now -- is it a *good* chart? What story is it telling? Is that clear? Here's another question -- do we need this chart to tell this story? The house is nearly evenly divided. We've made a chart, dividing by 3, where it would take a beat or two for you to see that there's almost exactly the same number of dots for each party. Do we need to represent that visually?
+And now you have a waffle chart that shows the partisan breakdown of the People's House. A very good question to ask yourself right now -- is it a *good* chart? What story is it telling? Is that clear? Here's another question -- do we need this chart to tell this story? The House is nearly evenly divided. We've made a chart, dividing by 3, where it would take a beat or two for you to see that there's almost exactly the same number of dots for each party. Do we need to represent that visually?
 
 I would say no. If your chart doesn't show some kind of difference -- tell some kind of story -- then a sentence in your story will do the same job with less code and with the same impact.
 
@@ -232,11 +232,11 @@ I would say no. If your chart doesn't show some kind of difference -- tell some 
 
 What does it look like if we try to use a dataframe instead of a named vector? And then what about geom_waffle?
 
-The first thing that you need to know is that for this to work, your data needs to be long data, and you want as little of it as you can get.
+First, for this to work, your data needs to be long data, and you want as little of it as you can get.
 
 ```{r storysetup, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
 if (stateName$State == "Nebraska") {
-  glue("Instead of Congress, let's look at the partisan breakdown of the {stateName$State} Legislature. Now, technically speaking, the Nebraska Legislature is weird. First, the data is going to call it the state senate, but Nebraska only has one chamber (and it's members are called senators). Even more weird: Nebraska is officially non-partisan. But which party each member belongs to is an open secret, so I've added the partisan breakdown to the National Conference of State Legislature's data on partisan control of state legislatures.")
+  glue("Instead of Congress, let's look at the partisan breakdown of the {stateName$State} Legislature. Now, technically speaking, the Nebraska Legislature is weird. First, the data is going to call it the state senate, but Nebraska only has one chamber (and its members are called senators). Even more weird: Nebraska is officially non-partisan. But which party each member belongs to is an open secret, so I've added the partisan breakdown to the National Conference of State Legislature's data on partisan control of state legislatures.")
 } else {
   "Instead of Congress, let's look at the partisan breakdown of the {stateName$State} Senate. Why the senate and not the house? Well, not every state has a house (cough, cough Nebraska), so to make it easier, we'll focus on the chamber everyone has. This data comes from the National Conference of State Legislature's data on partisan control of state legislatures."
 }
@@ -361,7 +361,7 @@ Now we have a similar -- but not quite exact -- copy of what we did with the Hou
 What if we want to look at multiple states? We have some options. One is a function in the `waffle` library called `iron` -- get it? Waffle iron? -- that will put multiple waffles together. Or, we can use some ggplot tricks using `geom_waffle`.
 
 ```{r storysetup2, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
-glue("Behind the scenes, I've created a dataframe called `xgrs` that has the most lopsided partisan legislatures in the US so we can compare {stateName$State} to those. My definition of lopsided partisan -- take the party with the majority, divide it by the total number of seats. Basically, the percentage of seats to that party. Arrange by that percentage and take the top 10. What you get are the 10 bluest or reddest state senates in the country.")
+glue("Behind the scenes, I've created a dataframe called `xgrs` that has the most lopsided partisan legislatures in the nation so we can compare {stateName$State} to those. My definition of lopsided partisan -- take the party with the majority, divide it by the total number of seats. Basically, the percentage of seats to that party. Arrange by that percentage and take the top 10. What you get are the 10 bluest or reddest state senates in the country.")
 ```
 
 So how does yours compare?
@@ -426,7 +426,7 @@ There are much bigger questions you should be thinking about now. Critical quest
 2.  Is that story clear?
 3.  Is this the best way to tell this story?
 
-If the answer is no -- to any of these, but especially 2 -- then you're going to have to start thinking about changing course. Does this chart tell a story? It's pretty clear there are some very lop-sided senates in the US. Is your state one of them?
+If the answer is no -- to any of these, but especially 2 -- then you're going to have to start thinking about changing course. Does this chart tell a story? It's pretty clear there are some lop-sided senates in the United States. Is your state one of them?
 
 **Just because you wrote code to make a graphic doesn't mean you have a graphic.** In journalism, the story is always the most important part. If it's not clear, if a reader who knows nothing about partisanship in America can't look at this and know what you're trying to communicate immediately, you need to keep working. That might be more fussing with this one. That might be dumping it entirely and trying something else.
 
@@ -456,7 +456,7 @@ ggplot() +
 
 ## The Recap
 
-Throughout this lesson, you've learned how to create and customize waffle charts using R's waffle library. You've practiced making single waffle charts to display proportions within a dataset, such as the partisan makeup of the US House of Representatives. You've also learned how to create comparative waffle charts using `geom_waffle`, allowing you to visually compare proportions across different facets. You've discovered how to adjust your data and chart parameters to handle issues like scale differences and visual clarity. Remember, waffle charts offer a more precise and visually appealing alternative to pie charts for displaying proportional data, making them a valuable tool in your data visualization toolkit.
+Throughout this lesson, you've learned how to create and customize waffle charts using R's waffle library. You've practiced making single waffle charts to display proportions within a dataset, such as the partisan makeup of the U.S. House of Representatives. You've also learned how to create comparative waffle charts using `geom_waffle`, allowing you to visually compare proportions across different facets. You've discovered how to adjust your data and chart parameters to handle issues like scale differences and visual clarity. Remember, waffle charts offer a more precise and visually appealing alternative to pie charts for displaying proportional data, making them a valuable tool in your data visualization toolkit.
 
 ## Terms to Know
 

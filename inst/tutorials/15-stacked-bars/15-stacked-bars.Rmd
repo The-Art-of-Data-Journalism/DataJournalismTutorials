@@ -133,9 +133,9 @@ In this lesson, you'll learn how to create stacked bar charts, a powerful visual
 
 ## Why Visualize Data?
 
-If you study data science long enough, you're going to come across the name John W. Tukey. Tukey was a statistician at Princeton, where he got his PhD before World War II and returned to after the war. His biography is fascinating. Among the algorithms and statistical tests he's credited with creating, he also first published the word *software*. For 20 years, he helped design NBC News' polls to predict elections. He consulted widely and wrote extensively.
+If you study data science long enough, you're going to come across the name John W. Tukey. He was a statistician at Princeton, where Tukey got his PhD before World War II and returned to after the war. His biography is fascinating. Among the algorithms and statistical tests he's credited with creating, he also first published the word *software*. For 20 years, Tukey helped design NBC News' polls to predict elections. He consulted widely and wrote extensively.
 
-One thing he is most known for, in the data science world, is the concept of Exploratory Data Analysis, an idea data journalism owes a lot of debts to. What is EDA? The Preface of his book Exploratory Data Analysis, written in 1977 starts with this:
+One thing he is most known for, in the data science world, is the concept of Exploratory Data Analysis, an idea data journalism owes a lot of debts to. What is EDA? The Preface of Tukey's book Exploratory Data Analysis, written in 1977 starts with this:
 
 > This book is based on an important principle: It is important to understand what you CAN DO before you learn to measure how WELL you seem to have DONE it.
 
@@ -228,7 +228,7 @@ grade_this({
 })
 ```
 
-And now the Census data. Remember -- here you use the postal code of your state to get that data. To speed matters along, we're going to chain a filter onto the end that narrows it down to just population estimates right on import.
+And now the census data. Remember -- here you use the postal code of your state to get that data. To speed matters along, we're going to chain a filter onto the end that narrows it down to just population estimates right on import.
 
 ```{r census-read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
 estimates23 <- get_estimates(geography="county", vintage = 2023, state="____") |> 

@@ -160,7 +160,7 @@ Line charts show change over time. It works the much the same as a bar chart, co
 
 The first secret to knowing if you have a line chart is if you have data that changes over time. The second secret to making a line chart is your x value is almost always a date. If it's not an actual date, it's a thing like a date -- a year, a season, a semester, something with date elements in it. 
 
-Let's look at how unemployment changed over the the last five years -- from before the pandemic until more recent months. First thing we'll do is take a look at our data. You should see a problem right away. 
+Let's look at how unemployment changed over the the past five years -- from before the pandemic until more recent months. First, take a look at our data. You should see a problem right away. 
 
 ```{r head, exercise=TRUE, exercise.setup = "load-data"}
 head(____)
@@ -357,7 +357,7 @@ grade_this_code()
 
 Better. Now we need to add another layer. `ggplot` layers are rendered in the order they appear in code. So your `ggplot` bit is like adding a canvas on a table. You are looking down at that canvas. The first `geom_line` you added is put on top of your canvas. Now, we're going to add a second `geom_line`. 
 
-In this case, adding a layer is very easy. The reason? We're adding a layer with just your state in it. So this new layer is identical to your `national` layer with two small changes -- your dataframe name is your state dataframe we used in exercise 3. And instead of grey, we're going to make it red, so it stands out from the pack. 
+In this case, adding a layer is easy. The reason? We're adding a layer with just your state in it. So this new layer is identical to your `national` layer with two small changes -- your dataframe name is your state dataframe we used in exercise 3. And instead of grey, we're going to make it red, so it stands out from the pack. 
 
 ```{r line6, exercise=TRUE, exercise.setup = "load-data"}
 ggplot() + 

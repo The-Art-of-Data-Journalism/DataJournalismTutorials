@@ -116,7 +116,7 @@ What you're about to learn in this series of tutorials is how to ask questions o
 
 But that's not a worry. 
 
-Ask any data journalist about how they learned, and they'll all tell you they started from square one. Mary Jo Webster, the data editor at the Star Tribune in Minneapolis, has been a journalist in the Twin Cities for more than 20 years. When she started as a professional, she had no data skills.
+Ask any data journalist about how they learned, and they'll all tell you they started from square one. MaryJo Webster, the data editor at the Star Tribune in Minneapolis, has been a journalist in the Twin Cities for more than 20 years. When she started as a professional, she had no data skills.
 
 "I didn't even know spreadsheets existed when I was a beginner reporter," she said. "And I was covering the police beat, and I had to write about the city budget, and the police department's budget looked like it was going up a lot. And so I had done the percentage change calculation year over year and saw that it was very high. Then I wanted to be able to say, how does that compare to all the other departments in the city?"
 

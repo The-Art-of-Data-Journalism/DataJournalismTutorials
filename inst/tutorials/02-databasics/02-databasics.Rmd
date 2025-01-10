@@ -106,13 +106,13 @@ So the first step in data journalism is finding data. Sometimes you can do that 
 Step 2 in data journalism is looking at what exactly is in your data. This process is so important that it requires multiple different lessons to come back to the same question: What is in my data? And is it what I need?
 
 "You have to explore the data to understand what questions can you even ask the data to
-begin with," said Mary Jo Webster of the Minneapolis Star Tribune. "What's the knowledge that this source has? What are the fields of information? What's the breadth of knowledge? You know, all the different fields, the columns that might have different variables that will tell you something more deep. How rich is that? How far back in time does the data go? Geographically, is it the entire state? Is it just one county? That's that breadth of knowledge.
+begin with," said MaryJo Webster of the Minneapolis Star Tribune. "What's the knowledge that this source has? What are the fields of information? What's the breadth of knowledge? You know, all the different fields, the columns that might have different variables that will tell you something more deep. How rich is that? How far back in time does the data go? Geographically, is it the entire state? Is it just one county? That's that breadth of knowledge.
 
 "You've got to explore that first to even think about what you could do with it."
 
 ## The Basics
 
-Data are everywhere (and data is plural of datum, thus the use of are in that statement). It surrounds you. Every time you use your phone, you are creating data. Lots of it. Your online life. Any time you buy something. It's everywhere. News, like life, is no different. Modernity is drowning in data, and more comes along all the time.
+Data are everywhere (and data is plural of datum, thus the use of the verb are in that statement). It surrounds you. Every time you use your phone, you are creating data. Lots of it. Your online life. Any time you buy something. It's everywhere. News, like life, is no different. Modernity is drowning in data, and more comes along all the time.
 
 In news, and in this class, we'll be dealing largely with two kinds of data: **event level data and summary data**. It's not hard to envision event level data. A car accident. A crime. A fire. They are the events that make up the whole. Combine them together -- summarize them -- and you'll have some notion of how the year went. What we usually see is summary data -- who wants to scroll through 365 days of crime data to figure out if crime was up or down? 
 
@@ -122,7 +122,8 @@ To start with, we need to understand the shape of data.
 
 R is a statistical programming language that is purpose built for data analysis.
 
-Base R does a lot, but there are a mountain of external libraries that do things to make R better/easier/more fully featured. We already installed the tidyverse -- or you should have if you followed the instructions for the last assignment -- which isn't exactly a library, but a collection of libraries. Together, they make up the tidyverse. Individually, they are extraordinarily useful for what they do. We can load them all at once using the tidyverse name, or we can load them individually. Let's start with individually.
+Base R does a lot, but there are a mountain of external libraries that do things to make R better/easier/more fully featured. We already installed the Tidyverse -- or you should have if you followed the instructions for the last assignment -- which isn't exactly a library, but a collection of libraries. Together, they make up the 
+Tidyverse. Individually, they are extraordinarily useful for what they do. We can load them all at once using the Tidyverse name, or we can load them individually. Let's start with individually.
 
 The two libraries we are going to need for this assignment are `readr` and `dplyr`. The library `readr` reads different types of data in as a dataframe. For this assignment, we're going to read in csv data or Comma Separated Values data. That's data that has a comma between each column of data.
 
@@ -152,7 +153,7 @@ library(dplyr)
 
 You can keep doing that for as many libraries as you need. I've seen notebooks with 10 or more library imports.
 
-**But the tidyverse has a neat little trick. We can load most of the libraries we'll need for the whole semester with one line.**
+**But the Tidyverse has a neat little trick. We can load most of the libraries we'll need for the whole semester with one line.**
 
 Run this.
 
@@ -170,18 +171,18 @@ grade_this_code()
 
 <div class="alert alert-info">
   <h4 class="alert-heading">Key Concept</h4>
-  <p class="mb-0">From now on, if that's not the first line of your notebook, you're probably doing it wrong.</p>
+  <p class="mb-0">From now on, if that library is not the first line of your notebook, you're probably doing it wrong.</p>
 </div>
 
 ## Loading Data
 
-The first thing we need to do is get some data to work with. We do that by reading it in. In our case, we're going to read data from a csv file -- a comma-separated values file. Most of the data we'll use in this class will come from CSV files. 
+The first thing we need to do is get some data to work with. We do that by reading it in. In our case, we're going to read data from a CSV file -- a comma-separated values file. Most of the data we'll use in this class will come from CSV files. 
 
 ```{r counties, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
 glue("The CSV file we're going to read is the same data you used in your last lesson -- Census Population Estimates. But this time, instead of one {countyLanguage[2]} in {stateName$State}, you're going to get all {nrows} of them.") 
 ```
 
-So step 2, after setting up our libraries, is most often going to be importing data. In order to analyze data, we need data, so it stands to reason that this would be something we'd do very early.
+So step 2, after setting up our libraries, is most often going to be importing data. In order to analyze data, we need data.
 
 The code looks *something* like this:
 
@@ -191,7 +192,7 @@ census <- read_csv("mystate.csv")
 
 Let's unpack that.
 
-The first part -- census -- is the **name of your variable**. Remember: A variable is just a name of a thing that stores stuff. In this case, our variable is a data frame, which is R's way of storing data (technically it's a tibble, which is the tidyverse way of storing data, but the differences aren't important and people use them interchangeably). **We can call this whatever we want, with a few exceptions.** I always want to name data frames after what is in it. In this case, we're going to import a dataset of census estimates. Variable names, by convention are one word all lower case. **You can end a variable with a number, but you can't start one with a number**.
+The first part -- census -- is the **name of your variable**. Remember: A variable is just a name of a thing that stores stuff. In this case, our variable is a data frame, which is R's way of storing data (technically it's a tibble, which is the Tidyverse way of storing data, but the differences aren't important and people use them interchangeably). **We can call this whatever we want, with a few exceptions.** I always want to name data frames after what is in it. In this case, we're going to import a dataset of census estimates. Variable names, by convention are one word all lower case. **You can end a variable with a number, but you can't start one with a number**.
 
 <div class="alert alert-info">
   <h4 class="alert-heading">Key Concept</h4>
@@ -262,7 +263,7 @@ grade_this_code()
 glue("Let's look at this. As you can see by the data, we have six {countyLanguage[2]}, **which is what we expect** from `head()`. But notice the first row -- the headers. We have things like `CTYNAME` and `ESTIMATEBASE2020` at the top. And we have a lot of number columns, showing everything from the population to the number of births and deaths in that place.") 
 ```
 
-That header row is *incredibly* important for what's to come. When your data is wider that what you can see in the window, you'll see a black triangle on the upper right of the header row. That let's you scroll right to see more.
+That header row is *incredibly* important for what's to come. When your data is wider than what you can see in the window, you'll see a black triangle on the upper right of the header row. That let's you scroll right to see more.
 
 ### Exercise 2: Using glimpse to see your data
 
@@ -343,13 +344,13 @@ Typically, they'll be one of four types of data:
 * Date: Fully formed dates -- 2019-01-01 -- have a special date type. Elements of a date, like a year (ex. 2019) are not technically dates, so they'll appear as numeric data types. 
 * Logical: Rare, but every now and then we'll have a data type that's Yes or No, True or False, etc.
 
-**Question:** Is a zip code a number? Is a phone number a number? Trick question, because the answer is no. Numbers are things we do math on. If the thing you want is not something you're going to do math on -- can you add two phone numbers together? -- then make it a character type. If you don't, most every software system on the planet will drop leading zeros. For example, every zip code in Boston starts with 0. If you record that as a number, your zip code will become a four digit number, which isn't a zip code anymore. 
+**Question:** Is a zip code a number? Is a phone number a number? Trick question, because the answer is no. Numbers are things we do math on. Can you add two phone numbers together? If the thing you want is not something you're going to do math on, then make it a character type. If you don't, most every software system on the planet will drop leading zeros. For example, every zip code in Boston starts with 0. If you record that as a number, your zip code will become a four digit number, which isn't a zip code anymore. 
 
 ![](images/classify.png){width="100%"}
 
 ## Recap
 
-In this lesson, you've learned essential concepts for working with data in R. We covered how to import data using read_csv(), and explored ways to inspect your data using head() and glimpse(). You now understand that data is typically organized into rows (individual elements like players) and columns (variables or attributes). We discussed the importance of the header row in naming your columns, which is crucial for data manipulation. You've also been introduced to common data types you'll encounter: numeric, character, date, and logical. Remember, always start by loading the tidyverse library, give your imported data a descriptive name, and take time to understand the structure of your dataset. These foundational skills will be vital as you progress in your sports data analysis journey.
+In this lesson, you've learned essential concepts for working with data in R. We covered how to import data using read_csv(), and explored ways to inspect your data using head() and glimpse(). You now understand that data are typically organized into rows (individual elements like players) and columns (variables or attributes). We discussed the importance of the header row in naming your columns, which is crucial for data manipulation. You've also been introduced to common data types you'll encounter: numeric, character, date, and logical. Remember, always start by loading the Tidyverse library, give your imported data a descriptive name, and take time to understand the structure of your dataset. These foundational skills will be vital as you progress in your data analysis journey.
 
 ## Terms To Know
 

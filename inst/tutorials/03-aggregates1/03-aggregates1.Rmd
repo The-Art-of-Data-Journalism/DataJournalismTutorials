@@ -111,18 +111,18 @@ mostrated <- homes |>
 ## The Goal
 
 ```{r intro, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
-glue("The goal of this lesson is to introduce you to one of the most fundamental and powerful concepts in data analysis: aggregation. You'll learn how to take large datasets with many individual records and summarize them into meaningful insights. We'll focus on using the group_by() and summarise() functions from the dplyr package to group similar items together and calculate totals. By the end of this lesson, you'll be able to answer questions about the {nrows} nursing homes in {stateName$State}, but the techniques you learn can be applied to any subject or dataset.") 
+glue("The goal of this lesson is to introduce you to one of the most fundamental and powerful concepts in data analysis: aggregation. You'll learn how to take large datasets with many individual records and summarize them into meaningful insights. We'll focus on using the group_by() and summarize() functions from the dplyr package to group similar items together and calculate totals. By the end of this lesson, you'll be able to answer questions about the {nrows} nursing homes in {stateName$State}, but the techniques you learn can be applied to any subject or dataset.") 
 ```
 
 ## What is Data Journalism?
 
-So far, in our philosophical discussion of data journalism, we've talked about how it's interviewing data as a source, and one of your first steps is just knowing what is in your data. What does it look like? Now we're going to take our first steps -- a giant leap, really -- into asking your data questions and getting answers. It's one of the most powerful things you can do as a data journalist. 
+So far, in our philosophical discussion of data journalism, we've talked about how it's interviewing data as a source, and one of your first steps is just knowing what is in your data. What does it look like? Now we're going to take our first steps -- a giant leap, really -- into asking your data questions and getting answers. It's one of the most powerful calculations you can do as a data journalist. 
 
 Count things.
 
 No really. 
 
-"Ninety percent of what I do is counting things," said Mary Jo Webster of the Star Tribune. "And so, to me, you could kind of think back to when you were a child and you were playing with a set of blocks or maybe Legos and you counted out how many blue ones do I have,
+"Ninety percent of what I do is counting things," said MaryJo Webster of the Star Tribune. "And so, to me, you could kind of think back to when you were a child and you were playing with a set of blocks or maybe Legos and you counted out how many blue ones do I have,
 how many red ones do I have. That is kind of what I do every day."
 
 So what kind of stories can you do with that?
@@ -133,7 +133,7 @@ It's hard to explain to people who have never worked with data how important the
 
 - How many of this thing are there where I live?
 - How many of those things were there last year? Or five years ago?
-- How does that many thing compare to my state? The nation?
+- How does that many things compare to my state? The nation?
 - Why is there that many or that few of these things?
 - When I count up all the things, there aren't any in this place. Why?
 
@@ -145,7 +145,7 @@ So let's start there.
 
 R is a statistical programming language that is purpose built for data analysis.
 
-One of the most basic bits of data analysis is just simply taking a lot of things -- hundreds, thousands, millions of things -- and putting them together somehow. Rarely ever to we want just one number. I'll give you an example: Let's pretend for a second that we have Spotify's data. We have every song streamed in a year. **Billions** of records. Do we want to just count them up? One number? Is your annual Spotify Wrapped just one number that's the total number of streams everyone played in a year? No, of course not. 
+One of the most basic bits of data analysis is just simply taking a lot of things -- hundreds, thousands, millions of things -- and putting them together somehow. Rarely ever do we want just one number. I'll give you an example: Let's pretend for a second that we have Spotify's data. We have every song streamed in a year. **Billions** of records. Do we want to just count them up? One number? Is your annual Spotify Wrapped just one number that's the total number of streams everyone played in a year? No, of course not. 
 
 It's streams -- but put in groups. You, a user, are a group. How many songs did you play? How many times? What artists? What genres? And on and on. And with each group, we get a different number. An interesting number. A useful number. 
 
@@ -211,7 +211,7 @@ Let's look at this. As you can see by the data, we have six nursing homes, **whi
 ## Answering questions with code
 
 ```{r numberhomes, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
-glue("There are {format(nrows, big.mark=",",scientific=FALSE)} nursing homes in {stateName$State} as of the June 2024 data from the national Center for Medicare and Medicaid Studies. Which, I suppose if we were writing about nursing homes in {stateName$State}, that's useful information, but it doesn't tell us much. Let's explore more.")
+glue("There are {format(nrows, big.mark=",",scientific=FALSE)} nursing homes in {stateName$State} as of the June 2024 data from the national Center for Medicare and Medicaid Studies. I suppose if we were writing about nursing homes in {stateName$State} that's useful information, but it doesn't tell us much. Let's explore more.")
 ```
 
 **The secret to writing code is that much of it is a pattern.** The building blocks largely stay the same. With the tidyverse, this is *especially* true.
@@ -220,11 +220,11 @@ To accomplish our goal, we start with the name of the data we created before. Th
 
 Then, the `dplyr` library, which we loaded when we loaded up the tidyverse, has a **`group_by`** function in it that does just what we've been talking about -- take your data, put each row into groups. This thing here together, those things over there together. A massive amount of data analysis involves grouping like things together at some point.
 
-It's important to understand in your mind what `group_by()` is doing. It might be easiest to think about it like a package of Skittles. Your data, when you first get it, is like a pack of Skittles -- all mixed up. What `group_by` does is comes along and puts them in little piles. Here's an bag of Skittles dumped out.
+It's important to understand in your mind what `group_by()` is doing. It might be easiest to think about it like a package of Skittles candy. Your data, when you first get it, is like a pack of Skittles -- all mixed up. What `group_by` does is puts the candy in little piles. Here's an bag of Skittles dumped out.
 
 ![Ungrouped data](images/IMG_1345.png){width="100%"}
 
-Now, using `group_by`, we can put them into piles. With Skittles, we group them by color. With data, we could do this with any column of data -- dates, locations, types, ratings and so on. The list is endless. But notice -- all of those things are not numbers. With the exception of dates, they're names or labels or text of some variety. Rarely ever will you group something by a number
+Now, using `group_by`, we can put them into piles. With Skittles, we group them by color. With data, we could do this with any column of data -- dates, locations, types, ratings and so on. The list is endless. But notice -- all of those things are not numbers. With the exception of dates, they're names or labels or text of some variety. Rarely ever will you group something by a number.
 
 ![Grouped data](images/IMG_1347.png){alt="Grouped data" width="100%"}
 
@@ -253,7 +253,7 @@ That block of code you just ran has two hints for the code block you'll have to 
 
 ### Exercise 2: Group by and count
 
-After we group our data together by the thing we want to group it by, we need to count how many things are in each group. We do that first by saying we want to summarize our data (a count is a part of a summary). To get a summary, we have to tell it what we want to summarize. So in this case, we want a count. To get that, let's create a thing called total and set it equal to n(), which is `dplyr`s way of counting something.
+After we group our data together by the thing we want to group it by, we need to count how many things are in each group. We do that first by saying we want to summarize our data (a count is a part of a summary). To get a summary, we have to tell it what we want to summarize. So in this case, we want a count. To get that, let's create a thing called total and set it equal to n(), which is the way `dplyr` counts something.
 
 Here's the pattern. **You fill in where there are blanks.** What you fill in are the two hints from above.
 
@@ -288,7 +288,7 @@ glue("In this case, we wanted to group together locations, signified by the fiel
 ### Exercise 3: Arranging data
 
 ```{r arrangepreamble, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
-glue("And when we run that, we get a list of {countyLanguage[2]} with a count next to them. But it's in alphabetical order. That doesn't help us much usually. Usually we want to know where the most or the least are. So we'll add another And Then Do This `|>` and use `arrange`. Arrange does what you think it does -- it arranges data in order. By default, it's in ascending order -- smallest to largest. But if we want to know the {countyLanguage[1]} with the most homes, we need to sort it in descending order. In arrange, we need to tell it what we are arranging by. **If you have group_by, then whatever you are arranging by will *always* come from inside summarize.** The pattern looks like this:")
+glue("And when we run that, we get a list of {countyLanguage[2]} with a count next to them. But it's in alphabetical order. That doesn't help us much. Usually we want to know where the most or the least are. So we'll add another And Then Do This `|>` and use `arrange`. Arrange does what you think it does -- it arranges data in order. By default, it's in ascending order -- smallest to largest. But if we want to know the {countyLanguage[1]} with the most homes, we need to sort it in descending order. In arrange, we need to tell it what we are arranging by. **If you have group_by, then whatever you are arranging by will *always* come from inside summarize.** The pattern looks like this:")
 ```
 
 ```{r group-by-2, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
@@ -323,7 +323,7 @@ glue("And when we run that, you'll see that {most$county_parish} has the most nu
 
 ### Exercise 4: Grouping by more than one thing
 
-We can, if we want, group by more than one thing. One of the most popular uses of this data is to compare nursing homes -- the federal government has created a five-star rating system, where five is the best and 1 is not. In the data you have, that rating is in the `overall_rating` column. So what if we looked at the ratings for each home in each county? 
+We can, if we want, group by more than one thing. One of the most popular uses of this data is to compare nursing homes -- the federal government has created a 5-star rating system, where 5 is the best and 1 is not. In the data you have, that rating is in the `overall_rating` column. So what if we looked at the ratings for each home in each county? 
 
 The hint here is **each**. Any time you hear an editor or a reporter or someone say **each**, it probably means there's a group by involved. **Each** county with **each** rating means there's two! 
 
@@ -358,16 +358,16 @@ grade_this_code()
 glue("Now there's a ton to look at here. But what does it mean? If you haven't looked at a lot of data before, it might not be immediately intuitive. Let's take the first row. What that says is {mostrated$county_parish} had {mostrated$total} homes with a {mostrated$overall_rating}-star rating. See how the columns are arranged? It's the first column in our group_by, followed by the second, and then the total we created in the summarize. Which is the order you come to them when you read the code. Logical, eh?")
 ```
 
-That first row might be interesting, it might not be. A few rows down, you might find a smaller county with a lot of five-star homes for its size. Or the opposite -- a smaller county with a lot of low-rated homes. Every state has economic and cultural reasons for just about everything that goes on there. Apply what you know about your state to that list, and stories will start popping into your head. 
+That first row might be interesting, it might not be. A few rows down, you might find a smaller county with a lot of 5-star homes for its size. Or the opposite -- a smaller county with a lot of low-rated homes. Every state has economic and cultural reasons for just about everything that goes on there. Apply what you know about your state to that list, and stories will start popping into your head. 
 
 <div class="alert alert-warning"> 
 <h4 class="alert-heading">Common Mistake</h4> 
-<p class="mb-0">Remember earlier when I said we'd rarely ever group by a number? Didn't we just do that? Yes, but ... Remember a number is only a number if you would do math on it. Is a Five-Star Rating system a number? Yes! And No! We will do math on it, but it's also a label too. A critical skill in data journalism is using logic and common sense, not rigid rules that something will <i>always</i> be this way or that.</p>
+<p class="mb-0">Remember earlier when I said we'd rarely ever group by a number? Didn't we just do that? Yes, but ... Remember a number is only a number if you would do math on it. Is a 5-Star Rating system a number? Yes! And No! We will do math on it, but it's also a label too. A critical skill in data journalism is using logic and common sense, not rigid rules that something will <i>always</i> be this way or that.</p>
 </div>
 
 ## If all you need is a count ... 
 
-Grouping and counting is such a common thing that there's multiple shortcuts to it in R. In the tidyverse specifically, there's a shortcut called `tally()` that just counts things up in groups. If all you need is a count, it's a timesaver. If, as you'll learn in the next tutorial, you need more than just a count, `tally()` is the wrong call. 
+Grouping and counting is such a common thing that there's multiple shortcuts to it in R. In the Tidyverse specifically, there's a shortcut called `tally()` that just counts things up in groups. If all you need is a count, it's a time saver. If, as you'll learn in the next tutorial, you need more than just a count, `tally()` is the wrong call. 
 
 Let's redo our count by `county_parish` from exercise 2 and 3. First, we'll just count them. Then, we'll use a shortcut in tally to arrange them with less code. 
 

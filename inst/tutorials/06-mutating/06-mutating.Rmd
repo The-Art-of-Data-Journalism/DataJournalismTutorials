@@ -137,7 +137,7 @@ One of the most common data analysis techniques is to look at change over time. 
 
 Or new minus old divided by old. Your new number minus the old number, the result of which is divided by the old number. To do that in R, we can use `dplyr` and `mutate` to calculate new metrics in a new field using existing fields of data. 
 
-So first we'll import the tidyverse so we can read in our data and begin to work with it.
+So first we'll import the Tidyverse so we can read in our data and begin to work with it.
 
 ```{r load-tidyverse, exercise=TRUE}
 library(tidyverse)
@@ -149,7 +149,7 @@ library(tidyverse)
 grade_this_code()
 ```
 
-Now we'll import a common and simple dataset of county population estimates from the US Census Bureau. Each year, the Census Bureau publishes estimates for states and counties. This one has every county in the US. A common question: who are the winners and losers?  
+Now we'll import a common and simple dataset of county population estimates from the U.S. Census Bureau. Each year, the Census Bureau publishes estimates for states and counties. This one has every county in the United States. A common question: who are the winners and losers?  
 
 Your first task is to import the data. For this exercise, you need to fill in your state name, lowercase letters and replace spaces with -:
 
@@ -200,7 +200,7 @@ grade_this_code()
 
 Look out on the right and you'll see your `percent_change` column. But what do you see right away? Do those numbers look like we expect them to? No. 
 
-### Exercise 2: Converting to a percentage.
+### Exercise 2: Converting to a percentage
 
 Those numbers are a decimal -- a really, really small decimal when you see things like e-03, which means that number is to the -10 power, which means move the decimal that many spaces to the left. We want it expressed as a percentage. So let's fix that by multiplying by 100. 
 
@@ -345,7 +345,7 @@ See that last column name? There's `rawchange`. That means if you want to use it
 
 ## The Recap
 
-Throughout this lesson, you've learned how to use the mutate() function to create new columns in your dataset. You've calculated percent change and raw change in population data, demonstrating how to perform simple mathematical operations on existing columns. You've also combined mutate() with arrange() to identify the fastest-growing counties and those with the largest absolute population increases. Remember, mutating data allows you to uncover new insights and tell more complex stories with your data. As you continue your data journalism journey, you'll find that the ability to create new variables is an invaluable tool in your analytical toolkit.
+Throughout this lesson, you've learned how to use the mutate() function to create new columns in your dataset. You've calculated percent change and raw change in population data, demonstrating how to perform simple mathematical operations on existing columns. You've also combined mutate() with arrange() to identify the fastest-growing counties and those with the largest absolute population increases. Remember, mutating data allows you to uncover new insights and tell more complex stories with your data.
 
 ## Terms to Know
 
