@@ -36,7 +36,7 @@ In this lesson, you'll learn how to create slope charts, a powerful tool for vis
 
 ## Why Visualize Data?
 
-Darla Cameron, now the Chief Product Officer at the Texas Tribune, has worked in visual journalism for more than 15 years with stops in Florida, Washington DC and now Texas. She's been at ground zero for an awakening in journalism that started in the 80s, got turbocharged by the internet and now seems like it was always so: journalism can be presented graphically. And for some stories, it's vastly better to do it with graphics.
+Darla Cameron, now the chief product officer at the Texas Tribune, has worked in visual journalism for more than 15 years with stops in Florida, Washington D.C. and now Texas. She's been at ground zero for an awakening in journalism that started in the 80s, got turbocharged by the internet and now seems like it was always so: journalism can be presented graphically. And for some stories, it's vastly better to do it with graphics.
 
 "Visual journalism is important because humans communicate visually. That's how we learn to read. That's how we learn to read our parents' faces when we're babies," Cameron said. "We are really good at understanding visual cues and visual context. So as visual journalists, we have this superpower because we can leverage that, this thing that's so innate inside people's brains, and we can tell them a story with that. It's amazing. It's so cool."
 
@@ -44,7 +44,7 @@ Learning what makes a better narrative versus a better graphic is a critical ski
 
 Or, as Cameron puts it, being able to communicate visually gives you a superpower.
 
-"How do you know that somebody's going to read a long narrative?" she said. "You don't. So that's why we need to be thinking about visuals in terms of how we communicate information. And I think it gives, it's like a superpower -- that you can tap into the part of people's brains that can understand information better when they learn it visually. We're visual thinkers. It's so innate."
+"How do you know that somebody's going to read a long narrative?" she said. "You don't. So that's why we need to be thinking about visuals in terms of how we communicate information. It's like a superpower that you can tap into the part of people's brains that can understand information better when they learn it visually. We're visual thinkers. It's so innate."
 
 ## The Basics
 
@@ -52,7 +52,7 @@ A line chart, as we learned, shows change over time, with the date on the x-axis
 
 But with some fiddling with lines and points, you can create a new chart type that does show change over two time periods quite well: A slope chart. 
 
-Think of a slope chart like the meme you see online: How is started vs how it's going. 
+Think of a slope chart like the meme you see online: How it started vs. how it's going. 
 
 For purposes of this exercise, we're going to look at unemployment again, but this time, we're just looking at April 2020 and April 2024. April 2020 is the month when unemployment was higest for almost every state. How does that compare four years later? 
 
@@ -60,7 +60,7 @@ Think of it like playing connect the dots from elementary school.
 
 The difference between slope charts and most other chart types in ggplot is that there is no geom for a slope chart. We're going to make one using pieces and parts of other geoms. Combine the parts together and you get a chart. This is another example of where layering is going to come in very handy.
 
-We'll need the tidyverse.
+We'll need the Tidyverse.
 
 ```{r load-tidyverse, exercise=TRUE}
 library(tidyverse)
@@ -101,7 +101,7 @@ grade_this_code()
 
 Our data is in pretty good shape already, so we can go right to making a chart. 
 
-A slope chart is really made up of two separate geoms that combine to make a form -- a geom_point and a geom_line. The parts inside the two geoms take is identical. In this case, we're going to have the x be the `year` because like a line chart, our x has to be a date or date-like thing. The y is our unemployment rate column and we're going to add a group value, which is the `Location`. I'm also going to go ahead and set the color for these to grey, which you'll see why in a moment. 
+A slope chart is really made up of two separate geoms that combine to make a form -- a geom_point and a geom_line. The parts inside the two geoms take are identical. In this case, we're going to have the x be the `year` because like a line chart, our x has to be a date or date-like thing. The y is our unemployment rate column and we're going to add a group value, which is the `Location`. I'm also going to go ahead and set the color for these to grey, which you'll see why in a moment. 
 
 ```{r slope2, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
 ggplot() + 

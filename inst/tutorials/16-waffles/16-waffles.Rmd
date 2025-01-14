@@ -93,7 +93,7 @@ Indeed, page 1, part 1, gives you a taste of his direct style.
 
 If you can do all that, you're on a great path. Easy right? Not exactly. Doing some of this is easy with the tools we have. Some of this requires a lot of thought.
 
-That brings us to today when we come not to praise the pie chart but to bury it. They're terrible, and people abuse them horribly. Using Tufte's own words, pie charts regularly fail to show the data, not distort it and are truly horrible at making large datasets coherent.
+That brings us to today when we come not to praise the pie chart but to bury it. They're terrible, and people abuse them horribly. Using Tufte's own words, pie charts regularly fail to show the data, often distorting it, and are truly horrible at making large datasets coherent.
 
 This can lead to what Tufte calls failures of Graphical Integrity. Tufte insists that the early years of graphics were plagued with designers who used them to lie -- intentionally or not -- by covering up bad data or bad results with charts. He credits no less than John Tukey for making graphics respectable again in the late 1960s.
 

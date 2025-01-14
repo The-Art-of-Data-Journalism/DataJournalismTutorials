@@ -89,7 +89,7 @@ In this lesson, you'll learn how to create dumbbell charts, a powerful tool for 
 
 ## Why Visualize Data?
 
-Coulter Jones has worked in tiny newspapers, trade publications and in public radio. He's also worked at two of the largest news organizations in the world in Bloomberg News and the Wall Street Journal. In smaller places, it's much more common for someone with some data skills to take a graphic all the way to publication. But Bloomberg and the WSJ have graphics staffs larger than most newspapers these days. There's zero chance of Jones turning some data he has into a graphic that faces the public.
+Coulter Jones has worked in tiny newspapers, trade publications and in public radio. He's also worked at two of the largest news organizations in the world -- Bloomberg News and the Wall Street Journal. In smaller places, it's much more common for someone with some data skills to take a graphic all the way to publication. But Bloomberg and the WSJ have graphics staffs larger than most newspapers these days. There's zero chance of Jones turning some data he has into a graphic that faces the public.
 
 And yet, he makes graphics all the time.
 
@@ -97,13 +97,13 @@ And yet, he makes graphics all the time.
 
 As a data analyst, one of the most important things you can do -- and one of the easiest once you get some practice -- is to convert your data into a picture. You learned this from Tukey. You learned this from Playfair. You learned this from Tufte. Data journalists do this all the time, and it's one of the best reasons to learn R. 
 
-"One of the things that I did not appreciate at first, but then like quickly learned to love about R is like, oh, this is a visual platform too," Jones said. "So I can very easily just do histogram. I can do like a two factor line or point, sort of like show me age and sex or something like that.
+"One of the things that I did not appreciate at first, but then quickly learned to love about R is, oh, this is a visual platform too," Jones said. "So I can very easily just do a histogram. I can do a two factor line or point, sort of like show me age and sex or something like that.
 
-"If you just chart it, you can sometimes like just see the story immediately."
+"If you just chart it, you can sometimes just see the story immediately."
 
-## The Basics.
+## The Basics
 
-Second to my love of waffle charts because or their name and I'm always hungry, dumbbell charts are an excellently named way of **showing the difference between two things on a number line** -- a start and a finish, for instance. Or the difference between two related things. When the gap between numbers is the news, dumbbell charts are what you want.
+Second to my love of waffle charts because of their name, and I'm always hungry, dumbbell charts are an excellently named way of **showing the difference between two things on a number line** -- a start and a finish, for instance. Or the difference between two related things. When the gap between numbers is the news, dumbbell charts are what you want.
 
 Dumbbell charts come batteries included in `ggalt` which we will have to load. Like usual, you already installed this if you followed the install instructions at the beginning of the course. But if you're having trouble getting this to work, go to your console in R Studio and install it with `install.packages("ggalt")`
 
@@ -121,11 +121,11 @@ library(ggalt)
 grade_this_code()
 ```
 
-For this, let's use a list of a colleges from the Department of Education's College Scorecard. The dataset is massive -- there's nearly 6,500 colleges and universities in the dataset, which in the grand scheme of data isn't that many rows. But there's more than 3,300 *columns* of data. In other words, there's that many things about each college being tracked.
+For this, let's use a list of a colleges from the Department of Education's College Scorecard. The dataset is massive -- there are nearly 6,500 colleges and universities in the dataset, which in the grand scheme of data isn't that many rows. But there's more than 3,300 *columns* of data. In other words, there's that many things about each college being tracked.
 
 Let's focus on a couple of the most important things -- do people graduate? And what does it cost to go there?
 
-We'll load the data for your state. I've cut down the number of columns to just what we need, and limited the the colleges to those granting associates and bachelors degrees. Two other limitations: If a college didn't report data, they were dropped. And the number of colleges for a state is capped at 20 (the 20 largest by undergraduate enrollment). Dumbbell charts can only hold so many. 
+We'll load the data for your state. I've cut down the number of columns to just what we need, and limited the the colleges to those granting associate and bachelor's degrees. Two other limitations: If a college didn't report data, they were dropped. And the number of colleges for a state is capped at 20 (the 20 largest by undergraduate enrollment). Dumbbell charts can only hold so many. 
 
 ```{r colleges-read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
 colleges <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/colleges/____.csv")
@@ -152,13 +152,13 @@ head(colleges)
 grade_this_code()
 ```
 
-For this example, let's look at the difference between a schools in-state tuition vs out-of-state tuition. Most public colleges charge more for people who don't live there. The obvious reason is giving people who pay taxes in the state a break, and charging more for people who don't pay taxes there. Private schools don't have to do that, but some do. 
+For this example, let's look at the difference between a school's in-state tuition vs. out-of-state tuition. Most public colleges charge more for people who don't live there. The obvious reason is giving people who pay taxes in the state a break, and charging more for people who don't pay taxes there. Private schools don't have to do that, but some do. 
 
 ### Exercise 1: The first dumbbell
 
 Now, the way that the `geom_dumbbell` works is pretty simple when viewed through what we've done before. There's just some tweaks. 
 
-First: We start with the y axis. The reason is we want our dumbbells going left and right, so the label is going to be on the y axis. That's the column with the college name in it.
+First: We start with the y axis. The reason is we want our dumbbells going left and right so the label is going to be on the y axis. That's the column with the college name in it.
 
 Second: Our x is actually two things: x and xend. What you put in there will decide where on the line the dot appears. What goes in the x and xend are the two numbers where the gap between them is meaningful. So for us, it's our two tuition columns, one for in-state and the second for out of state. 
 
@@ -180,7 +180,7 @@ ggplot() +
 grade_this_code()
 ```
 
-Well, that's a chart alright, but did you get a warning? Not to worry -- that's an issue in `ggalt`, nothing you did. But with what you *did* do, what dot is the in-state tuition and what the out of state? To fix this, we'll add colors.
+Well, that's a chart alright, but did you get a warning? Not to worry -- that's an issue in `ggalt`, nothing you did. But with what you *did* do, what dot is the in-state tuition and what is the out of state? To fix this, we'll add colors.
 
 ### Exercise 2: Colors and size
 
@@ -210,7 +210,7 @@ ggplot() +
 grade_this_code()
 ```
 
-And now we have a chart that is trying to tells a story. We know, logically, that green on the left is good, because it means cheaper tuition. A long distance between green and red? That shows a gap between what in-state students pay and what out-of-state students pay. In some cases, that's small. In some it's *huge*. But what about the colleges that have just red dots? The issue there is that they don't have in-state and out-of-state tuition. They just have ... tuition. The green dot is there -- it's just getting covered by the red dot.
+And now we have a chart that is trying to tell a story. We know, logically, that green on the left is good, because it means cheaper tuition. A long distance between green and red? That shows a gap between what in-state students pay and what out-of-state students pay. In some cases, that's small. In some it's *huge*. But what about the colleges that have just red dots? The issue there is that they don't have in-state and out-of-state tuition. They just have ... tuition. The green dot is there -- it's just getting covered by the red dot.
 
 ### Exercise 3: Arrange helps tell the story
 
