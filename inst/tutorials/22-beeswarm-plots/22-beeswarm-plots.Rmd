@@ -23,6 +23,7 @@ tutorial_options(exercise.completion=FALSE)
 ```
 ```{r load-data, message=FALSE, warning=FALSE}
 state <- Sys.getenv("tutorial.state")
+if(state == "") state <- "NE"
 
 stateName <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/states.csv") |> filter(Postal == state) 
 
