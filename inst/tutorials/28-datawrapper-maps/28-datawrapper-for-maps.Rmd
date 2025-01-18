@@ -24,29 +24,29 @@ In this lesson, you'll learn how to create interactive maps using Datawrapper, a
 
 ## Why Visualize Data?
 
-Past students in my data journalism class have heard me say this before, but if I could make my 16 week class a 32 week class, the first 16 weeks would stay the same. They would remain the same chapters you've worked through here. The remaining 16 weeks would be all about maps. 
+Past students in my data journalism class have heard me say this before: if I could make my 16-week class a 32-week class, the first 16 weeks would stay the same. They would remain the same chapters you've worked through here. The remaining 16 weeks would be all about maps. 
 
 Maps are a truly incredible data journalism tool. They are a universal language that nearly all of us speak. They are built for things like context, but also allow us to indulge in a little selfishness. What do you do every time you see a weather map? Find your neighborhood right? What do you do when you see a county map shaded by anything? Find yours, no? Here's a map of every university in the country and some piece of data about it that you really want to know. The first dot you're clicking on is your university, guaranteed. 
 
 The problem is that maps are hard. If you're a university student reading this right now, somewhere on your campus are whole sections of multiple courses at multiple levels of the curriculum that are all about using Geographic Information Systems to do analysis. Geographic analysis has all of the problems of data analysis -- incomplete, incorrect, poorly formatted data, for example -- and adds to it the math of representing physical space. 
 
-What types of problems are those? Well, consider this: The earth is not round. No, this isn't Flat Earth Propaganda making its way into this textbook. The earth is a spheroid, and not only that, it's an oblate spheroid, which is a funny way of saying it's squished from the top, fattening out the middle. Now, take things on that oblate spheroid and take them from a three-dimensional shape and flatten them into a two-dimensional shape. Map nerds can go on all day about how the distortions that occur from that flattening screws up our understanding of the world. What I want you to understand is this: There are so many ways that people have come up with to solve this problem that counting them is impossible. There is no comprehensive list of map projections in the world *because the set of possible outcomes is infinite*. 
+What types of problems are those? Well, consider this: The Earth is not round. No, this isn't Flat Earth Propaganda making its way into this textbook. The Earth is a spheroid, and not only that, it's an oblate spheroid, which is a funny way of saying it's squished from the top, fattening out the middle. Now, take things on that oblate spheroid and take them from a three-dimensional shape and flatten them into a two-dimensional shape. Map nerds can go on all day about how the distortions that occur from that flattening screws up our understanding of the world. What I want you to understand is this: There are so many ways that people have come up with to solve this problem that counting them is impossible. There is no comprehensive list of map projections in the world *because the set of possible outcomes is infinite*. 
 
 All that is to say that doing sophisticated analysis with maps and spatial data is hard. Enter Datawrapper. 
 
 ## The Basics
 
-Making charts in Datawrapper is preposterously simple. Making maps is less so, but not hard. It just involves you choosing a basemap and making sure your data has geographic elements to them. Those might be FIPS numbers to match to counties. Those might be latitude and longitude coordinate points. There's others, but those are two of the biggest ones. 
+Making charts in Datawrapper is preposterously simple. Making maps is less so, but not hard. It involves you choosing a base map and making sure your data has geographic elements to them. Those might be FIPS numbers to match to counties. Those might be latitude and longitude coordinate points. There are others, but those are two of the biggest ones. 
 
-First, we need some data. And for this one, we're going to do something a little different. All throughout this course, you've dealt with Serious Data. Plane crashes and tax-payer funded grants and college tuition bills. How about something silly for a change? 
+First, we need some data. And for this one, we're going to have some fun. Throughout this course, you've dealt with mostly serious data. Plane crashes and tax-payer funded grants and college tuition bills. 
 
-I give you [Groundhog-Day.com](https://groundhog-day.com/). Groundhog Day, the day when a rodent in Pennslyvania comes out of a hole and if it sees its shadow, we're all miserable for a while longer because we're all sick of winter. But did you know that Punxatawny Phil is not the only weather prognosticating rodent in the US? Not even close. There are 74 ... things ... that people consult about the the coming forecast. 
+Let's return to the data we used for a waffle chart in Chapter 26: [Groundhog-Day.com](https://groundhog-day.com/). Groundhog Day, the day when a rodent in Pennslyvania comes out of a hole and if it sees its shadow, we're all miserable for a while longer because we're all sick of winter. Remember I told you that Punxatawny Phil is not the only weather prognosticating rodent in the United States? Not even close. There are 74 ... things ... that people consult about the the coming forecast. 
 
-Why do I say things? Because the things people consult are ... eclectic. Sure there are lots of groundhogs -- 32 of them in 2024. But did you know that 7 other communities in the US and Canada consult a *DEAD* groundhog? Or, as Groundhog-Day.com politely describes them, taxidermied groundhogs. Six more ask a *person in a groundhog suit* if winter will end early. Then there are the places who don't use groundhogs, and instead as a chicken, or an alligator, or a lobster, beaver, bullfrog, prairie dog or ... a statue of a prairie dog. 
+Why do I say things? Because the things people consult are ... eclectic. Sure there are lots of groundhogs -- 32 of them in 2024. But did you know that seven other communities in the United States and Canada consult a *DEAD* groundhog? Or, as Groundhog-Day.com politely describes them, taxidermied groundhogs. Six more ask a *person in a groundhog suit* if winter will end early. Then there are the places who don't use groundhogs, and instead use a chicken, or an alligator, or a lobster, beaver, bullfrog, prairie dog or ... a statue of a prairie dog. 
 
 So like every presidential election, we have poll aggregators who average together poll results to try and predict a winner. You now are a Groundhog aggregator to find out the truth about if winter will end early or not. 
 
-I've gone ahead and scraped the data from Groundhog-Day.com -- they very politely provide it to you. You need this url:
+I've gone ahead to Groundhog-Day.com and scraped the data. You need this url:
 
 ```
 https://the-art-of-data-journalism.github.io/tutorial-data/groundhogs/predictions2024.csv
@@ -58,7 +58,7 @@ In your Datawrapper dashboard, we want to start with a new chart. One thing Data
 knitr::include_graphics(rep("images/datawrapper1.png"))
 ```
 
-We're going to make a symbol map because our data is made up of points. Another very common map type is the Choropleth map where each unit of geography is shaded in by the value.
+We're going to make a symbol map because our data is made up of points. Another common map type is the Choropleth map where each unit of geography is shaded in by the value.
 
 ```{r, echo=FALSE, out.width = "100%"}
 knitr::include_graphics(rep("images/datawrapper2.png"))
@@ -70,7 +70,7 @@ Our data includes points in Canada, so we want to select North America as our ba
 knitr::include_graphics(rep("images/datawrapper3.png"))
 ```
 
-Here's where that work of creating the data comes in. Similar to the last exercise, click the Link External Data button below the Upload area. There you can paste in the url of your data into the box and then click connect. 
+Here's where that work of creating the data comes in. Similar to the last exercise, click the Link external data button below the Upload area. There you can paste in the url of your data into the box and then click Connect. 
 
 ```{r, echo=FALSE, out.width = "100%"}
 knitr::include_graphics(rep("images/datawrapper4.png"))
@@ -90,7 +90,7 @@ We'll start to work with color palettes. You should change it to Steps given tha
 knitr::include_graphics(rep("images/datawrapper6.png"))
 ```
 
-Now we can fiddle with the legend to make it so instead of saying 1 or 0 it says late winter or early spring. 
+Now we can fiddle with the legend to make it so instead of saying 1 or 0 it says long winter or early spring. 
 
 ```{r, echo=FALSE, out.width = "100%"}
 knitr::include_graphics(rep("images/datawrapper7.png"))
@@ -118,7 +118,7 @@ If you're happy with it, go on and proceed to the end. Similar to charts, you ca
 
 ## The Recap
 
-Throughout this lesson, you've mastered the process of creating interactive maps with Datawrapper. You've learned to prepare your data in R, import it into Datawrapper, and customize various aspects of your map, including color schemes, legends, and tooltips. Remember, effective data visualization is about more than just plotting points—it's about telling a story through your data. Consider how tools like Datawrapper can help you present complex geographic information in a clear, engaging format that resonates with your audience.
+Throughout this lesson, you've mastered the process of creating interactive maps with Datawrapper. You've learned to prepare your data in R, import it into Datawrapper, and customize various aspects of your map, including color schemes, legends, and tooltips. Remember, effective data visualization is about more than just plotting points -- it's about telling a story through your data. Consider how tools like Datawrapper can help you present complex geographic information in a clear, engaging format that resonates with your audience.
 
 ## Terms to Know
 

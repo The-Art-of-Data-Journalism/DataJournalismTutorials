@@ -92,7 +92,7 @@ In this lesson, you'll learn how to create informative and visually appealing ta
 
 ## Why Visualize Data?
 
-There are few graphical forms of data more criticized than the data table. For a long time, there were all there was. And they were used heavily -- and not particularly creatively. And people knew it wasn't good.
+There are few graphical forms of data more criticized than the data table. For a long time, they were all there was. And they were used heavily -- and not particularly creatively. And people knew it wasn't good.
 
 "Information, that is imperfectly acquired, is generally as imperfectly retained; and a man who has carefully investigated a printed table, finds, when done, that he has only a very faint and partial idea of what he has read; and that like a figure imprinted on sand, is soon totally erased and defaced," Playfair wrote in 1786. 
 
@@ -110,20 +110,20 @@ Let's explore.
 
 A table is the most simple form of data presentation. Tables have been around for millenia. We've improved in them since, so we're not making a table. We're making a table with features. 
 
-What features you ask? Because the library we're using today is different from ggplot, we're going to jump the gun a little bit and add required parts of every chart. There are some exceptions to this rule, but not many, and used only by people who really, really know what they're doing. The rest of us should live by every chart having these parts:
+What features you ask? Because the library we're using today is different from ggplot, we're going to jump ahead a little bit and add required parts of every chart. There are some exceptions to this rule, but not many, and used only by people who really, really know what they're doing. The rest of us should live by every chart having these parts:
 
 1. A headline.
 2. Explanatory text under the headline, called chatter in the business.
 3. A source line, where you say where you got the data from.
 4. A credit line, where you put your name on the chart. All the glory and all the blame belong to you.
 
-There's more parts that your chart might need -- annotations, arrows, shapes to indicate regions -- and we've talked about using color to draw a readers eye, but every chart needs those four. So we're going to build a table with those four things ... and some color to draw the eye. 
+There are more parts that your chart might need -- annotations, arrows, shapes to indicate regions -- and we've talked about using color to draw a reader's eye, but every chart needs those four. So we're going to build a table with those four things ... and some color to draw the eye. 
 
-Why a table? Sometimes, the best way to show your data is with a table -- simple rows and columns. It allows a reader to compare whatever they want to compare a little easier than a graph where you've chosen what to highlight. The folks that made R Studio and the tidyverse have a neat package called `gt`.
+Why a table? Sometimes, the best way to show your data is with a table -- simple rows and columns. It allows a reader to compare whatever they want to compare a little easier than a graph where you've chosen what to highlight. The folks that made R Studio and the Tidyverse have a neat package called `gt`.
 
 For this assignment, we'll need `gt`.
 
-What does this library do? We need the tidyverse and gt to find out.
+What does this library do? We need the Tidyverse and gt to find out.
 
 ```{r load-tidyverse, exercise=TRUE}
 library(tidyverse)
@@ -137,7 +137,7 @@ library(gt)
 grade_this_code()
 ```
 
-This is being written in the middle of a presidential election that never seems like ever ended from the last one, and I have a terrible feeling that the next one will start as soon as this one is over. A permanent campaign issue seems to be health care -- who should get it, how it should be paid for, etc. It's such an issue that the Census Bureau has a programmed called the Small Area Health Insurance Estimates program, which ... you guessed it ... esimates the number of people who have health insurance in an area. It's an estimate, based on a model, but it's the best we've got if you've got a question about differences in your state when it comes to health insurance coverage. 
+This is being written in the middle of a presidential election that seems like it never ended from the last one, and I have a terrible feeling that the next one will start as soon as this one is over. A permanent campaign issue seems to be health care -- who should get it, how it should be paid for, etc. It's such an issue that the Census Bureau has a program called the Small Area Health Insurance Estimates program, which ... you guessed it ... estimates the number of people who have health insurance in an area. It's an estimate, based on a model, but it's the best we've got if you've got a question about differences in your state when it comes to health insurance coverage. 
 
 Let's take a look. Plug your state name in and load up the data:
 
@@ -154,7 +154,7 @@ grade_this({
 })
 ```
 
-Tables, like bar charts, beeswarms, waffles and a few others, can only fit so many rows of data. Generally speaking, tables are great at Top 10 lists. Even top 20 can work if you've got the space and your readers have the time. So let's first take a quick peek at our data and then we're going to make a list of the 10 counties with the largest percentage of uninsured people.
+Tables, like bar charts, beeswarms, waffles and a few others, can only fit so many rows of data. Generally speaking, tables are great at top 10 lists. Even top 20 can work if you've got the space and your readers have the time. So let's first take a quick peek at our data and then we're going to make a list of the 10 counties with the largest percentage of uninsured people.
 
 ```{r head-data, exercise=TRUE, exercise.setup = "load-data"}
 head(uninsured)
@@ -166,7 +166,7 @@ head(uninsured)
 grade_this_code()
 ```
 
-The column `nic_pt` are the number of insured people and the column `nui_pt` are the number of uninsured people. One thing to realize about this data -- if you add up the insured people and the uninsured people, you will **not** get the number of people in the county. Why? The answer is pretty simple, once you think about it -- in the US, Medicare kicks in for people 65 and over. If you dig into the SAHIE docs, they cut their data off at 64. What this all means is that the numbers we're looking at are the estimates of non-Medicare aged people. So something to keep in mind when wording certain things later. 
+The column `nic_pt` are the number of insured people and the column `nui_pt` are the number of uninsured people. One thing to realize about this data -- if you add up the insured people and the uninsured people, you will **not** get the number of people in the county. Why? The answer is pretty simple, once you think about it -- in the United States, Medicare kicks in for people 65 and over. If you dig into the SAHIE docs, they cut their data off at 64. What this all means is that the numbers we're looking at are the estimates of non-Medicare aged people. So something to keep in mind when wording certain things later. 
 
 ### Exercise 1: Making a top 10 list
 
@@ -174,7 +174,7 @@ To make a top 10 list, we have to convert our numbers into percentages first, th
 
 <div class="alert alert-info">
 <h4 class="alert-heading">Key Concept</h4> 
-<p class="mb-0">Calculating a percentage is taking the small thing -- the component -- and dividing it by the total things. So if 5 students in a class of 20 are left-handed, the percentage is 5/20.</p>
+<p class="mb-0">Calculating a percentage is taking the small thing -- the component -- and dividing it by the total things. So if five students in a class of 20 are left-handed, the percentage is 5/20.</p>
 </div>
 
 We don't have the total number of insurable people, so we'll have to add our two insurance estimate numbers together to get it. We can use that new column in the `wt` of our `top_n` function to get the top 10. 
@@ -251,7 +251,7 @@ Now we can start working with styling.
 
 ### Exercise 3: Styling, part 1
 
-The truth is most of your code in tables is going to be dedicated to styling specific things. The first thing we need: A headline and some chatter. They're required parts of a graphic so they're a good place to start. We do that with `tab_header` and in there we need a title and subtitle.
+The truth is most of your code in tables is going to be dedicated to styling specific things. First we need: A headline and some chatter. They're required parts of a graphic so they're a good place to start. We do that with `tab_header` and in there we need a title and subtitle.
 
 ```{r table4, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
 top10 |> 
