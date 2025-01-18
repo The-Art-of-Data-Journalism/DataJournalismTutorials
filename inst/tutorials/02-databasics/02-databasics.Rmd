@@ -106,8 +106,7 @@ So the first step in data journalism is finding data. Sometimes you can do that 
 
 Step 2 in data journalism is looking at what exactly is in your data. This process is so important that it requires multiple different lessons to come back to the same question: What is in my data? And is it what I need?
 
-"You have to explore the data to understand what questions can you even ask the data to
-begin with," said MaryJo Webster of the Minneapolis Star Tribune. "What's the knowledge that this source has? What are the fields of information? What's the breadth of knowledge? You know, all the different fields, the columns that might have different variables that will tell you something more deep. How rich is that? How far back in time does the data go? Geographically, is it the entire state? Is it just one county? That's that breadth of knowledge.
+"You have to explore the data to understand what questions can you even ask the data to begin with," said MaryJo Webster of the Minneapolis Star Tribune. "What's the knowledge that this source has? What are the fields of information? What's the breadth of knowledge? You know, all the different fields, the columns that might have different variables that will tell you something more deep. How rich is that? How far back in time does the data go? Geographically, is it the entire state? Is it just one county? That's that breadth of knowledge.
 
 "You've got to explore that first to even think about what you could do with it."
 
