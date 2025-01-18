@@ -34,7 +34,7 @@ state_colleges_count <- nrow(state_colleges)
 
 collegeplural <- pluralize("There {?is/are} {state_colleges_count} {?college/colleges} in the state.")
 
-collegeplural2 <- pluralize("{state_colleges_count} institution{?s} that grant bachelors degrees.")
+collegeplural2 <- pluralize("{state_colleges_count} institution{?s} that grant bachelor's degrees.")
 ```
 ## The Goal
 
@@ -52,12 +52,12 @@ What do I mean by this? And what do I mean by Cairo being one of the most fascin
 
 In August 2023, Cairo made an appearance on the Real World Data Science podcast to talk about his not-yet-released book The Art of Insight. In it, he talked about how visualization is like language in that it has dialects. The dialects of data viz are the places that use them -- journalism, science, industry, art, and others. The rules for how we write in journalism, for example, are vastly different from how we write in the sciences. So why are we trying to create rigid rules for all data visualization? 
 
-"There are really no universal rules in data visualization: they are parochial rules that are applicable to different to the different dialects," Cairo said. "But it is wrong --
+"There are really no universal rules in data visualization: they are parochial rules that are applicable to the different dialects," Cairo said. "But it is wrong --
 it is a mistake -- to apply the standards of one of the dialects of data visualization to a completely different dialect of data visualization." 
 
 And, not just that, the "rules" are kind of a mishmash of empirical research and opinions. 
 
-"There are a few things that could be considered rules," he said. "For example we know that if you want to compare numbers a bar graph is usually superior to a pie chart, for example. We know that there's empirical evidence behind that so you can sort of like derive a principle out of that, right, but beyond those very basic things there really not many rules."
+"There are a few things that could be considered rules," he said. "For example we know that if you want to compare numbers a bar graph is usually superior to a pie chart, for example. We know that there's empirical evidence behind that so you can sort of like derive a principle out of that, right, but beyond those very basic things there are really not many rules."
 
 What do we have? Guidelines. Inherited wisdom. Historical examples. And you should learn them, Cairo said, along with the perception and cognition research that can guide us. 
 
@@ -71,7 +71,7 @@ One of the most powerful things that we can do with visualizing data is establis
 
 In the last assignment, we looked at colleges, at the gap between in-state and out-of-state tuition. Next question: Is there a relationship between how much it costs to go to a college and how many people graduate? In other words -- if it's really expensive to go there, is that creating problems for people finishing their degrees? Or is it that the more expensive the school, the more likely those people graduate? Maybe they only let smart people in. Maybe they only let rich people in who don't worry about the cost. Maybe all of those things. We don't know. 
 
-We'll start with libraries. We're adding `ggrepel` to this one because one very common thing to do is to label dots in the scatterplot. `ggrepel` does that. 
+We'll start with libraries. We're adding `ggrepel` to this one because one common thing to do is label dots in the scatterplot. `ggrepel` does that. 
 
 ```{r load-tidyverse, exercise=TRUE}
 library(tidyverse)
@@ -87,8 +87,8 @@ grade_this_code()
 
 We're going to work with a slightly different version of the college data. In this case, the differences are: 
 
-* We're only looking at 4-year colleges, ones that primarily grant bachelors and graduate degrees, for the entire nation.
-* The two fields we're going to look at are the average cost of attendance and the completion rate. The average cost of attendance -- `COSTT4_A` in the data -- is the total cost for a year at that school, including tuition, housing, books and fees. The completion rate -- `C150_4` in the data -- is the percent of first time, first semester freshmen who complete their degree in *6* years.
+* We're only looking at four-year colleges, ones that primarily grant bachelor's and graduate degrees, for the entire nation.
+* The two fields we're going to look at are the average cost of attendance and the completion rate. The average cost of attendance -- `COSTT4_A` in the data -- is the total cost for a year at that school, including tuition, housing, books and fees. The completion rate -- `C150_4` in the data -- is the percent of first-time, first-semester freshmen who complete their degree in *6* years.
 * I have filtered out schools who didn't report one or both of these bits of data. Example: There's 23 schools who reported zero students graduating in 6 years. That's ... odd.
 
 Let's import the data now.
@@ -143,7 +143,7 @@ glue("Where are {stateName$State} colleges on this chart? {collegeplural} You ma
 
 ### Exercise 2: Colleges in your state 
 
-The way to highlight a dot is to make a dataframe of one and add another geom_point. If you change the color of that one dot, it stands out. First, the dataframe. We'll call it `state_colleges` and the state abbreviation you want is your state's postal code. 
+The way to highlight a dot is to make a dataframe of one and add another geom_point. If you change the color of that one dot, it stands out. First, the dataframe. We'll call it `state_colleges` and the state abbreviation you want is your state's two-letter postal code. 
 
 ```{r college-read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
 ____ <- colleges |> filter(STABBR == "____")
@@ -162,7 +162,7 @@ grade_this({
 glue("Now we have a dataframe of {state_colleges_count}. Let's use it in a new geom.")
 ```
 
-### Exercise 4: Red dots please
+### Exercise 3: Red dots please
 
 ```{r scatter5, exercise=TRUE, exercise.setup = "load-data"}
 ggplot() + 
@@ -184,7 +184,7 @@ glue("And there's a chart of {stateName$State}'s {collegeplural2} But who is who
 
 To get labels on there, we're going to add another geom. This one is called `geom_text_repel` and it's going to add text near each dot -- a `label` -- without them overlapping. The good news -- your `geom_text_repel` aes is exactly the same as your geom_point aes, just adding a `label`. And what column would make the most sense here to label the dot? 
 
-### Exercise 5: Labeling
+### Exercise 4: Labeling
 
 ```{r scatter6, exercise=TRUE, exercise.setup = "load-data"}
 ggplot() + 
@@ -204,9 +204,9 @@ grade_this_code()
 
 ```{r storysetup4, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
 if (state_colleges_count <= 5) {
-  glue("And now you know which and where {stateName$State}'s colleges reside in this Cheap/Expensive vs Graduates Nobody/Everybody comparison.")
+  glue("And now you know which and where {stateName$State}'s colleges reside in this Cheap/Expensive vs. Graduates Nobody/Everybody comparison.")
 } else {
-  glue("And now you know which and where {stateName$State}'s colleges reside in this Cheap/Expensive vs Graduates Nobody/Everybody comparison. But let's be honest: is it kind of a mess? Do you even see all of them? Do you need that many labels on there? What you would normally do at this point is pick and choose who you label. Is is just the largest? Is it a specific set of schools? You probably don't want more than about 5 to avoid cluttering up your scatterplot.")
+  glue("And now you know which and where {stateName$State}'s colleges reside in this Cheap/Expensive vs. Graduates Nobody/Everybody comparison. But let's be honest: is it kind of a mess? Do you even see all of them? Do you need that many labels on there? What you would normally do at this point is pick and choose who you label. Is is just the largest? Is it a specific set of schools? You probably don't want more than about five to avoid cluttering up your scatterplot.")
 }
 ```
 

@@ -116,18 +116,18 @@ In this lesson, you'll learn about filtering data - a crucial skill for focusing
 
 ## What is Data Journalism?
 
-Chad Day's career has taken him from covering the night cops beat in Little Rock Arkansas to the Chief Elections Analyst for the Associated Press, going from data analysis about crimes in a mid-South city to the most consequential event in American democracy. Between those two things, he was part of team that won a Pulitzer Prize at the Wall Street Journal. 
+Chad Day's career has taken him from covering the night cops beat in Little Rock Arkansas to the chief elections analyst for the Associated Press, going from data analysis about crimes in a mid-South city to the most consequential event in American democracy. Between those two jobs, he was part of team that won a Pulitzer Prize at the Wall Street Journal. 
 
 So I asked him, how often does he work with data and not use group by, summarize, arrange and what this tutorial covers, filtering?
 
 "I think almost never," he said. "I mean, I do it all the time, right? There's never a time where I don't use it, I should say."
 
-Every data journalist I talked to said the same thing. 
+Every data journalist I talked to said the same. 
 
 There's an old expression in music that all you need is three chords and the truth to make a song. Data journalism is not that far off. I'd make the argument it's more like five chords, but those chords -- group by, summarize, arrange, filter and mutating -- are the foundation to nearly everything. 
 
 ```{r whatis, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
-glue("What is filtering? It focusing our data down to what we care about, what we're curious about, what we want to know. An example: Safe to say if we're working for a {stateName$State} news organization, we should focus on {stateName$State} data. People care about where they live. They do not care about what's going on a thousand miles away. They *really* care about what's going on their neighborhood, their city, their county and so on. With filtering, we can take a national dataset and focus it on where you live. In fact, behind the scenes, these tutorials have been using filtering all along so instead of somewhere else, you get {stateName$State} data.")
+glue("What is filtering? It focuses our data down to what we care about, what we're curious about, what we want to know. An example: Safe to say if we're working for a {stateName$State} news organization, we should focus on {stateName$State} data. People care about where they live. They do not care about what's going on a thousand miles away. They *really* care about what's going on their neighborhood, their city, their county and so on. With filtering, we can take a national dataset and focus it on where you live. In fact, behind the scenes, these tutorials have been using filtering all along so instead of somewhere else, you get {stateName$State} data.")
 ```
 
 ## The Basics
@@ -139,12 +139,12 @@ More often than not, we have more data than we want. Sometimes we need to be rid
 **Selecting simply returns only the fields named**. So if you only want to see School and Attendance, you select those fields. When you look at your data again, you'll have two columns. If you try to use one of your columns that you had before you used select, you'll get an error.  
 
 ```{r storysetup, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
-glue("Let's work on some examples using a dataset of rural investments made by the US Department of Agriculture. If you aren't from a rural place or state with lot of rural areas, a lot of small towns are shrinking. One of the reasons? A lack of housing in those places. There may be people or businesses that want to move to a small community but there aren't places for them to live. With this data, we can look at what the federal government is doing about that through the Department of Agriculture. 
+glue("Let's work on some examples using a dataset of rural investments made by the U.S. Department of Agriculture. If you aren't from a rural place or state with lot of rural areas, a lot of small towns are shrinking. One of the reasons? A lack of housing in those places. There may be people or businesses that want to move to a small community but there aren't places for them to live. With this data, we can look at what the federal government is doing about that through the Department of Agriculture. 
      
 What kind of money are we talking? In {stateName$State}, since 2019, the USDA has invested ${totalformatted} in rural business development, housing, energy and other areas.")
 ```
 
-First we'll need the tidyverse. Your first step is always loading libraries and you'll need to run this step in nearly every single thing you do.
+First we'll need the Tidyverse. Your first step is always loading libraries and you'll need to run this step in nearly every single thing you do.
 
 ```{r load-tidyverse, exercise=TRUE}
 library(tidyverse)
@@ -175,7 +175,7 @@ grade_this({
 glue("First things first, let's look investments in building houses in rural {stateName$State}. How do we go from {format(nrows, nsmall=1, big.mark=",")} rows of investments, which includes everything, down to just grants and loans for houses? We do that with `filter()` and some logic that at first will seem a little weird, but you'll get used to pretty quickly.") 
 ```
 
-That little weird bit is called a condition. A condition contains three parts: 1. A column name that has the information you're going to use to filter things. 2. A conditional operator. More on that in a second. And 3. The condition you want to use to filter. Is it a word -- like a state name? Or a number? This is where that goes.
+That little weird bit is called a condition. A condition contains three parts: 1. A column name that has the information you're going to use to filter things. 2. A conditional operator. More on that in a bit. And 3. The condition you want to use to filter. Is it a word -- like a state name? Or a number? This is where that goes.
 
 The new part here is the conditional operator. Most of the conditional operators you'll understand on sight. A few are a little different than you're used to, but not hard to understand. Here's a table of them. 
 
@@ -190,7 +190,7 @@ The new part here is the conditional operator. Most of the conditional operators
 
 The tough one to remember is equal to. In conditional statements, equal to is == not =. If you haven't noticed, = is a variable assignment operator, not a conditional statement. So equal is == and NOT equal is !=. You can also combine greater than and equal to. So, for instance, if you want all values that are 10 or greater, you can use >= 10, which is the same thing as > 9. Both will include 10 and everything greater. But one is more clear -- >= 10 -- and one is a trick. Always be clear. 
 
-What we want to do is look at all rows that exactly match "Single Family Homes". 
+What we want to do is look at all rows that exactly match "Single Family Housing". 
 
 First, let's use head to give us a peek at the data.
 
@@ -238,7 +238,7 @@ In Normal People Talk, we go to the grocery store and say "I would like donuts A
 
 To get both of them, what you really want is OR. Show me all grocery items that are a donut OR a cinnamon roll. That way, you go home with glazed donuts, frosted cinnamon rolls and our mythical cinnamon roll donut. 
 
-In the tidyverse, when you want AND, you use & and when you want OR you use |. We want all investments that are Single Family Housing OR Multifamily Housing. 
+In the Tidyverse, when you want AND, you use & and when you want OR you use |. We want all investments that are Single Family Housing OR Multifamily Housing. 
 
 ```{r filtering-wordy, exercise=TRUE, exercise.setup = "load-data"}
 ____ |> filter(program_area == "____" | program_area == "____")
@@ -389,7 +389,7 @@ investments |>
 grade_this_code()
 ```
 
-If you have truly massive data, `select` has tools to help you select fields that start_with the same things or ends with a certain word. [The documentation will guide you](https://dplyr.tidyverse.org/reference/select.html) if you need those someday. For 90 plus percent of what we do, just naming the fields will be sufficient. 
+If you have truly massive data, `select` has tools to help you select fields that `start_with` the same things or ends with a certain word. [The documentation will guide you](https://dplyr.tidyverse.org/reference/select.html) if you need those someday. For 90 plus percent of what we do, just naming the fields will be sufficient. 
 
 ## Top list
 
@@ -431,7 +431,7 @@ Editors love top 10 lists. Like catnip.
 
 ## The Recap
 
-Throughout this lesson, you've learned how to use filters to focus on specific parts of your dataset. You've practiced filtering with exact matches, using `grepl()` for partial matches, and filtering with lists. You've also learned how to chain multiple filters together and use `select()` to simplify your data view. Remember, filtering is a powerful tool that allows you to zoom in on the most relevant data for your story. As you continue your data journalism journey, you'll find these filtering techniques invaluable for uncovering specific trends and patterns within larger datasets.
+Throughout this lesson, you've learned how to use filters to focus on specific parts of your dataset. You've practiced filtering with exact matches, using `grepl()` for partial matches, and filtering with lists. You've also learned how to chain multiple filters together and use `select()` to simplify your data view. Remember, filtering is a powerful tool that allows you to zoom in on the most relevant data for your story. You'll find these filtering techniques invaluable for uncovering specific trends and patterns within larger datasets.
 
 ## Terms to Know
 

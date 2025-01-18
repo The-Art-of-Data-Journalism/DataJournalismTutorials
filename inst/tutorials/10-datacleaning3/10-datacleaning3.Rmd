@@ -55,7 +55,7 @@ totalkeychanges <- crashes |>
 ```
 ## The Goal
 
-In this lesson, you'll learn about advanced data cleaning techniques using text-cleaning techniques and the R package refinr. By the end of this tutorial, you'll understand how to use some text manipulation functions to merge similar text entries. You'll practice using different techniques and learn to critically evaluate the results. This skill is crucial for data journalists who often work with messy, real-world datasets that require careful standardization before analysis.
+In this lesson, you'll learn about advanced data cleaning techniques using text-cleaning and the R package refinr. By the end of this tutorial, you'll understand how to use some text manipulation functions to merge similar text entries. You'll learn to critically evaluate the results. This skill is crucial for data journalists who often work with messy, real-world datasets that require careful standardization before analysis.
 
 ## What is Data Journalism?
 
@@ -65,7 +65,7 @@ And then I learned that addresses were not stored in a standard way. However the
 
 What did that mean? 
 
-It meant the Lincoln Police Department came up with dozens of ways to say a single place. And since the mapping software needed the addressed to be in a specific form, I had to fix them. For example, I will go to my grave knowing that Lincoln High School's street address is 2229 J Street. Police officers wrote down LHS, L.H.S., Lincoln HS, Lincoln H.S., LHS (J Street), 2229 J, 2229 J ST, St., Street and on and on and on. That one was relatively easy. A local convenience store chain, with 8 locations around the city, was harder. I had to use the patrol district to locate them. 
+It meant the Lincoln Police Department came up with dozens of ways to say a single place. And since the mapping software needed the addresses to be in a specific form, I had to fix them. For example, I will go to my grave knowing that Lincoln High School's street address is 2229 J Street. Police officers wrote down LHS, L.H.S., Lincoln HS, Lincoln H.S., LHS (J Street), 2229 J, 2229 J ST, St., Street and on and on and on. That one was relatively easy. A local convenience store chain, with eight locations around the city, was harder. I had to use the patrol district to locate them. 
 
 It took me four months to clean up more than 30,000 unique addresses and map them. 
 
@@ -77,7 +77,7 @@ I tell you this because if I had OpenRefine, it would have taken me a week, not 
 
 ## The Basics
 
-Data cleaning is a series of logic puzzles. The logic is very simple: I have a goal. Most often that goal is to have all the like things together. The problem is always that someone did something to prevent that. The logic game you are playing is doing things to your text until all the like things match. No matter what it is you need done to the text, someone, somewhere has screwed that up before and a programmer wrote a function to fix it.
+Data cleaning is a series of logic puzzles. The logic is very simple: I have a goal. Most often that goal is to have all the like items together. The problem is always that someone did something to prevent that. The logic game you are playing is doing things to your text until all the like things match. No matter what it is you need done to the text, someone, somewhere has screwed that up before and a programmer wrote a function to fix it.
 
 Let's dig into some of them, using a version of the plane crash data we've worked with before. This time it's a special cut of the data -- it's national data, but a limited number of columns. It just makes it easier on everyone to have a smaller dataset. 
 

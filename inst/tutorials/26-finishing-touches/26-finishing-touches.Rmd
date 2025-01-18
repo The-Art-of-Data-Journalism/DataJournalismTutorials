@@ -28,13 +28,13 @@ In this lesson, you'll learn how to apply professional finishing touches to your
 
 ## Why Visualize Data?
 
-If you're a student of journalism, and you've taken your studies seriously, you've hopefully learned by now that often the most direct path to better writing is taking stuff out.
+If you're a student of journalism, and you've taken your studies seriously, you've learned by now that often the most direct path to better writing is taking stuff out.
 
 Focus on the main message. The point. The "give a shit factor" an old editor of mine used to call it. Then ruthlessly remove everything that doesn't focus directly on that. 
 
 A graphic is no different. 
 
-"Just as a good editor of prose ruthlessly prunes out unnecessary words, so a designer of statistical graphics should prune out in that fails to present fresh data-information," Tufte wrote in his 1983 work The Visual Display of Quantitative Information. "Although nothing can replace a good graphical idea applied to an interesting set of numbers, editing and revision are essential to sound graphical design work as they are to writing." 
+"Just as a good editor of prose ruthlessly prunes out unnecessary words, so a designer of statistical graphics should prune out ink that fails to present fresh data-information," Tufte wrote in his 1983 work The Visual Display of Quantitative Information. "Although nothing can replace a good graphical idea applied to an interesting set of numbers, editing and revision are essential to sound graphical design work as they are to writing." 
 
 Tufte's worldview on graphics can be described as minimalist. If it wasn't absolutely essential to the graphic, remove it. He wrote an entire chapter aiming his criticism at what he called Chartjunk -- unnecessary textures, flourishes, images and other distractions that took attention away from the data. 
 
@@ -50,17 +50,17 @@ The difference between a beginner and a professional graphic is a series of choi
 
 ## The Basics
 
-For the last two tutorials, we've been circling around the last bits you need to make a graphic into something publishable. With annotations, we learned about the need for additional text like headlines and chatter, as well as fixing the axis labels so a normal person can read it. We learned that every graphic needs the following to be reasonably complete:
+For the past two tutorials, we've been circling around the last bits you need to make a graphic into something publishable. With annotations, we learned about the need for additional text like headlines and chatter, as well as fixing the axis labels so an average person can read it. We learned that every graphic needs the following to be reasonably complete:
 
 * Headline
 * Chatter
-* The main body
+* Main body
 * Annotations
 * Labels
 * Source line
 * Credit line
 
-Here's a graphic from the New York Times, annotated: 
+Here's a graphic from The New York Times, annotated: 
 
 ```{r, echo=FALSE}
 knitr::include_graphics(rep("images/chartannotated.png"))
@@ -148,11 +148,11 @@ ggplot() +
 grade_this_code()
 ```
 
-The first thing you should do with any chart that isn't a waffle chart -- more on that later -- is remove the default plot look and grey background by adding a pre-defined theme. There are two you should use to clean your charts up: `theme_minimal` or `theme_light`. These pre-packaged themes do just that. They make your chart cleaner and easier to read in one swoop. 
+The first thing you should do with any chart that isn't a waffle chart -- more on that later -- is remove the default plot look and grey background by adding a pre-defined theme. There are two you should use to clean up your charts: `theme_minimal` or `theme_light`. These pre-packaged themes do just that. They make your chart cleaner and easier to read in one swoop. 
 
 **NOTE**: Adding a `theme()` is something you do last. And if you're going to change theme elements, you need to **apply your prepackaged theme first**, then do your theme customization. Everything in ggplot is rendered in order. If you do custom theming, THEN apply the prepackaged theme, the prepackaged theme will overwrite anything you did. So `theme_minimal()` or `theme_light()` comes first.
 
-### Exercise 1: Dump the grey background.
+### Exercise 1: Dump the grey background
 
 Scroll down here and add `theme_minimal()` at the very end. We're just adding it on, like any other part of ggplot.
 
@@ -224,7 +224,7 @@ Compare that to your previous chart. Easier to read, right?
 
 We're off to a good start, but our text has no real hierarchy. We want our headline to stand out more. So let's change that. When it comes to changing text, the place to do that is in the theme element. [There are a lot of ways to modify the theme](https://ggplot2.tidyverse.org/reference/theme.html). An overwhelming number of ways to modify a theme. The dirty secret is we only need a few. The rest you look up when the need arises.
 
-### Exercise 2: Bigger and bolder.
+### Exercise 2: Bigger and bolder
 
 We'll start easy. Let's make the headline bigger -- size 20 -- and bold. Scroll down here under theme_minimal and you'll see where this happens.
 
@@ -298,9 +298,9 @@ ggplot() +
 grade_this_code()
 ```
 
-Now let's fix a few other things -- like the axis labels being too big, the subtitle could be smaller and lets drop some grid lines. Let's make the subtitle 10, the axis labels 8. Scroll down and take a look.
+Now let's fix a few other issues -- like the axis labels being too big, the subtitle could be smaller and let's drop some grid lines. Let's make the subtitle 10, the axis labels 8. Scroll down and take a look.
 
-### Exercise 3: More text heirarchy.
+### Exercise 3: More text heirarchy
 
 ```{r finishing4, exercise=TRUE, exercise.setup = "finishing-load-data", message=FALSE}
 ggplot() + 
@@ -464,13 +464,13 @@ grade_this_code()
 
 Frequently in my classes, students use the waffle charts library quite extensively to make graphics. This is a quick walkthrough on how to get a waffle chart into a publication ready state. 
 
-Let's make a quick waffle chart using my most favorite silly dataset: Climate prognostications from groundhogs, other assorted animals, taxidermied animals and other objects from around the US. You thought Punxatawney Phil was the only one? Oh no. There were 73 others in 2024 who made a prediction on early spring vs longer winter. So what was the consensus? Let's visualize. 
+Let's make a quick waffle chart using my most favorite silly dataset: Climate prognostications from groundhogs, other assorted animals, taxidermied animals and other objects from around the United States. You thought Punxatawney Phil was the only one? Oh no. There were 73 others in 2024 who made a prediction on early spring vs. longer winter. So what was the consensus? Let's visualize. 
 
 ```{r waffle-load-data, message=FALSE, warning=FALSE}
 predictions <- c("Early Spring"=55, "Longer Winter"=19)
 ```
 
-We can add labels and themes, but you have to be careful. The waffle library is applying it's own theme -- like theme_minimal -- but if we override something they are using in their theme, some things that are hidden come back and make it worse. So here is an example of how to use ggplot's `labs` and the `theme` to make a fully publication ready graphic. They just get added with a + after the waffle.
+We can add labels and themes, but you have to be careful. The waffle library is applying its own theme -- like theme_minimal -- but if we override something they are using in their theme, some things that are hidden come back and make it worse. So here is an example of how to use ggplot's `labs` and the `theme` to make a fully publication ready graphic. They just get added with a + after the waffle.
 
 ```{r waffle1, exercise=TRUE, exercise.setup = "waffle-load-data", message=FALSE}
 waffle(
@@ -512,7 +512,7 @@ grade_this_code()
 
 But what if we're using a waffle iron? It gets tougher. 
 
-Here is a full example. I start with my waffle iron code, but note that each waffle is pretty much a self contained thing. That's because a waffle iron isn't really a thing. It's just a way to group waffles together, so you have to make each waffle individually. My first waffle has the title and subtitle and the x-axis label is the year. The bottom one has no title or subtitle but it does have the caption and the axis label has a little trick to add a return into the label, so I get both the team and the unit in there. 
+Here is a full example. I start with my waffle iron code, but note that each waffle is pretty much a self-contained thing. That's because a waffle iron isn't really a thing. It's just a way to group waffles together, so you have to make each waffle individually. My first waffle has the title and subtitle and the x-axis label is the year. The bottom one has no title or subtitle but it does have the caption and the axis label has a little trick to add a return into the label, so I get both the team and the unit in there. 
 
 ```{r waffle2, exercise=TRUE, exercise.setup = "waffle-load-data", message=FALSE}
 prediction24 <- c("Early Spring"=55, "Longer Winter"=19, 1)
@@ -580,7 +580,7 @@ Note: These finishing touches aren't optional. They're required of every graphic
 
 ## The Recap
 
-Throughout this lesson, you've mastered the art of refining your data visualizations for professional presentation. You've learned to apply clean themes, adjust text hierarchy, customize chart elements, and fine-tune layouts for both standard ggplot charts and waffle charts. Remember, these finishing touches are not just cosmetic - they're essential for effectively communicating your data story to your audience. Always consider how these final adjustments can enhance the clarity and impact of your visualizations.
+Throughout this lesson, you've mastered the art of refining your data visualizations for professional presentation. You've learned to apply clean themes, adjust text hierarchy, customize chart elements, and fine-tune layouts for both standard ggplot charts and waffle charts. Remember, these finishing touches are not just cosmetic - they're required for effectively communicating your data story to your audience. Always consider how these final adjustments can enhance the clarity and impact of your visualizations.
 
 ## Terms to Know
 

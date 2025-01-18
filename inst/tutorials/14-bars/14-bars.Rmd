@@ -166,7 +166,7 @@ Data visualization has become such an important skill in many different industri
 
 Good news: one of the best libraries for visualizing data is in the `tidyverse` and it threads that needle of making charts with very little code, but if you know how to customize your charts, you can make graphics that would run in any publication in the world.
 
-Let's revisit some data we've used in the past and turn it into bar charts. First, we need libraries. We're going to start by looking at community investments made by the USDA -- the same dataset we used in Chapter 5. Later, we're going to need some Census data, so to get that, we'll need `tidycensus` as well as the `tidyverse`. 
+Let's revisit some data we've used in the past and turn it into bar charts. First, we need libraries. We're going to start by looking at community investments made by the USDA -- the same dataset we used in Chapter 5. Later, we're going to need some census data, so to get that, we'll need `tidycensus` as well as the `tidyverse`. 
 
 ```{r load-tidyverse, exercise=TRUE}
 library(tidyverse)
@@ -252,12 +252,12 @@ glue("Let's look at what we have here. Did we get a list with a big number at th
 A question that should come with every comparison -- is it fair? Are the things we're comparing on the same footing? Is population a factor here? 
 
 ```{r storysetup3, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
-glue("Answer ... yep. It would make sense that the USDA would spend more money in places with more people, and less in places with fewer people. In some states, the difference between the largest {countyLanguage[2]} and the smallest can be more than 200 times. Texas may be the most extreme example. In Texas, Harris County -- home of Houston -- is home to 4.8 million people. Texas is also home to the smallest county in the US -- Loving County, population 43. That means Harris County is about 112,445 times larger than Loving County. The difference in any numbers comparing these things are going to be vast.")
+glue("Answer ... yep. It would make sense that the USDA would spend more money in places with more people, and less in places with fewer people. In some states, the difference between the largest {countyLanguage[2]} and the smallest can be more than 200 times. Texas may be the most extreme example. In Texas, Harris County -- home of Houston -- is home to 4.8 million people. Texas is also home to the smallest county in the nation -- Loving County, population 43. That means Harris County is about 112,445 times larger than Loving County. The difference in any numbers comparing these things are going to be vast.")
 ```
 
 How do we solve for this? We put things on a population basis. That might be a simple percentage. It might be a rate -- per person, per 10,000 people, per 100,000 people. But to do that, we need to add population numbers.
 
-Thankfully, you learned how to grab population estimates in the previous chapter, so we're going to get the 2023 estimates for your state using `tidycensus`. Remember -- here you use the postal code of your state to get that data. To speed matters along, we're going to chain a filter onto the end that narrows it down to just population estimates right on import.
+Thankfully, you learned how to grab population estimates in the previous chapter, so we're going to get the 2023 estimates for your state using `tidycensus`. Remember -- here you use the two-letter postal code of your state to get that data. To speed matters along, we're going to chain a filter onto the end that narrows it down to just population estimates right on import.
 
 ```{r census-read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
 estimates23 <- get_estimates(geography="county", vintage = 2023, state="____") |> 

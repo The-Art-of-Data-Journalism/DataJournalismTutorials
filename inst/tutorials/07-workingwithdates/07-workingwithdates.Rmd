@@ -110,19 +110,19 @@ In this lesson, you'll learn how to work with dates in R, a critical skill for d
 
 ## What is Data Journalism?
 
-Yanqi Xu, a reporter at the Flatwater Free Press in Omaha, Neb., started her road into data journalism through interactives. Starting out in grad school at the University of Missouri, it was multimedia and charts that moved and that you could click on that hatched an interest in code and data. 
+Yanqi Xu, a reporter at the Flatwater Free Press in Omaha, Neb., started her road into data journalism through interactives. In grad school at the University of Missouri, it was multimedia and charts that moved and that you could click on, which hatched her interest in code and data. 
 
 The real thunderclap moment for her came in a data journalism class -- her "third time trying to learn R."
 
-"And I realized, 'Oh, my God, like, there are so many problems I will be able to solve if I know how to, you know, manipulate strings, for example, clean text, and just use that, make a pivot table,'" she said. 
+"And I realized oh, my God, like, there are so many problems I will be able to solve if I know how to, you know, manipulate strings, for example, clean text, and just use that, make a pivot table," she said. 
 
-One of Xu's first stories was a story based largely around dates. The basic premise of the story: [Members of the parole board -- appointed by the governor -- weren't showing up for work.](https://flatwaterfreepress.org/the-full-nebraska-parole-board-appears-at-less-than-half-of-hearings-when-members-miss-votes-fewer-get-paroled/) In fact, the full board appeared in only half of meetings. The other half? Appointees making $85,000 in taxpayer-funded salaries didn't show. 
+One of Xu's first stories was based largely around dates. The basic premise of the story: [Members of the parole board -- appointed by the governor -- weren't showing up for work.](https://flatwaterfreepress.org/the-full-nebraska-parole-board-appears-at-less-than-half-of-hearings-when-members-miss-votes-fewer-get-paroled/) In fact, the full board appeared in only half of meetings. The other half? Appointees making $85,000 in taxpayer-funded salaries didn't show. 
 
 Since the story ran, legislators have passed new rules requiring them to be present. 
 
-The story started with spreadsheets of voting records made by people. What I mean by that is that each row wasn't a complete record. A human could look at the spreadsheet, see a date on the first row, and interpret that the date applied to all rows. Same for other bits of information. But as you've learned -- for data to be analyzed, each row must contain complete, and consistent data. 
+The story started with spreadsheets of voting records made by people. What I mean by that is each row wasn't a complete record. A human could look at the spreadsheet, see a date on the first row, and interpret that the date applied to all rows. Same for other bits of information. But as you've learned -- for data to be analyzed, each row must contain complete, and consistent data. 
 
-Xu spent hours reformatting information, transforming the structure of the data, and melding it back together. One of the first job was standardizing dates. 
+Xu spent hours reformatting information, transforming the structure of the data, and melding it back together. One of the first jobs was standardizing dates. 
 
 The tools she used are the same you'll learn here. And don't worry -- she doesn't remember the exact details of each date function either. She does what lots of people do: Make a cheatsheet.
 
@@ -154,7 +154,7 @@ grade_this_code()
 
 For this, we're going to look at a dataset from the National Transportation Safety Board, which is a database of all airplane crashes since 2019. The irony here is that this dataset, when you download it from the NTSB, has properly formatted dates. Every dataset I could find that had bad dates was too large to efficiently use in this tutorial. 
 
-Planes crash -- and small planes crash far more often than big planes. Commercial airline crashes are exceedingly rare -- years can go by in the US between major airline crashes. Every state has a number of small plane crashes every year. If you work as a breaking news reporter, you will very likely have to cover a small plane crash at some point. Having this data, or knowing where it is to get it quickly on deadline, can add depth and context to a breaking news story about a pilot injured in a botched landing. 
+Planes crash -- and small planes crash far more often than big planes. Commercial airline crashes are exceedingly rare -- years can go by in the United States between major airline crashes. Every state has a number of small plane crashes every year. If you work as a breaking news reporter, you will very likely have to cover a small plane crash at some point. Having this data, or knowing where it is to get it quickly on deadline, can add depth and context to a breaking news story about a pilot injured in a botched landing. 
 
 Questions you can ask: How many crashes are there in a year? Is this year worse or better than last year? Is there a seasonal element to crashes in your state? I live in the Midwest, where spring winds are no joke and early summer thunderstorms can get pretty wild. Warm winter states might get an influx of older pilots who might need to hang it up. You won't know until you look. 
 
@@ -189,7 +189,7 @@ At the bottom of the data, you'll see a column called first_bad_date. See how it
 
 ### Exercise 1: Formatting the date
 
-To walk through this, we're going to use `mutate` to create a new column. Why not just overwrite our original column? It's good practice never to delete or overwrite data. What do you have to compare it to and how will you know you did it correctly if you overwrite it? We'll name that new column `clean_date`. It's a habit I picked up where when I clean a column, I name it clean_originalcolumnname. Helps keep track of which is original and which has been modified. 
+To walk through this, we're going to use `mutate` to create a new column. Why not just overwrite our original column? It's good practice never to delete or overwrite data. What do you have to compare it to and how will you know you did it correctly if you overwrite it? We'll name that new column `clean_date`. It's a habit I picked up where when I clean a column, I name it clean_originalcolumnname. This helps keep track of which is original and which has been modified. 
 
 Then, we're going to use the `as.POSIXct` function. That function parses -- splits -- text into dates. It takes two inputs: First, what column are you parsing? Second, what is the `format`? That format can get really complicated, but look at one of the dates and times we have. You have things like `1/19/2023`. So we can see the format of the date we have. It's the month, with just one number, then the day, then the four-digit year. And all of it with slashes between those things.
 
@@ -298,7 +298,7 @@ There's lots of ways in programming to pull text apart and put it back together 
 
 For example, if we wanted to know how many crashes happened each month, we could use formatting to create a Month field but that would group all the Aprils together, regardless of if they were in 2022 or 2021. We could create a year and a month together, but that would give us an invalid date object and that would create problems later. What `lubridate` does with floor_date is takes all the dates in April and makes the floor date April 1 of that year. Then does it for all the other months. So you get a properly formatted date -- which will be important later when we want to graph this -- and a way to count crashes by month. 
 
-Or year. Which is what we're going to do here. 
+Or year. This is what we're going to do here. 
 
 To do this, we first have to have a date column R understands. To do that, we're just going to do the same thing we just did in Exercise 1. We're going to make `clean_date` and use a `lubridate` function to reformat `first_bad_date`. Then, in the first next line, we're going to make our `floor_year`. All we need to tell the `floor_date` function is what the name of our real, fixed, properly formatted date column that we just made is named, and what floor we want to set. 
 

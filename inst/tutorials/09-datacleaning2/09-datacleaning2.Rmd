@@ -116,9 +116,9 @@ Your question -- what you want to do with the data -- is almost never part of th
 
 So cleaning data is the process of fixing issues in your data so you can answer the questions you want to answer. Unfortunately, there's no template here. There's no checklist. It's just a big bag of tricks that eventually runs out and you'll be left fixing individual issues by hand, if it's really bad.
 
-But let's start simple. There are certain things that need we can start with that will make our lives easier. We'll slowly make it harder as we dig deeper.
+But let's start simple. There are certain tricks that we can start with to make our lives easier. We'll slowly make it harder as we dig deeper.
 
-One of the first places we can start with cleaning data is cleaning the headers. Every system has their own way of recording headers, and every developer has their own thoughts of what a good idea is within it. R is most happy when headers are one word, lower case, without special characters. Without telling you, I've been fixing these headers behind the scenes before you get the data. No more. Today, you're going to notice that the `tidyverse` has output columns that have spaces or start with numbers or have special characters in them with backticks around headers. So a column name like Incident Date, is going to look like \`Incident Date\` because of the space. Headers that start with numbers or are just a number -- 2002 -- also get backticks in the `tidyverse`. 
+One of the first places we can clean data is cleaning the headers. Every system has their own way of recording headers, and every developer has their own thoughts of what a good idea is within it. R is most happy when headers are one word, lower case, without special characters. Without telling you, I've been fixing these headers behind the scenes before you get the data. No more. Today, you're going to notice that the `tidyverse` has output columns that have spaces or start with numbers or have special characters in them with backticks around headers. So a column name like Incident Date, is going to look like \`Incident Date\` because of the space. Headers that start with numbers or are just a number -- 2002 -- also get backticks in the `tidyverse`. 
 
 There is an external library in R called `janitor` that makes fixing headers trivially simple. You should already have it, but if you don't, you can install it by running `install.packages("janitor")` in your console. 
 
@@ -136,7 +136,7 @@ library(janitor)
 grade_this_code()
 ```
 
-Now we load our data. I'm writing this chapter during the last few months of the 2024 Presidential Election, though it seems like elections never stop these days. A common thing journalists do during elections? Fact check things that come up during the campaigns. A common trope in elections are claims that government has become too big, too bloated, too expensive. Your first thought, as a reporter, should be simply: Has it? A way to check? The United State Census Bureau. The same people who count people and estimate populations between counts do a ton of other enumerations in and around American society. One is the annual survey of governments, where the Census Bureau asks every government -- state, county, city, school district -- how many people they employ and what their payroll is. It's a fantastic dataset for comparing your community to others like it, in your state and in the nation. Got a mayoral candidate claiming the city has tripled the number of people working there and is out of control? You can check that. 
+Now we load our data. I'm writing this chapter during the last few months of the 2024 Presidential Election. A common task for journalists during elections? Fact-checking. A common trope in elections are claims that government has become too big, too bloated, too expensive. Your first thought, as a reporter, should be simply: Has it? A way to check? The U.S. Census Bureau. The same agency who counts people and estimate populations between counts do a ton of other enumerations in and around American society. One is the annual survey of governments, where the Census Bureau asks every government -- state, county, city, school district -- how many people they employ and what their payroll is. It's a fantastic dataset for comparing your community to others like it, in your state and in the nation. Got a mayoral candidate claiming the city has tripled the number of people working there and is out of control? You can check that. 
 
 We get this data the same way we have all along -- fill in your state, all lowercase letters, dashes for spaces. 
 
@@ -167,7 +167,7 @@ glimpse(governments)
 grade_this_code()
 ```
 
-The second column name tells you a lot of what the problems are. First, notice the backticks. That's the key next to the 1 key on your keyboard. That is not an apostrophe. But you've got a mix of capitals and lowercase and spaces. If you wanted to use this column in a filter, it would look like this: `governments |> filter(\`Type of Government\` == "State")` That's a lot of extra things to go wrong -- did you capitalize correctly, did you use backticks, is that a capial O or lowercase o in of? It would be better if we could simplify this and reduce the number of places where we could go wrong.
+The second column name tells you a lot of what the problems are. First, notice the backticks. That's the key next to the 1 key on your keyboard. That is not an apostrophe. But you've got a mix of capitals and lowercase and spaces. If you wanted to use this column in a filter, it would look like this: `governments |> filter(\`Type of Government\` == "State")` That's a lot of extra things to go wrong -- did you capitalize correctly, did you use backticks, is that a capital O or lowercase o in the word of? It would be better if we could simplify this and reduce the number of places where we could go wrong.
 
 Janitor makes this easy to fix. How easy? This easy. Janitor has a function called `clean_names()`. That's it. 
 
@@ -183,13 +183,13 @@ governments |> clean_names()
 grade_this_code()
 ```
 
-Just like that, all lower case, all one word, no backticks necessary to confuse our code later on. 
+Just like that, all lowercase, all one word, no backticks necessary to confuse our code later on. 
 
 ### Exercise 2: Dropping empty columns
 
-Another thing janitor does well is to make it easy to drop empty columns and rows. Sometimes columns are in the data and there's nothing in them. Nada. Blank. Rarer, but still possible: Rows of blank data. We could use `select` and `filter` but janitor reduces the labor involved there.
+Another good trick by janitor is easily dropping empty columns and rows. Sometimes columns are in the data and there's nothing in them. Nada. Blank. Rarer, but still possible: Rows of blank data. We could use `select` and `filter` but janitor reduces the labor involved.
 
-Because this is data from the Census Bureau, an agency who exists to create data, we have a minimum of weirdness to deal with. But a good plan when you begin working with data is to inspect if after you import it and then apply `janitor` functions to clean it up. `janitor` has a function called `remove_empty()` where you have to specify which of `rows` or `cols` you want to remove. If they're empty, why have them at all? This won't remove anything, but this is how you would if you needed to:
+Because this is data from the Census Bureau, an agency who exists to create data, we have a minimum of weirdness to deal with. But a good plan when you begin working with data is to inspect the data after you import it, and then apply `janitor` functions to clean it up. `janitor` has a function called `remove_empty()` where you have to specify which of `rows` or `cols` you want to remove. If they're empty, why have them at all? This won't remove anything, but this is how you would if you needed to:
 
 ```{r remove-data, exercise=TRUE, exercise.setup = "load-data"}
 governments |> 
@@ -268,9 +268,9 @@ Throughout this lesson, you've learned several key data cleaning techniques usin
 ## Terms to Know
 
 - `janitor`: An R package designed to simplify data cleaning tasks.
-clean_names(): A janitor function that standardizes column names to lowercase, removes spaces and special characters.
-remove_empty(): A janitor function that removes empty rows, columns, or both from a dataset.
-tabyl(): A janitor function that creates a frequency table of unique values in a column.
-Data cleaning: The process of identifying and correcting errors or inconsistencies in datasets.
-Duplicates: Multiple identical records in a dataset that may skew analysis results.
-Data consistency: The uniformity and reliability of data across a dataset.
+- `clean_names()`: A janitor function that standardizes column names to lowercase, removes spaces and special characters.
+- `remove_empty()`: A janitor function that removes empty rows, columns, or both from a dataset.
+- `tabyl()`: A janitor function that creates a frequency table of unique values in a column.
+- Data cleaning: The process of identifying and correcting errors or inconsistencies in datasets.
+- Duplicates: Multiple identical records in a dataset that may skew analysis results.
+- Data consistency: The uniformity and reliability of data across a dataset.

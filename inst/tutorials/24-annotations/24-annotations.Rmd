@@ -25,7 +25,7 @@ tutorial_options(exercise.completion=FALSE)
 
 In this lesson, you'll learn about the critical role of text elements in creating effective data visualizations for journalism. By the end of this tutorial, you'll understand how to craft compelling headlines, write informative subtitles, add clear axis labels, and use strategic annotations to guide readers through your charts. You'll practice applying these text elements to a scatterplot, gaining hands-on experience in transforming raw data into a story-driven visualization. These skills will enable you to create more impactful and informative graphics that effectively communicate your data stories to readers.
 
-## Why Visualize Data
+## Why Visualize Data?
 
 In 2016, a group of Harvard and MIT researchers set out to answer a set of what seems like simple questions: What gets people's attention when looking at a chart? And what do they remember? 
 
@@ -36,7 +36,7 @@ That's right: Words. Not shapes or colors. Words. When you track people's eyes, 
 "When participants were shown visualizations with titles during encoding, the titles were fixated 59% of the time," according to [Borkin et. al](http://olivalab.mit.edu/Papers/07192646.pdf). "Correspondingly, during the recall phase of the experiment, titles were the element most likely
 to be described if present."
 
-So not only is the title the thing people are looking at first, it's the title that acts as an anchor to memory. 
+So not only is the title what people are looking at first, it's the title that acts as an anchor to memory. 
 
 In short: the headline (or title depending on who you are asking) is incredibly important. In video storytelling, there's an old saying: If you have bad audio, you have bad video. A similar saying here could be this: if you have a bad title, you have a bad graphic.
 
@@ -48,7 +48,7 @@ Just be careful what you're imprinting.
 
 ## The Basics
 
-We started down this road a bit in the tables tutorial, but repeating some important stuff from that, text is a vital part of a good graphic. Some text is absolutely required. 
+We started down this road a bit in the tables tutorial, but let's repeat some important stuff from that. Text is a vital part of a good graphic. Some text is absolutely required. 
 
 These are the pieces of a good graphic:
 
@@ -60,7 +60,7 @@ These are the pieces of a good graphic:
 -   Source line
 -   Credit line
 
-The first on that list is the first for a reason. The headline is an incredibly important part of any graphic: it's often the first thing a reader will see. It's got to entice people in, tell them a little bit about what they're going to see, and help tell the story.
+The first on that list is the first for a reason. The headline is an incredibly important part of any graphic. It's often the first thing a reader will see. It's got to entice people in, tell them a little bit about what they're going to see, and help tell the story.
 
 The second item is the chatter -- the text underneath that headline. It needs to work with the headline to further the story, drive people toward the point, maybe add some context.
 
@@ -94,7 +94,7 @@ natstats <- national |>
   )
 ```
 
-The data and the chart code isn't important for you to follow along. The code is nothing special -- it's a riff off of work we've done before. Under the hood, I've loaded up all colleges and universities, and we're going to look at comparing how exclusive a school is vs how much it costs.
+The data and the chart code isn't important for you to follow along. The code is nothing special -- it's a riff off of work we've done before. Under the hood, I've loaded up all colleges and universities, and we're going to look at comparing how exclusive a school is vs. how much it costs.
 
 Let's bring up the scatterplot with an odd group of schools -- colleges that admit fewer than 20 percent of applicants, but cost less than $50,000 a year to attend -- as a starting place.
 

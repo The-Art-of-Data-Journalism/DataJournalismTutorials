@@ -192,13 +192,13 @@ At the center of that database is a table -- a dataframe, if you will. In that t
 
 Ever checked out a book at the campus library? When they scanned your card, a database recorded what book you checked out and used your Student ID number to relate back to the student table, where your name is. Somewhere, there's a table of all the classes you took. Is your name, date of birth, home address and all that information attached to *every* class you took? No. But your student ID number is, and that's so it can be related back. That same class table is also related to the table of tuition bills, and I *guarantee* that one is connected to your name. 
 
-Relational databases are very useful and are literally everywhere in the digital world. What made them so appealing back in the 1970s and 80s when they took off -- you weren't storing any more data than you needed. Back in the day, storage was **expensive**. Storing a single iPhone photo would cost hundreds of thousands of dollars in the 1970s. The storage you have on your iPhone would make you 1 percenter level rich if you went back in time.
+Relational databases are very useful and are literally everywhere in the digital world. What made them so appealing back in the 1970s and 80s when they took off? Well, you weren't storing any more data than you needed. Back in the day, storage was **expensive**. Storing a single iPhone photo would cost hundreds of thousands of dollars in the 1970s. The storage you have on your iPhone would make you 1 percenter level rich if you went back in time.
 
-Storage, now, today, in our time, is cheap. We don't have to worry about these things, but some government databases have been around for decades. The cost to update them for modern computing is far more expensive than it's worth. As such, you're likely to run into relational databases in your work as a data journalist. 
+Storage, now, today, in our time, is cheap. But, some government databases have been around for decades. The cost to update them for modern computing is far more expensive than it's worth. As such, you're likely to run into relational databases in your work as a data journalist. 
 
 One such database is the Fatality Analysis Reporting System (or FARS) from the National Highway Traffic Safety Administration. Every year since 1975, NHTSA -- pronounced "Nit-Sah" by transportation nerds -- has gathered data on every fatal car crash in the United States. A mind-boggling amount of information is available about each and every crash that killed someone going back a long time. And that data has been used by traffic engineers to make cars and the roads they drive on safer. 
 
-In 2002, I used FARS data to write about a stretch of highway in Pasco County, Florida that is one of the nations most deadly places to walk across the street. I looked at deaths from 1990-2000 and wrote this section of that story:
+In 2002, I used FARS data to write about a stretch of highway in Pasco County, Florida, which is one of the nation's most deadly places to walk across the street. I looked at deaths from 1990-2000 and wrote this section of that story:
 
 >  Who dies on U.S. 19, when they die and where they die follow distinct patterns. A Times analysis of data from 1990 to 2000 found that most are middle aged men who try to cross the road . . .
   * At night (88 percent).
@@ -211,7 +211,7 @@ After the story ran, the county added lighting, signs and more crosswalk signage
 
 How did I find all that out? Joining tables together.
 
-First we'll start with libraries. We'll need the tidyverse.
+First we'll start with libraries. We'll need the Tidyverse.
 
 ```{r load-tidyverse, exercise=TRUE}
 library(tidyverse)
@@ -297,7 +297,7 @@ Joining in dplyr is easiest when the column names you want to join are the same.
 
 ### Exercise 1: joining the hard way
 
-The hard way, in spite of it's name, isn't that hard. We just have to tell the `inner_join` what column from our left data (accidents) is going to match what column from our right data (people). So we're going to put accidents on the left -- that would be the first position -- and people on the right. Remember: the common column between them that we'll use is ST_CASE. *Both* side have this one column. 
+The hard way, in spite of it's name, isn't that hard. We just have to tell the `inner_join` what column from our left data (accidents) is going to match what column from our right data (people). So we're going to put accidents on the left -- that would be the first position -- and people on the right. Remember: the common column between them that we'll use is ST_CASE. *Both* sides have this one column. 
 
 ```{r join1, exercise=TRUE, exercise.setup = "load-data"}
 accidents |>

@@ -121,15 +121,15 @@ In this lesson, you will learn about aggregates ... again. Just like the last tu
 
 ## What is Data Journalism?
 
-Ben Welsh, the News Applications Editor at Reuters, has been in the game a long time. He learned data journalism as a student, as a reporter and later a graphics and data editor. He was part of the movement of data journalism to expand from reporters who know data to reporters who know code and build websites. 
+Ben Welsh, the news applications editor at Reuters, has been in the game a long time. He learned data journalism as a student, as a reporter and later a graphics and data editor. He was part of the movement of data journalism to expand from reporters who know data to reporters who know code and build websites. 
 
-The one thing data journalists across the country know him for is his First Notebook class, which is packed every year at NICAR. There's a waiting list to get in most years. People travel, often on their own dime, to sit in a conference room of a hotel in a city somewhere for 8-hours to learn how to write code that does basic data analysis. Why? Because he's good at it, that's why. 
+The one thing data journalists across the country know him for is his First Notebook class, which is packed every year at the NICAR conference. There's a waiting list to get in most years. People travel, often on their own dime, to sit in a conference room of a hotel in a city somewhere for eight hours to learn how to write code that does basic data analysis. Why? Because he's good at it, that's why. 
 
-For Ben, a news application or a data-driven investigation have a logic to them.
+For Welsh, a news application or a data-driven investigation have a logic to them.
 
-"I often think about (them) as kind of pipelines, that are in a sequential order trying to take, or in assembly lines, that are trying to take the raw materials of data that we're gathering from the world or wherever else, and we're refining it and cleaning it and preparing it and simplifying it and summarizing it so that we can create the manufactured good," he said. "A refined piece of information that's ready for people to buy, to consume, and it's something that they want, right? 
+"I often think about (them) as kind of pipelines, that are in a sequential order trying to take, or in assembly lines, that are trying to take the raw materials of data that we're gathering from the world or wherever else," he said. "We're refining it, cleaning it, preparing it, simplifying it and summarizing it so that we can create the manufactured good. A refined piece of information that's ready for people to buy, to consume, and it's something that they want, right? 
 
-"And those information factors, those pipelines that do that data delivery, are nothing but a collection of these very basic fundamental tools that you're trying to teach, which is how do I get data in and read it out? How do I turn it around and change its shape and summarize and aggregate it into something that's separate?"
+"Those information factors, those pipelines that do that data delivery, are nothing but a collection of these very basic fundamental tools that you're trying to teach, which is how do I get data in and read it out? How do I turn it around and change its shape and summarize and aggregate it into something that's separate?"
 
 Sensing a pattern yet? You should. They're everywhere in these tutorials. But one that should become very clear in what follows is that simple things like grouping things together and calculating up a number is very easy and very powerful. 
 
@@ -189,7 +189,7 @@ Things to note here -- we're going to look at some numbers for each county. So y
 
 ### Exercise 2: Group by and count ... and more
 
-In the last tutorial, we grouped and counted. We should do that again -- it's useful to know how many homes are in a county when you're calculating other numbers. But this time, we're going to not just count the homes, we're going to total up the number of beds in a county. This sounds like a silly number if you've never had to think about it, and until the pandemic, most people never thought about how many nursing home beds there were in a county. But one group of people who were particularly hit hard by the early days of the pandemic were nursing home residents. It might seem kind of pointless to do this today, but you just never know when you are going to need this.
+In the last tutorial, we grouped and counted. We should do that again -- it's useful to know how many homes are in a county when you're calculating other numbers. But this time, we're going to not just count the homes, we're going to total up the number of beds in a county. This sounds like a silly number if you've never had to think about it, and until the pandemic, most people never thought about how many nursing home beds there were in a county. But one group of people who were particularly hit hard by the early days of the pandemic were nursing home residents.
 
 And the critical idea here is the **difference between a count and a sum**. You learned how to count before you went to school -- 1, 2, 3, 4. But if I said what is the sum of those numbers, you wouldn't say 4. 1+2+3+4 = 10. It seems silly, but you'd be surprised how many people get too far into worrying about code and forget this distinction. 
 
