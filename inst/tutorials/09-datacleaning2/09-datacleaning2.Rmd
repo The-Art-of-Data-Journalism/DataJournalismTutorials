@@ -104,7 +104,19 @@ In this lesson, you'll learn how to use the janitor package to clean and standar
 
 ## What is Data Journalism?
 
-More to come here.
+Janitor is one of those R packages that honestly, I never knew I needed until I *really* needed it. Now it's one of the packages I use the most. 
+
+What does `janitor` do? Think of it like a Swiss Army Knife of data cleaning. It's got a knife, some scissors, a file, a bottle opener, and on and on. Do they all go together? It doesn't seem like it until you're camping and having all of those things in a small package is really handy. 
+
+Enter `janitor`. Someday, you'll get a dataset with 300 *columns* of data and most of them have names that don't conform to R's conventions. Names like "1st Quarter 2024 Actual" or "2024 Estimated Revenue". Spaces, numbers, symbols -- a horrorshow. And `readr` will dutifully read that, but using those column names in a filter query is a pain. 
+
+What if you could fix them all at once? You can with `janitor`. It has a `clean_names()` function that does this. 
+
+Did you get some funky spreadsheet from a government entity with lots of blank rows and columns? Janitor can remove columns with no data in them automatically. 
+
+Using R to try and read in hundreds of spreadsheets programmatically, but those spreadsheets put the header row on line 6 instead of line 1 like you're supposed to? `janitor` can handle that. 
+
+And a lot more. Let's explore.
 
 ## The Basics
 

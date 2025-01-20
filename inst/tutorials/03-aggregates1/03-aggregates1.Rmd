@@ -130,7 +130,7 @@ So what kind of stories can you do with that?
 
 "How many car crashes there were and how many were in this county versus that county?" she said. "How many were this year versus that year? Very simple count. You're just counting."
 
-It's hard to explain to people who have never worked with data how important the simple act of count is. Almost every data story you will ever work on will have a count in them -- either one you will do or one done for you before you get the data. Almost every data story can be summarized into a few questions:
+It's hard to explain to people who have never worked with data how important the simple act of counting is. Almost every data story you will ever work on will have a count in them -- either one you will do or one done for you before you get the data. Almost every data story can be summarized into a few questions:
 
 - How many of this thing are there where I live?
 - How many of those things were there last year? Or five years ago?
@@ -372,7 +372,7 @@ Grouping and counting is such a common thing that there's multiple shortcuts to 
 
 Let's redo our count by `county_parish` from exercise 2 and 3. First, we'll just count them. Then, we'll use a shortcut in tally to arrange them with less code. 
 
-### Exercise 4: Tally
+### Exercise 5: Tally
 
 ```{r group-by-4, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
 homes |>
@@ -392,7 +392,7 @@ grade_this_code()
 
 As you can see -- very similar results to exercise 2, except this time, instead of total, our count of homes is called n. But what if you want them arranged? You could add an arrange here like you did before. But the developers of tally knew you wanted to do that -- everyone does -- so they added a shortcut in tally to help you. In `tally()`, you just need to set a sort equal to TRUE -- all caps. What that means is yes, I want it sorted.
 
-### Exercise 5: Tally, but arranged this time
+### Exercise 6: Tally, but arranged this time
 
 ```{r group-by-5, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
 homes |>
