@@ -114,8 +114,6 @@ top15 <- totalinvestments |>
     desc(investment_dollars_per_person)
   ) |> 
   top_n(15, wt=investment_dollars_per_person)
-
-
 ```
 ## The Goal
 
@@ -375,7 +373,7 @@ Note the `ungroup()` in the code. For `top_n` to work, it can't have grouped dat
 
 <div class="alert alert-warning"> 
 <h4 class="alert-heading">Common Mistake</h4> 
-<p class="mb-0"><code>top_n<code/> not working right? Try ungrouping before you use it.</p>
+<p class="mb-0">top_n not working right? Try ungrouping before you use it.</p>
 </div>
 
 At long last, we're ready to make bar charts. 
