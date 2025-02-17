@@ -292,7 +292,7 @@ But you're not done with `lubridate` yet. It has some interesting pieces parts w
 
 Let's start with the question of how many plane crashes happen each year.  
 
-### Exercise 3: Floor dates
+### Exercise 4: Floor dates
 
 There's lots of ways in programming to pull text apart and put it back together again. Could we search our date column and find a four-digit year and create a new column out of that and call it year? Sure we could. But `lubridate` has a function in it called a `floor_date` that does this. We can put all the weeks, months, quarters and seasons together with a little trick.
 
