@@ -130,6 +130,8 @@ What we need to be able to tell `read_excel` is that it should just ignore those
 
 Handy enough: `read_excel` and `read_csv` both have a `skip` parameter. You can tell it to skip a certain number of rows. Our header row is in row 4, so we need to skip how many rows?
 
+### Exercise 1: Skipping
+
 ```{r load-data2-exercise, exercise = TRUE, exercise.reveal_solution = FALSE}
 emitters <- read_excel("data/ghgp_data_2022.xlsx", ____ = ____)
 ```
@@ -143,6 +145,8 @@ grade_this_code()
 Now we're getting something else we haven't seen -- import errors. What that is saying is based on the first 1,000 rows, `read_excel` is expecting one type of data, but it's getting a different kind. That might mean the first 1,000 rows were numbers, but now there's text in the column and that's creating problems. It might mean the first 1,000 rows had good dates and now they've gone bad. The point is, the guesses are wrong. 
 
 Sometimes this is a major problem, sometimes this can be solved by just giving it more rows to guess with. Good news: both `read_excel` and `read_csv` have a `guess_max` parameter where you can give it however many rows you want it to use to guess. The default is 1,000. Our data has almost 7,000 rows. How about we try giving it 5,000 rows to guess with?
+
+### Exercise 2: Guessing
 
 ```{r load-data3-exercise, exercise = TRUE, exercise.reveal_solution = FALSE}
 emitters <- read_excel("data/ghgp_data_2022.xlsx", skip = ____, guess_max = ____)
@@ -161,6 +165,8 @@ One last thing we can do that we haven't done before -- there is nothing stoppin
 Sometimes, adding a little more to your read step will make your life a lot easier later. You probably haven't noticed because we haven't really looked, but some of the column names in this data are really gnarly from the standpoint of the `tidyverse`'s rules about naming columns. For example, one column is called "Total reported direct emissions" which has four spaces in it that are no good. Another is "CO2 emissions (non-biogenic)", which adds parens to our column name. 
 
 Good thing you learned about `clean_names()` in Chapter 9. That would come in really handy here.
+
+### Exercise 3: Cleaning
 
 ```{r load-data4-exercise, exercise = TRUE, exercise.reveal_solution = FALSE}
 emitters <- read_excel("data/ghgp_data_2022.xlsx", skip = ____, guess_max = ____) |> 
