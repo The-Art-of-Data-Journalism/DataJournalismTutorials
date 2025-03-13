@@ -245,6 +245,9 @@ grade_this({
 })
 ```
 
+
+### Exercise 1: Making impact
+
 Now, to speed things up, we're going to create a dataframe called `impact` that is going to do everything we did to prepare our bar charts before, but in one block. We're going to total up investments in each county, join the census data to it, mutate a new `investment_dollars_per_person` column and use `top_n` to get the top 15 counties most impacted by these investments. It might *seem* like a lot of code, but it's all things you've already done, just stacked together instead of pulled apart into steps.
 
 ```{r join-data, exercise=TRUE, exercise.setup = "load-data"}
@@ -287,6 +290,8 @@ grade_this_code()
 
 Now, our data is currently just county totals with a new measure of impact. And that's fine for bar charts, but for stacked bar charts we're looking at **categories** of our data within each county. One thing you want to be careful about is the *number* of categories you include. Rule of thumb? About the max you want to look at is 5. Any more than that and you're going to have a lot of colors to manage and it's hard to interpret what is going on. 
 
+### Exercise 2: Two groups
+
 Our original `investments` data has a column called `program_area` that we've looked at before in the filtering chapter. There, we looked at investments in housing. But here, since we're interested in all of the categories, it would be useful for us to create a summary of dollars in each county AND each program area. See if you can re-interpret how I said that into code.
 
 
@@ -316,8 +321,9 @@ glue("So what's left to do? Note we have long data for *every* {countyLanguage[1
 
 Joining. Remember: we have a dataframe called `impact` and it has stuff we need in it. Another thing to remember from the joining chapter -- when we use `inner_join`, it keeps all rows that match from **both** dataframes. Meaning if we use `inner_join`, we'll get all rows from our program_areas group by work *and* a row that matches the county name from our top 15. We *won't* get places that *aren't* in the top 15. 
 
-While we're at this, we're going to store this in a new dataframe called `stacked`.
+### Tutorial exercise 3: Joining
 
+While we're at this, we're going to store this in a new dataframe called `stacked`.
 
 ```{r join3-data, exercise=TRUE, exercise.setup = "load-data"}
 ____ <- investments |> 
@@ -361,6 +367,8 @@ More often than not with stacked bar charts, what you need to make each bar and 
 
 How do we give each segment a new color? We're going to add a new thing to our bar chart called the `fill`. It does what you think -- fills in the bar with a color for each program area in that county. 
 
+### Tutorial Exercise 4: The stacked bar
+
 ```{r bar1, exercise=TRUE, exercise.setup = "load-data"}
 ggplot() + 
   geom_bar(data=stacked, aes(x=____, weight=____, fill=____))
@@ -374,6 +382,8 @@ grade_this_code()
 ```
 
 And just like that, we've made a stacked bar chart. But just like our first, bar chart, it needs help to be readable. What we did last time works here too, but we're going to add one wrinkle. Last time, we reordered by the same number in our weight. In this case, we want the bars to be in order of `total_dollars`, not `program_dollars`. Think of it this way -- the `total_dollars` determines the total size of the bar. The `program_dollars` determines the size of each segment. And we'll throw a `coord_flip()` on the end to make it more readable.
+
+### Tutorial exercise 5: Flipping
 
 ```{r bar2, exercise=TRUE, exercise.setup = "load-data"}
 ggplot() + 
