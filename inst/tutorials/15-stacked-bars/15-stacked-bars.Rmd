@@ -383,7 +383,7 @@ grade_this_code()
 
 And just like that, we've made a stacked bar chart. But just like our first, bar chart, it needs help to be readable. What we did last time works here too, but we're going to add one wrinkle. Last time, we reordered by the same number in our weight. In this case, we want the bars to be in order of `total_dollars`, not `program_dollars`. Think of it this way -- the `total_dollars` determines the total size of the bar. The `program_dollars` determines the size of each segment. And we'll throw a `coord_flip()` on the end to make it more readable.
 
-### Tutorial exercise 5: Flipping
+### Tutorial exercise 5: Reorder and Flipping
 
 ```{r bar2, exercise=TRUE, exercise.setup = "load-data"}
 ggplot() + 
