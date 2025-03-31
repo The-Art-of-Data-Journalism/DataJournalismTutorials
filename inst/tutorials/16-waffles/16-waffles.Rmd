@@ -175,7 +175,7 @@ The waffle library can break this down in a way that's easier on the eyes than a
 waffle(
         ____, 
         rows = ____, 
-        title="Partian breakdown of the House", 
+        title="Partisan breakdown of the House", 
         xlab="1 square = 1 representative", 
         colors = c("red", "blue", "grey")
 )
@@ -185,7 +185,7 @@ waffle(
 waffle(
         house, 
         rows = 10, 
-        title="Partian breakdown of the House", 
+        title="Partisan breakdown of the House", 
         xlab="1 square = 1 representative", 
         colors = c("red", "blue", "grey")
 )
