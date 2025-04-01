@@ -194,7 +194,7 @@ grade_this_code()
 
 A ha! Better. We now just have the two years and we have some space to put our state name in there to help people.
 
-### Exercise 6: adding labels
+### Exercise 5: adding labels
 
 To add the labels, we again need to be a bit clever. We want to label each dot *twice* -- once for 2020 and once for 2024. To do this *looks* like a lot, but it really isn't. It's two rows for each state, but most of it is copy and paste work. Once you get one state working, you can add more with copy, paste, change the dataframe and done. 
 
