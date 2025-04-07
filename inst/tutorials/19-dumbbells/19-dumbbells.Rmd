@@ -231,7 +231,7 @@ ggplot() +
 ggplot() + 
   geom_dumbbell(
     data=colleges, 
-    aes(y=reorder(INSTNM, TUITIONFEE_IN), x=TUITIONFEE_IN, xend=TUITIONFEE_OUT),
+    aes(y=reorder(INSTNM, TUITIONFEE_OUT), x=TUITIONFEE_IN, xend=TUITIONFEE_OUT),
     size = 2,
     colour = "grey",
     colour_x = "green",
