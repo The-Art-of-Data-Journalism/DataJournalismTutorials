@@ -286,7 +286,7 @@ The best way to know you're using color wrong is to watch what is -- without arg
 
 So how do you do that here? By moving the fill inside the aes and making everything a color. 
 
-### Exercise 5: Doing it wrong
+### Exercise 6: Doing it wrong
 
 So what do we use for our fill? When working *inside* the aes -- meaning inside the () after aes -- we have to use column names without quotes. We've already used `percent_uninsured` to make the width of the bars. We need the other column name we have used in this geom_bar.
 
