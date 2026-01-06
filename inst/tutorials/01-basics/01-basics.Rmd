@@ -305,7 +305,7 @@ When it's time to turn it in, you just go to File \> Save and give the file a na
 
 ## The Recap
 
-In this lesson, we covered the essentials of R programming for beginners. We learned how to use R as a calculator, performing basic arithmetic operations and understanding the order of operations (PEMDAS). We then explored the concept of variables, learning how to create them, name them effectively, and assign different types of values (numbers and strings) to them. We practiced these skills by calculating the percentage of undergraduate students at UNL, demonstrating how these basic concepts can be applied to real-world data analysis tasks. Remember, mastering these fundamentals is crucial as they form the foundation for more complex data journalism techniques we'll explore in future lessons.
+In this lesson, we covered the essentials of R programming for beginners. We learned how to use R as a calculator, performing basic arithmetic operations and understanding the order of operations (PEMDAS). We then explored the concept of variables, learning how to create them, name them effectively, and assign different types of values (numbers and strings) to them. We practiced these skills by calculating change in census numbers, demonstrating how these basic concepts can be applied to real-world data analysis tasks. Remember, mastering these fundamentals is crucial as they form the foundation for more complex data journalism techniques we'll explore in future lessons.
 
 ## Terms to Know
 
