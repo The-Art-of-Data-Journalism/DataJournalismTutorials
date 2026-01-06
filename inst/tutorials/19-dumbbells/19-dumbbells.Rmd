@@ -15,7 +15,6 @@ library(learnr)
 library(gradethis)
 library(tidyverse)
 library(glue)
-library(ggalt)
 knitr::opts_chunk$set(echo = FALSE)
 tutorial_options(exercise.completion=FALSE)
 ```
@@ -106,17 +105,15 @@ As a data analyst, one of the most important things you can do -- and one of the
 
 Second to my love of waffle charts because of their name, and I'm always hungry, dumbbell charts are an excellently named way of **showing the difference between two things on a number line** -- a start and a finish, for instance. Or the difference between two related things. When the gap between numbers is the news, dumbbell charts are what you want.
 
-Dumbbell charts come batteries included in `ggalt` which we will have to load. Like usual, you already installed this if you followed the install instructions at the beginning of the course. But if you're having trouble getting this to work, go to your console in R Studio and install it with `install.packages("ggalt")`
+If you Google dumbbell charts, you'll find they come batteries included in a library called `ggalt`. The problem? `ggalt` has been abandoned, and is fading away slowly. It won't install easily now, which is a bad sign for the future. But the truth is, dumbbell charts are easy to make -- it's just a line and two dots. That's three geoms, and that's not hard. 
 
 Let's give it a whirl.
 
 ```{r load-tidyverse, exercise=TRUE, message=FALSE, warning=FALSE}
 library(tidyverse)
-library(ggalt)
 ```
 ```{r load-tidyverse-solution}
 library(tidyverse)
-library(ggalt)
 ```
 ```{r load-tidyverse-check}
 grade_this_code()
@@ -155,63 +152,107 @@ grade_this_code()
 
 For this example, let's look at the difference between a school's in-state tuition vs. out-of-state tuition. Most public colleges charge more for people who don't live there. The obvious reason is giving people who pay taxes in the state a break, and charging more for people who don't pay taxes there. Private schools don't have to do that, but some do. 
 
-### Exercise 1: The first dumbbell
+### Exercise 1: The first part of the dumbbell
 
-Now, the way that the `geom_dumbbell` works is pretty simple when viewed through what we've done before. There's just some tweaks. 
+Now, the way that the dumbbell works is pretty simple when viewed through what we've done before. There's just some tweaks. 
 
-First: We start with the y axis. The reason is we want our dumbbells going left and right so the label is going to be on the y axis. That's the column with the college name in it.
+The first thing we need is a `geom_segment` -- a line segment. `geom_segment` takes four parts: where the y axis starts and ends and where the x axis starts and ends. 
 
-Second: Our x is actually two things: x and xend. What you put in there will decide where on the line the dot appears. What goes in the x and xend are the two numbers where the gap between them is meaningful. So for us, it's our two tuition columns, one for in-state and the second for out of state. 
+First: We start with the y axis. The reason is we want our dumbbells going left and right so the label is going to be on the y axis. That's the column with the college name in it. Good news: where this starts and ends -- `y` and `yend` -- is the same in a dumbbell chart. We want our segment to stay on the line given to a particular college. 
+
+Second: Our x is actually two things as well: `x` and `xend`. What you put in there will decide where on the line the segment starts and ends. What goes in the `x` and `xend` are the two numbers where the gap between them is meaningful. So for us, it's our two tuition columns, one for in-state and the second for out of state. 
 
 ```{r dumbbell2, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
 ggplot() + 
-  geom_dumbbell(
+  geom_segment(
     data=colleges, 
-    aes(y=____, x=____, xend=____)
+    aes(
+      y=____, yend = ____,
+      x=____, xend=____
+      )
   )
 ```
 ```{r dumbbell2-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
-  geom_dumbbell(
+  geom_segment(
     data=colleges, 
-    aes(y=INSTNM, x=TUITIONFEE_IN, xend=TUITIONFEE_OUT)
+    aes(
+      y=INSTNM, yend=INSTNM, 
+      x=TUITIONFEE_IN, xend=TUITIONFEE_OUT
+      )
   )
 ```
 ```{r dumbbell2-check}
 grade_this_code()
 ```
 
-Well, that's a chart alright, but did you get a warning? Not to worry -- that's an issue in `ggalt`, nothing you did. But with what you *did* do, what dot is the in-state tuition and what is the out of state? To fix this, we'll add colors.
+Well, that's a chart alright. But we need dots -- the bells on our dumbbell -- and then we need to show which dot is the in-state tuition and what is the out of state. How? With colors.
 
-### Exercise 2: Colors and size
+### Exercise 2: Bells and colors
 
-To make this work, we'll need to do three things: first, use the English spelling of color, so `colour`. The, uh, `colour` is the bar between the dots, the `colour_x` is the color of the x value dot and the `colour_xend` is the color of the xend dot. So in our setup, in-state tuition is the x, so let's make that green. And let's make the out-of-state tuition red. While we're at it, we'll add a size to make the dots stand out.
+To make this work, we'll need to do three things: first, we're going to add two `geom_point`s. Those will be the bells in the the dumbbell. Our `geom_point`s will get two things: a color *inside* the aes and a size *outside* of it. Because the color goes *inside* the aes, we have to play with it a little. If we put a number column in there, the legend will give us a gradient instead of just a color. But if we put text in there, it will give us one color and a legend. The size is there to make the bells a little bigger than standard dot size. What goes in y stays the same as the `geom_segment`. What goes in `x` is what is in `x` and `xend` in your `geom_segment`. 
 
 ```{r dumbbell3, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
 ggplot() + 
-  geom_dumbbell(
-    data=____, 
-    aes(y=____, x=TUITIONFEE_IN, xend=TUITIONFEE_OUT),
-    size = 2,
-    colour = "____",
-    colour_x = "____",
-    colour_xend = "____")
+  geom_segment(
+    data=colleges, 
+    aes(
+      y=INSTNM, yend=INSTNM, 
+      x=TUITIONFEE_IN, xend=TUITIONFEE_OUT
+      )
+  ) + 
+  geom_point(
+    data=colleges,
+    aes(
+      y=____,
+      x=____,
+      color="In-state"
+    ),
+    size=2
+  ) + 
+  geom_point(
+    data=colleges,
+    aes(
+      y=____,
+      x=____,
+      color="Out-of-state"
+    ),
+    size=2
+  )
 ```
 ```{r dumbbell3-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
-  geom_dumbbell(
+  geom_segment(
     data=colleges, 
-    aes(y=INSTNM, x=TUITIONFEE_IN, xend=TUITIONFEE_OUT),
-    size = 2,
-    colour = "grey",
-    colour_x = "green",
-    colour_xend = "red")
+    aes(
+      y=INSTNM, yend=INSTNM, 
+      x=TUITIONFEE_IN, xend=TUITIONFEE_OUT
+      )
+  ) + 
+  geom_point(
+    data=colleges,
+    aes(
+      y=INSTNM,
+      x=TUITIONFEE_IN,
+      color="In-state"
+    ),
+    size=2
+  ) + 
+  geom_point(
+    data=colleges,
+    aes(
+      y=INSTNM,
+      x=TUITIONFEE_OUT,
+      color="Out-of-state"
+    ),
+    size=2
+  )
 ```
 ```{r dumbbell3-check}
 grade_this_code()
 ```
 
-And now we have a chart that is trying to tell a story. We know, logically, that green on the left is good, because it means cheaper tuition. A long distance between green and red? That shows a gap between what in-state students pay and what out-of-state students pay. In some cases, that's small. In some it's *huge*. But what about the colleges that have just red dots? The issue there is that they don't have in-state and out-of-state tuition. They just have ... tuition. The green dot is there -- it's just getting covered by the red dot.
+And now we have a chart that is trying to tell a story. We know, logically, that the dot on the left is good, because it means cheaper tuition. A long distance between the two dots? That shows a gap between what in-state students pay and what out-of-state students pay. In some cases, that's small. In some it's *huge*. But what about the colleges that have just one color of dots? The issue there is that they don't have in-state and out-of-state tuition. They just have ... tuition. The dot is there -- it's just getting covered by the other dot.
 
 ### Exercise 3: Arrange helps tell the story
 
@@ -219,23 +260,59 @@ But what if we sort it by out-of-state tuition, so we see them in order of cost.
 
 ```{r dumbbell4, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
 ggplot() + 
-  geom_dumbbell(
-    data=____, 
-    aes(y=reorder(____, ____), x=TUITIONFEE_IN, xend=TUITIONFEE_OUT),
-    size = 2,
-    colour = "____",
-    colour_x = "____",
-    colour_xend = "____")
+  geom_segment(
+    data=colleges, 
+    aes(
+      y=reorder(____, ____), yend=INSTNM, 
+      x=TUITIONFEE_IN, xend=TUITIONFEE_OUT
+      )
+  ) + 
+  geom_point(
+    data=colleges,
+    aes(
+      y=reorder(____, ____),
+      x=TUITIONFEE_IN,
+      color="In-state"
+    ),
+    size=2
+  ) + 
+  geom_point(
+    data=colleges,
+    aes(
+      y=reorder(____, ____),
+      x=TUITIONFEE_OUT,
+      color="Out-of-state"
+    ),
+    size=2
+  )
 ```
 ```{r dumbbell4-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
-  geom_dumbbell(
+  geom_segment(
     data=colleges, 
-    aes(y=reorder(INSTNM, TUITIONFEE_OUT), x=TUITIONFEE_IN, xend=TUITIONFEE_OUT),
-    size = 2,
-    colour = "grey",
-    colour_x = "green",
-    colour_xend = "red")
+    aes(
+      y=reorder(INSTNM, TUITIONFEE_OUT), yend=INSTNM, 
+      x=TUITIONFEE_IN, xend=TUITIONFEE_OUT
+      )
+  ) + 
+  geom_point(
+    data=colleges,
+    aes(
+      y=reorder(INSTNM, TUITIONFEE_OUT),
+      x=TUITIONFEE_IN,
+      color="In-state"
+    ),
+    size=2
+  ) + 
+  geom_point(
+    data=colleges,
+    aes(
+      y=reorder(INSTNM, TUITIONFEE_OUT),
+      x=TUITIONFEE_OUT,
+      color="Out-of-state"
+    ),
+    size=2
+  )
 ```
 ```{r dumbbell4-check}
 grade_this_code()
