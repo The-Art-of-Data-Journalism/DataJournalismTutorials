@@ -17,7 +17,6 @@ library(gradethis)
 library(tidyverse)
 library(ggrepel)
 library(ggtext)
-library(waffle)
 knitr::opts_chunk$set(echo = FALSE)
 tutorial_options(exercise.completion=FALSE)
 ```
@@ -467,17 +466,35 @@ Frequently in my classes, students use the waffle charts library quite extensive
 Let's make a quick waffle chart using my most favorite silly dataset: Climate prognostications from groundhogs, other assorted animals, taxidermied animals and other objects from around the United States. You thought Punxatawney Phil was the only one? Oh no. There were 73 others in 2024 who made a prediction on early spring vs. longer winter. So what was the consensus? Let's visualize. 
 
 ```{r waffle-load-data, message=FALSE, warning=FALSE}
-predictions <- c("Early Spring"=55, "Longer Winter"=19)
+predictions <- data.frame(
+  category = c("Early Spring", "Longer Winter"),
+  count = c(55, 19)
+)
+
+rows <- 5
+
+waffle_predictions <- predictions |>
+  uncount(count) |>
+  mutate(
+    x = (row_number() - 1) %/% rows + 1,
+    y = (row_number() - 1) %% rows + 1
+  )
 ```
 
-We can add labels and themes, but you have to be careful. The waffle library is applying its own theme -- like theme_minimal -- but if we override something they are using in their theme, some things that are hidden come back and make it worse. So here is an example of how to use ggplot's `labs` and the `theme` to make a fully publication ready graphic. They just get added with a + after the waffle.
+We can add labels and themes, but you have to be careful. For this to look like a waffle chart, we have to use `theme_void()`. Here is an example of how to use ggplot's `labs` and the `theme` to make a fully publication ready graphic. They just get added with a + after the waffle.
 
 ```{r waffle1, exercise=TRUE, exercise.setup = "waffle-load-data", message=FALSE}
-waffle(
-        predictions, 
-        rows = 5, 
-        colors = c("yellow", "lightblue")
-) +
+ggplot() +
+  geom_tile(
+    data=waffle_predictions, 
+    aes(
+      x = x, y = y, fill = category
+      ), 
+    color = "white", 
+    linewidth = .5) +
+  coord_equal() + 
+  theme_void() + 
+  scale_fill_manual(values = c("yellow", "lightblue")) +
   labs(
     x = "1 square = 1 prediction",
     title="Early spring it is", 
@@ -490,11 +507,17 @@ waffle(
   )
 ```
 ```{r waffle1-solution, exercise.reveal_solution = FALSE}
-waffle(
-        predictions, 
-        rows = 5, 
-        colors = c("yellow", "lightblue")
-) +
+ggplot() +
+  geom_tile(
+    data=waffle_predictions, 
+    aes(
+      x = x, y = y, fill = category
+      ), 
+    color = "white", 
+    linewidth = .5) +
+  coord_equal() + 
+  theme_void() + 
+  scale_fill_manual(values = c("yellow", "lightblue")) +
   labs(
     x = "1 square = 1 prediction",
     title="Early spring it is", 
@@ -510,77 +533,13 @@ waffle(
 grade_this_code()
 ```
 
-But what if we're using a waffle iron? It gets tougher. 
-
-Here is a full example. I start with my waffle iron code, but note that each waffle is pretty much a self-contained thing. That's because a waffle iron isn't really a thing. It's just a way to group waffles together, so you have to make each waffle individually. My first waffle has the title and subtitle and the x-axis label is the year. The bottom one has no title or subtitle but it does have the caption and the axis label has a little trick to add a return into the label, so I get both the team and the unit in there. 
-
-```{r waffle2, exercise=TRUE, exercise.setup = "waffle-load-data", message=FALSE}
-prediction24 <- c("Early Spring"=55, "Longer Winter"=19, 1)
-prediction23 <- c("Early Spring"=40, "Longer Winter"=35)
-
-
-iron(
-  waffle(
-  prediction24,
-  rows=5,
-  colors = c("yellow", "lightblue", "white")) + 
-   labs(
-     x="2024",
-     title="Early spring it is",
-     subtitle="The groundhogs, lobsters and other assorted predictors from around the \nUS and Canada were decisvely feeling spring this year.") + 
-   theme(
-    plot.title = element_text(size = 16, face = "bold"),
-    axis.title = element_text(size = 10),
-    axis.title.y = element_blank()
-  ),
-  waffle(
-    prediction23,
-    rows=5,
-    colors = c("yellow", "lightblue")) + 
-    labs(
-     x = "2023\n1 square = 1 prediction",
-     caption="Source: Groundhog-Day.com | Graphic by Matt Waite"
-     )
-) 
-```
-```{r waffle2-solution, exercise.reveal_solution = FALSE}
-prediction24 <- c("Early Spring"=55, "Longer Winter"=19, 1)
-prediction23 <- c("Early Spring"=40, "Longer Winter"=35)
-
-
-iron(
-  waffle(
-  prediction24,
-  rows=5,
-  colors = c("yellow", "lightblue", "white")) + 
-   labs(
-     x="2024",
-     title="Early spring it is",
-     subtitle="The groundhogs, lobsters and other assorted predictors from around the \nUS and Canada were decisvely feeling spring this year.") + 
-   theme(
-    plot.title = element_text(size = 16, face = "bold"),
-    axis.title = element_text(size = 10),
-    axis.title.y = element_blank()
-  ),
-  waffle(
-    prediction23,
-    rows=5,
-    colors = c("yellow", "lightblue")) + 
-    labs(
-     x = "2023\n1 square = 1 prediction",
-     caption="Source: Groundhog-Day.com | Graphic by Matt Waite"
-     )
-) 
-```
-```{r waffle2-check}
-grade_this_code()
-```
+The same additions work for the multiple chart version from the waffle chapter. 
 
 Note: These finishing touches aren't optional. They're required of every graphic you create going forward. They are what makes professional graphics look professional. It's the careful consideration of every element on the screen and how they impact a reader's understanding of the graphic.
 
 ## The Recap
 
-Throughout this lesson, you've mastered the art of refining your data visualizations for professional presentation. You've learned to apply clean themes, adjust text hierarchy, customize chart elements, and fine-tune layouts for both standard ggplot charts and waffle charts. Remember, these finishing touches are not just cosmetic - they're required for effectively communicating your data story to your audience. Always consider how these final adjustments can enhance the clarity and impact of your visualizations.
+Throughout this lesson, you've mastered the art of refining your data visualizations for professional presentation. You've learned to apply clean themes, adjust text hierarchy, customize chart elements, and fine-tune layouts for ggplot charts. Remember, these finishing touches are not just cosmetic - they're required for effectively communicating your data story to your audience. Always consider how these final adjustments can enhance the clarity and impact of your visualizations.
 
 ## Terms to Know
 
