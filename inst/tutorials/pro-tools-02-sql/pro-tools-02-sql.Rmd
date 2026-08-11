@@ -1,0 +1,342 @@
+---
+title: "Pro Tools Lesson 2: SQL"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    theme: journal
+    ace_theme: github
+runtime: shiny_prerendered
+description: >
+  Analyzing data with Structured Query Language
+---
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+library(learnr)
+library(gradethis)
+library(tidyverse)
+library(dbplyr)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.completion=FALSE)
+
+state <- Sys.getenv("tutorial.state")
+if(state == "") state <- "NE"
+
+stateName <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/states.csv") |> filter(Postal == state) 
+
+stateName <- stateName |> 
+  mutate(dataurl = case_when(
+    Postal == "AL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "AK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "AZ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "AR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "CA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "CO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "CT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "DE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "FL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "GA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "HI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "ID" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "IL" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "IN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "IA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "KS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "KY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "LA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "ME" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "MD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "MA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "MI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "MN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "MS" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "MO" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "MT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "NE" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "NV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "NH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "NJ" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "NM" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "NY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "NC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "ND" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "OH" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "OK" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "OR" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "PA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "RI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "SC" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "SD" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "TN" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "TX" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "UT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "VT" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "VA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "WA" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "WV" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "WI" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    Postal == "WY" ~ paste0("https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/", str_to_lower(State), ".csv"),
+    TRUE ~ "https://the-art-of-data-journalism.github.io/tutorial-data/nursing-homes/nebraska.csv"  # Default case if none match
+  ))
+
+homes <- read_csv(stateName$dataurl)
+
+db_con <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+DBI::dbWriteTable(db_con, "homes", homes)
+```
+
+## The Goal
+
+In this lesson, you're going to get an introduction to Structured Query Language, one of the oldest and fastest ways to query data in a database. Shortened to SQL (and pronounced See-kwull), it's the language of relational database systems and is the language most of the modern data analysis libraries are based on (like the `tidyverse`). SQL regularly comes up in job descriptions as a skill you need, as some news organizations have invested in creating data stores you can query on deadline. In short, it's a useful skill to have, and knowing the `tidyverse` will make it much easier to learn. 
+
+## What is Data Journalism?
+
+In ye olden times, the first thing you learned in Data Journalism -- back when we called it Computer Assisted Reporting -- was spreadsheets. And spreadsheets are very useful and very flexible. At the time, people were able to have pretty good careers just using spreadsheets. But they had one very, very big problem: You couldn't load more than 65,536 rows. Old heads had to just know that if your data had that many rows, that was a GIANT RED FLAG that something was amiss. And yes, people had to correct stories because they didn't know their data was bigger than that. The latest version of Microsoft Excel will let you import 1,048,576 rows, but ... why would you do that? There are much, much better tools.
+
+Which brings us to the second thing people learned: Databases. Databases were the answer to this problem of Big Dataset. You could load millions of rows and query them very quickly. And by very quickly, back in the day, that meant writing your query, hitting enter and going to lunch. It will probably be done when you get back. Yes, computers were very slow.
+
+But they kept getting faster, and lunch became a coffee break, which became an annoyingly long pause, which became instantaneous. Computers now -- even yours -- can read millions of records into memory and do all kinds of things with them in the blink of an eye. You don't even need a database to do that -- and most of the time, it's an unnecessary amount of overhead. This is why the `tidyverse` in R and `pandas` in Python have become so popular -- database functionality without the headache of running a database. 
+
+But the real truth is a gigantic amount of the world still runs on databases. Major corporations. The financial services industry. Heck, every content managemnt system on the planet has a database at the bottom of it storing that content to be managed. Governments are heavily invested in large-scale data stores to keep all the data they have. The university you attend (or attended) has loads of data about every student, class, grade and parking ticket on campus. How else do your tuition bills get to you? It's not done on paper, I can assure you. 
+
+## The Basics
+
+This tutorial is going to walk you through the basics of SQL. It is not going to show you how to load data into a database, because that depends on the database platform you choose to use. There are lots of database platforms out there. The most common databases deployed for companies or governments are Microsoft SQLServer, MySQL, PostGreSQL (a personal favorite). 
+
+A great one for individual users like you is SQLite. It is, as the name says, lightweight and is used in all kinds of places you might not suspect. If you use a browser on your computer, you have SQLite running. If you use an iPhone or an Android mobile device, they both run SQLite. It's everywhere, including this tutorial. In the background, I've spun up a SQLite database for you. 
+
+If you've used the `tidyverse` before, you're accustomed to following a pattern. That pattern starts with `dataname` and then you do things to it, like filter, select, group_by, summarize etc. SQL is kind of backwards from that. In SQL, you SELECT what you want to see FROM the data table it's coming from. And yes, the verbs are in all caps. 
+
+### Exercise 1: your first SQL query
+
+In R, you're used to using `head(data)` to see the first six rows of data to get a look at it. SQL doesn't have the same thing, but it does have a shortcut. 
+
+The first thing you tell a SQL query is what columsn do you want to see with the verb SELECT. In SQL, SELECT * means select all columns. After you have selected your columns, you have to tell it where it comes from, using FROM as the verb. In our case, that data is stored in a table called `homes`, which is a dataset of all nursing homes in your state. 
+
+Based on that, fill in the blanks here to see the first five rows of data. 
+
+```{sql db1, exercise = TRUE, connection = "db_con"}
+____ * FROM ____ LIMIT 5
+```
+
+```{sql db1-solution, exercise.reveal_solution = FALSE}
+SELECT * FROM homes LIMIT 5
+```
+
+```{r db1-check}
+grade_this({
+  if (!grepl("\\bselect\\b", .user_code, ignore.case = TRUE)) {
+    fail("Don't forget to start your query with the `SELECT` keyword.")
+  }
+
+  if (!grepl("\\bhomes\\b", .user_code, ignore.case = TRUE)) {
+    fail("Your query needs to pull from the `homes` table. Check what you wrote after `FROM`.")
+  }
+
+  .solution <- DBI::dbGetQuery(db_con, .solution_code)
+
+  pass_if_equal(message = "Nice work! You selected everything from the homes table.")
+  fail("Your query ran, but the results don't match what we expected. Double check you're selecting everything (`*`) from the `homes` table.")
+})
+```
+
+What is exciting here is that you've now written SQL. Is what you did very interesting? No. But it worked. And that's a start. 
+
+## Asking questions with SQL
+
+Once you start asking questions using SQL, you start to see how much the `tidyverse` borrowed from it. You can do everything in the Aggregates 1 and 2 tutorials in SQL. In fact, that's what we're going to do. 
+
+### Exercise 2: Group by and count
+
+First question: How many nursing homes are there in each county? We know from Aggregates 1 that we're going to need to group things together -- probably by the county column -- and count them. SQL has an explicit COUNT function, and in SQL, GROUP BY doesn't have the underscore like the `tidyverse`. Also, any column name that isn't one word has to appear in quotes. 
+
+In this example, we're not going to use \*. We *only* want the county column (make sure you look at your previous results to get the exact name of the county column). And then, when we count it up.
+
+```{sql db2, exercise = TRUE, connection = "db_con"}
+SELECT ____,
+COUNT(____)
+FROM homes
+GROUP BY ____
+```
+```{sql db2-solution, exercise.reveal_solution = FALSE}
+SELECT county_parish,
+COUNT(county_parish)
+FROM homes
+GROUP BY county_parish
+```
+```{r db2-check}
+grade_this({
+  if (!grepl("\\bcounty_parish\\b", .user_code, ignore.case = TRUE)) {
+    fail("Remember we're working with the `county_parish` column in two places.")
+  }
+
+  .solution <- DBI::dbGetQuery(db_con, .solution_code)
+
+  pass_if_equal(message = "Nice work! You counted up nursing homes by county.")
+  fail("Your query ran, but the results don't match what we expected. Double check you're using the `county_parish` column in both places.")
+})
+```
+
+Now, that's a bit ugly. That column name where our count goes is ... unsightly. And it's in alphabetical order, which is ... fine ... I guess. But alphabetical is rarely ever going to give us news. 
+
+### Exercise 3: Renaming and Reordering
+
+Let's learn how to arrange our data in SQL so it's more newsworthy. 
+
+In the `tidyverse` you used arrange. Here, you'll use ORDER BY. It works the same way. The only real difference? Instead of desc(column_name) to put it in descending order, you put DESC after your column name in ORDER BY. 
+
+You can also rename columns on the fly in SQL by using AS. Lets rename our Count column as total_homes and arrange it in descending order.
+
+```{sql db3, exercise = TRUE, connection = "db_con"}
+SELECT county_parish,
+COUNT(county_parish) AS ____
+FROM homes
+GROUP BY county_parish
+ORDER BY ____ ____
+```
+```{sql db3-solution, exercise.reveal_solution = FALSE}
+SELECT county_parish,
+COUNT(county_parish) AS total_homes
+FROM homes
+GROUP BY county_parish
+ORDER BY total_homes DESC
+```
+```{r db3-check}
+grade_this({
+  if (!grepl("\\bcounty_parish\\b", .user_code, ignore.case = TRUE)) {
+    fail("Remember we're working with the `county_parish` column in three places.")
+  }
+  
+  if (!grepl("\\btotal_homes\\b", .user_code, ignore.case = TRUE)) {
+    fail("Check the paragraphs above what we're naming our count column.")
+  }
+
+  if (!grepl("\\bDESC\\b", .user_code, ignore.case = TRUE)) {
+    fail("What order are we putting this in? Check the paragraphs above the exercise.")
+  }
+  
+  .solution <- DBI::dbGetQuery(db_con, .solution_code)
+
+  pass_if_equal(message = "Nice work! You renamed a column and reordered nursing home counts by county.")
+  fail("Your query ran, but the results don't match what we expected. Double check your work with the paragraphs above the exercise.")
+})
+```
+
+Now we're cooking. But what if we wanted to add more math, like a sum or an average? Good news! it's easy.
+
+### Exercise 4: Adding new calculations
+
+To do this, just like in Aggregates 1 and 2, you just need to know the name of the function. Good news -- just like in Aggregates 2, the function to add things up is SUM. Bad news: The function to create an average isn't the nerdy/mathy `mean`: It's AVG.
+
+In our data, there's a column called `number_of_certified_beds` that is what it says on the tin. To add a sum and average of bed counts for each county, you just add them to your select statement at the beginning, just like your COUNT. But note something in the previous exercise: There's no comma after your count. You *will* need a comma between each new column *except* the last one. So Count, Sum, Avg no comma. If you had 50 columns in there, you'd need commas between all of them *except* the last one. 
+
+Let's order this one by the average number of beds. 
+
+```{sql db4, exercise = TRUE, connection = "db_con"}
+SELECT county_parish,
+COUNT(county_parish) AS ____,
+____(number_of_certified_beds) AS total_beds,
+____(number_of_certified_beds) AS avg_beds
+FROM homes
+GROUP BY county_parish
+ORDER BY ____ DESC
+```
+```{sql db4-solution, exercise.reveal_solution = FALSE}
+SELECT county_parish,
+COUNT(county_parish) AS total_homes,
+SUM(number_of_certified_beds) AS total_beds,
+AVG(number_of_certified_beds) AS avg_beds
+FROM homes
+GROUP BY county_parish
+ORDER BY avg_beds DESC
+```
+```{r db4-check}
+grade_this({
+  if (!grepl("\\bSUM\\b", .user_code, ignore.case = TRUE)) {
+    fail("Remember we're adding things up. What is that function called?")
+  }
+
+  if (!grepl("\\bAVG\\b", .user_code, ignore.case = TRUE)) {
+    fail("Remember we're averaging bed counts. What is that function called?")
+  }  
+    
+  if (!grepl("\\btotal_homes\\b", .user_code, ignore.case = TRUE)) {
+    fail("Check the paragraphs above what we're naming our count column.")
+  }
+
+  if (!grepl("\\bavg_beds\\b", .user_code, ignore.case = TRUE)) {
+    fail("What order are we putting this in? Check the paragraphs above the exercise.")
+  }
+  
+  .solution <- DBI::dbGetQuery(db_con, .solution_code)
+
+  pass_if_equal(message = "Nice work! You've got a list of counties sorted by the average home size in beds.")
+  fail("Your query ran, but the results don't match what we expected. Double check your work with the paragraphs above the exercise.")
+})
+```
+
+Now you've done just about everything in Aggregates 1 and 2, just in SQL now. And to be clear -- you can do a *lot* in data journalism with just this. Grouping, counting, summing, arranging -- these are the major chords of a whole lot of data journalism music. 
+
+## One more thing: Filters
+
+A major tool we're missing right now is the ability to filter our data. Filters, in SQL, work very, very similarly to filtering in the `tidyverse`. You're going to use a logical condition again -- something like state = "NE". But note -- in SQL, it's just one =, not == like in the `tidyverse`. Everything else works just the same -- >, <, >=, <=, you name it. 
+
+The other major difference in SQL vs the `tidyverse`: We don't use the word filter. In SQL, it's WHERE, and it goes right after the FROM statement. And when you think about it, spoken out loud, it kind of makes sense. 
+
+SELECT (aka show me) ColumnName FROM DataName WHERE Something = "Something". Like really nerdy poetry. 
+
+### Exercise 5: Filtering
+
+Are there any nursing homes in your state with fewer than 50 certified beds?
+
+```{sql db5, exercise = TRUE, connection = "db_con"}
+SELECT *
+FROM homes
+WHERE ____ < ____
+```
+```{sql db5-solution, exercise.reveal_solution = FALSE}
+SELECT *
+FROM homes
+WHERE number_of_certified_beds < 50
+```
+```{r db5-check}
+grade_this({
+  if (!grepl("\\bnumber_of_certified_beds\\b", .user_code, ignore.case = TRUE)) {
+    fail("Remember that we're filtering on the number of certified beds. What was that column from previous exercises?")
+  }
+
+  if (!grepl("\\b50\\b", .user_code, ignore.case = TRUE)) {
+    fail("How many beds are we setting the threshold at? Better check the text.")
+  }  
+  
+  .solution <- DBI::dbGetQuery(db_con, .solution_code)
+
+  pass_if_equal(message = "Nice work! You've got a list of nursing homes with fewer than 50 beds.")
+  fail("Your query ran, but the results don't match what we expected. Double check your work with the paragraphs above the exercise.")
+})
+```
+
+## The Recap
+
+In this lesson, you wrote your first SQL queries, and you learned that SQL flips the `tidyverse` pattern around -- instead of starting with your data and doing things to it, you SELECT what you want to see FROM the table it lives in. You used LIMIT to peek at data the way you'd use `head()`. You used GROUP BY and COUNT() to count nursing homes by county the way you'd use `group_by()` and `n()`. You used AS to rename a column on the fly, and ORDER BY ... DESC to sort your results the way you'd use `arrange()` and `desc()`. You added SUM() and AVG() to get totals and averages for each group, the same math you did with `sum()` and `mean()`. And you used WHERE to filter rows down to just the ones you care about, the same job `filter()` does in the `tidyverse`.
+
+The syntax looks different, but the thinking is identical: group, count, sum, average, arrange, filter. If you already know that pattern in the `tidyverse`, you already know it in SQL. You've just learned a new accent for saying the same thing.
+
+## Terms to Know
+
+- **SQL**: Structured Query Language, pronounced "See-kwull." The language used to store, organize and ask questions of data held in a relational database.
+- **Query**: A single SQL statement that asks a database a question -- what to select, where to get it from, and how to organize it.
+- **SELECT**: The keyword that specifies which columns you want in your results. `SELECT *` means "give me every column."
+- **FROM**: The keyword that specifies which table your data is coming from.
+- **LIMIT**: Restricts a query to a set number of rows, handy for quickly previewing a table.
+- **GROUP BY**: Groups rows that share the same value in a column so you can run a calculation, like a count or a sum, on each group separately. It's the SQL equivalent of `group_by()`.
+- **COUNT()**: A function that counts the number of rows in each group.
+- **AS**: Renames a column or calculation in your results, similar to naming a new column with `mutate()` or `summarise()`.
+- **ORDER BY**: Sorts your results by one or more columns. Add DESC after a column name to sort it largest-to-smallest; the default, ascending order, doesn't need a keyword.
+- **SUM()**: A function that adds up the values in a column for each group.
+- **AVG()**: A function that averages the values in a column for each group.
+- **WHERE**: Filters rows based on a condition, the SQL equivalent of `filter()`.
+
+
+
+
+

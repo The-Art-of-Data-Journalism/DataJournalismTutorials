@@ -1,5 +1,5 @@
 ---
-title: "Data Journalism Lesson 27: Datawrapper for charts"
+title: "Bonus Lesson 3: Datawrapper for Charts"
 output: 
   learnr::tutorial:
     progressive: true

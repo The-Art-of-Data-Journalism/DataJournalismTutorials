@@ -1,5 +1,5 @@
 ---
-title: "Data Journalism Lesson 28: Datawrapper for maps"
+title: "Bonus Lesson 4: Datawrapper for Maps"
 output: 
   learnr::tutorial:
     progressive: true
