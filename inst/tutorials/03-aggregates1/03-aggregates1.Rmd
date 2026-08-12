@@ -212,7 +212,7 @@ Let's look at this. As you can see by the data, we have six nursing homes, **whi
 ## Answering questions with code
 
 ```{r numberhomes, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
-glue("There are {format(nrows, big.mark=",",scientific=FALSE)} nursing homes in {stateName$State} as of the June 2024 data from the national Center for Medicare and Medicaid Studies. I suppose if we were writing about nursing homes in {stateName$State} that's useful information, but it doesn't tell us much. Let's explore more.")
+glue("There are {format(nrows, big.mark=",",scientific=FALSE)} nursing homes in {stateName$State} as of the June 20246 data from the national Center for Medicare and Medicaid Studies. I suppose if we were writing about nursing homes in {stateName$State} that's useful information, but it doesn't tell us much. Let's explore more.")
 ```
 
 **The secret to writing code is that much of it is a pattern.** The building blocks largely stay the same. With the tidyverse, this is *especially* true.
