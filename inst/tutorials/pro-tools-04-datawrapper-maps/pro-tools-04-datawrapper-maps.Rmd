@@ -1,5 +1,5 @@
 ---
-title: "Bonus Lesson 4: Datawrapper for Maps"
+title: "Pro Tools Lesson 4: Datawrapper for Maps"
 output: 
   learnr::tutorial:
     progressive: true

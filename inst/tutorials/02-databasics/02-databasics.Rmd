@@ -122,8 +122,7 @@ To start with, we need to understand the shape of data.
 
 R is a statistical programming language that is purpose built for data analysis.
 
-Base R does a lot, but there are a mountain of external libraries that do things to make R better/easier/more fully featured. We already installed the Tidyverse -- or you should have if you followed the instructions for the last assignment -- which isn't exactly a library, but a collection of libraries. Together, they make up the 
-Tidyverse. Individually, they are extraordinarily useful for what they do. We can load them all at once using the Tidyverse name, or we can load them individually. Let's start with individually.
+Base R does a lot, but there are a mountain of external libraries that do things to make R better/easier/more fully featured. We already installed the Tidyverse -- or you should have if you followed the instructions for the last assignment -- which isn't exactly a library, but a collection of libraries. Together, they make up the Tidyverse. Individually, they are extraordinarily useful for what they do. We can load them all at once using the Tidyverse name, or we can load them individually. Let's start with individually.
 
 The two libraries we are going to need for this assignment are `readr` and `dplyr`. The library `readr` reads different types of data in as a dataframe. For this assignment, we're going to read in csv data or Comma Separated Values data. That's data that has a comma between each column of data.
 
@@ -331,7 +330,7 @@ If your data is properly formed, the first row of your data will be the header r
 
 ![](images/columnnames.png){width="100%"}
 
-So the names of every county in this dataset are in the `CTYNAME` column. Want to know what county has the most people? You'll need the `POPESTIMATE2023` column. Looking at that first row for those names is something you're going to do over and over again. 
+So the names of every county in this dataset are in the `CTYNAME` column. Want to know what county has the most people? You'll need the `POPESTIMATE2025` column. Looking at that first row for those names is something you're going to do over and over again. 
 
 ## Types
 

@@ -1,5 +1,5 @@
 ---
-title: "Bonus Lesson 3: Datawrapper for Charts"
+title: "Pro Tools Lesson 3: Datawrapper for Charts"
 output: 
   learnr::tutorial:
     progressive: true
