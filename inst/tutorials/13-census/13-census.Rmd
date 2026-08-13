@@ -25,29 +25,27 @@ if(state == "") state <- "NE"
 
 stateName <- read_csv("https://the-art-of-data-journalism.github.io/tutorial-data/states.csv") |> filter(Postal == state) 
 
-estimates23 <- get_estimates(geography="county", vintage = 2023, state=state)
-estimates22 <- get_estimates(geography="county", vintage = 2022, state=state)
+estimates25 <- get_estimates(geography="county", vintage = 2025, state=state)
+estimates24 <- get_estimates(geography="county", vintage = 2024, state=state)
 
-nrows <- nrow(estimates23)
+nrows <- nrow(estimates25)
 
-acs <- load_variables(2022, "acs5", cache = TRUE)
-
-pop23 <- estimates23 |> 
+pop25 <- estimates25 |> 
   filter(variable == "POPESTIMATE") |> 
   select(NAME, year, value)
 
-pop22 <- estimates22 |> 
+pop24 <- estimates24 |> 
   filter(variable == "POPESTIMATE") |> 
   select(NAME, year, value)
 
-popest <- bind_rows(pop23, pop22)
+popest <- bind_rows(pop25, pop24)
 
-acs <- load_variables(2022, "acs5", cache = TRUE)
+acs <- load_variables(2024, "acs5")
 
 origin <- get_acs(geography = "county", 
               variables = c("B03001_001", "B03001_002", "B03001_003"),  
               state = state, 
-              year = 2022)
+              year = 2024)
 
 originrows <- nrow(origin)
 ```
@@ -98,7 +96,16 @@ Unfortunately, the census is exceedingly complicated to work with. It takes time
 
 Let's demonstrate. 
 
-We're going to use a library called `tidycensus` which makes calls to the Census API in a very tidy way, and gives you back tidy data. That means we don't have to go through the process of importing the data from a file, cleaning it up and making it a dataframe. I can't tell you how amazing this is, speaking from experience. My first experience with the census was for the 2000 data. I was part of a team at the Tampa Bay Times that had to pull the data in, chop it up for reporters working on specific stories and send that data out to them and graphic artists to make charts and maps out of it. What we're going to do today took **hours** on that day in 2001 when the data officially dropped. Just getting the data took hours. You're going to do it in seconds. 
+The first thing you must do is get an API key from the Census Bureau. Previous students of this class didn't have to do this. You do now the first time you run this. So how do you get an API key? 
+
+1. Go to [this website](https://api.census.gov/data/key_signup.html) and fill out the request for a key. 
+2. Your key will arrive in your email. Copy the long hash of letters and numbers. 
+3. Run this in your console: `tidycensus::census_api_key("PASTE YOUR KEY HERE", install = TRUE)`
+4. Then quit R Studio and restart this tutorial.
+
+Once you've done that, it's all set up, you don't need to do this again. 
+
+The `tidycensus` library makes calls to the Census API in a very tidy way, and gives you back tidy data. That means we don't have to go through the process of importing the data from a file, cleaning it up and making it a dataframe. I can't tell you how amazing this is, speaking from experience. My first experience with the census was for the 2000 data. I was part of a team at the Tampa Bay Times that had to pull the data in, chop it up for reporters working on specific stories and send that data out to them and graphic artists to make charts and maps out of it. What we're going to do today took **hours** on that day in 2001 when the data officially dropped. Just getting the data took hours. You're going to do it in seconds. 
 
 First, we'll need libraries. The two we need are the `tidyverse` as always and `tidycensus`. 
 
@@ -120,12 +127,12 @@ First, let's replicate something we've done already in these tutorials -- calcul
 
 ### Exercise 1: Get data
 
-Under the [`tidycensus` documentation](https://walker-data.com/tidycensus/reference/index.html), you'll find a function called `get_estimates()` which does what we need. All we need to do is tell it what year we want and what state we're focusing on. But, that means to calculate the change in population between 2023 and 2022, we have to do this twice, once for each year. 
+Under the [`tidycensus` documentation](https://walker-data.com/tidycensus/reference/index.html), you'll find a function called `get_estimates()` which does what we need. All we need to do is tell it what year we want and what state we're focusing on. But, that means to calculate the change in population between 2025 and 2024, we have to do this twice, once for each year. 
 
-For now, we'll get the 2023 data. And, for this, use the postal abbreviation for your state.
+For now, we'll get the 2025 data. And, for this, use the postal abbreviation for your state.
 
 ```{r read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
-estimates23 <- get_estimates(geography="county", vintage = 2023, state="____")
+estimates25 <- get_estimates(geography="county", vintage = 2025, state="____")
 ```
 
 ```{r read-check}
@@ -137,13 +144,13 @@ grade_this({
 })
 ```
 
-Behind the scenes, I've created estimates22 for you, which is identical to estimates23 except it's ... a different year. The problem now is we have two dataframes instead of one, and way too much data. Let's look at our data first so we can see the problem before we fix it. Let's just run head on the 2023 estimates dataframe. 
+Behind the scenes, I've created estimates24 for you, which is identical to estimates25 except it's ... a different year. The problem now is we have two dataframes instead of one, and way too much data. Let's look at our data first so we can see the problem before we fix it. Let's just run head on the 2025 estimates dataframe. 
 
 ```{r head-data, exercise=TRUE, exercise.setup = "load-data"}
 head(____)
 ```
 ```{r head-data-solution, exercise.reveal_solution = FALSE}
-head(estimates23)
+head(estimates25)
 ```
 ```{r head-data-check}
 grade_this_code()
@@ -156,20 +163,20 @@ See the variable column? The variable column contains all of columns we had in o
 We don't want all of those, we just want the population estimates, which is listed as `POPESTIMATE` in the `variable` column. Then, to make our lives easier, we're going to select just three columns -- the county name, the year the data is from and the value, which is the population estimate after our filter.
 
 ```{r filter-data, exercise=TRUE, exercise.setup = "load-data"}
-pop23 <- estimates23 |> 
+pop25 <- estimates25 |> 
   filter(____ == "____") |> 
   select(NAME, year, value)
 
-pop22 <- estimates22 |> 
+pop24 <- estimates24 |> 
   filter(____ == "____") |> 
   select(NAME, year, value)
 ```
 ```{r filter-data-solution, exercise.reveal_solution = FALSE}
-pop23 <- estimates23 |> 
+pop25 <- estimates25 |> 
   filter(variable == "POPESTIMATE") |> 
   select(NAME, year, value)
 
-pop22 <- estimates22 |> 
+pop24 <- estimates24 |> 
   filter(variable == "POPESTIMATE") |> 
   select(NAME, year, value)
 ```
@@ -177,7 +184,7 @@ pop22 <- estimates22 |>
 grade_this_code()
 ```
 
-Now we have two dataframes of three columns: `pop23`, and `pop22`. We could join them using the county name, but the problem then is we have two different years and the column names for the estimate are the same. We won't know which year is which without some careful connecting-the-dots in our code. 
+Now we have two dataframes of three columns: `pop25`, and `pop24`. We could join them using the county name, but the problem then is we have two different years and the column names for the estimate are the same. We won't know which year is which without some careful connecting-the-dots in our code. 
 
 ### Exercise 3: Binding
 
@@ -187,13 +194,13 @@ There's another way to do this that's a useful skill to have -- we can *bind* th
 popest <- bind_rows(____, ____)
 ```
 ```{r bind-data-solution, exercise.reveal_solution = FALSE}
-popest <- bind_rows(pop23, pop22)
+popest <- bind_rows(pop25, pop24)
 ```
 ```{r bind-data-check}
 grade_this_code()
 ```
 
-Our next problem? We have data that's stacked, not side by side. To calculate the percent change in population, you need the 2023 population - the 2022 population / the 2022 population -- new - old / old. To do that, they have to be **columns**. You have **rows**. So how do we flip our data on its side, so to speak, and turn each row for a county into two columns for a county? 
+Our next problem? We have data that's stacked, not side by side. To calculate the percent change in population, you need the 2025 population - the 2024 population / the 2024 population -- new - old / old. To do that, they have to be **columns**. You have **rows**. So how do we flip our data on its side, so to speak, and turn each row for a county into two columns for a county? 
 
 Good news: This is a pretty common problem to have. And because it's a pretty common problem, there's a function that does this. 
 
@@ -209,14 +216,14 @@ What you have now is this:
 
 |NAME |year|value|
 |-----|----|-----|
-|Smith|2023|123  |
-|Smith|2022|99   |
-|Jones|2023|345  |
-|Jones|2022|678  |
+|Smith|2025|123  |
+|Smith|2024|99   |
+|Jones|2025|345  |
+|Jones|2024|678  |
 
 And what you want is this: 
 
-|County|2023|2022|
+|County|2025|2024|
 |------|----|----|
 |Smith |123 |99  |
 |Jones |345 |678 |
@@ -245,13 +252,13 @@ The decennial census and the American Community Survey data are considerably mor
 
 But to give you an idea of how hefty this data is, let's look at the ACS. We're going to use a function called `load_variables()` to tell us just what's in the ACS. But even that's not simple. The ACS is broken down into products -- 1 year, 3 year and 5 year. The more years, the smaller levels of geography you can get some information for. So, for instance, with 1-year ACS data, states and counties are a given but small areas like neighborhoods aren't available. With 5-year data, those neighborhood sized areas become possible because the sample size has built up over 5 years. 
 
-Let's use the 5-year ACS from 2022, the most recent year 5-year ACS data is available for, as our example here. `tidycensus` shortens that to "acs5
+Let's use the 5-year ACS from 2024, the most recent year 5-year ACS data is available for, as our example here. `tidycensus` shortens that to "acs5
 
 ```{r variable-data, exercise=TRUE, exercise.setup = "load-data"}
-acs <- load_variables(2022, "____", cache = TRUE)
+acs <- load_variables(2024, "____")
 ```
 ```{r variable-data-solution, exercise.reveal_solution = FALSE}
-acs <- load_variables(2022, "acs5", cache = TRUE)
+acs <- load_variables(2024, "acs5")
 ```
 ```{r variable-data-check}
 grade_this_code()
@@ -298,7 +305,7 @@ One of the most common data problems in American government is the confusion ove
 origin <- get_acs(geography = "____", 
               variables = c("B03001_001", "B03001_002", "B03001_003"), 
               state = "____", 
-              year = 2022)
+              year = 2024)
 ```
 
 ```{r origin-check}
