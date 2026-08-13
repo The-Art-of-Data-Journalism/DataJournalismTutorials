@@ -99,10 +99,10 @@ totalinvestments <- investments |>
     total_dollars = sum(investment_dollars)
   )
 
-estimates23 <- get_estimates(geography="county", vintage = 2023, state=state) |> 
+estimates25 <- get_estimates(geography="county", vintage = 2025, state=state) |> 
   filter(variable == "POPESTIMATE")
 
-estimatesrows <- nrow(estimates23)
+estimatesrows <- nrow(estimates25)
 
 impact <- investments |> 
   group_by(county, county_fips) |> 
@@ -110,7 +110,7 @@ impact <- investments |>
     total_investments = sum(number_of_investments),
     total_dollars = sum(investment_dollars)
   ) |> 
-  inner_join(estimates23, by=c("county_fips" = "GEOID")) |> 
+  inner_join(estimates25, by=c("county_fips" = "GEOID")) |> 
   mutate(
     investment_dollars_per_person = (total_dollars/value)
   ) |> 
@@ -232,7 +232,7 @@ grade_this({
 And now the census data. Remember -- here you use the postal code of your state to get that data. To speed matters along, we're going to chain a filter onto the end that narrows it down to just population estimates right on import.
 
 ```{r census-read, exercise=TRUE, exercise.reveal_solution = FALSE, exercise.setup = "load-data"}
-estimates23 <- get_estimates(geography="county", vintage = 2023, state="____") |> 
+estimates25 <- get_estimates(geography="county", vintage = 2025, state="____") |> 
   filter(variable == "POPESTIMATE")
 ```
 
@@ -257,7 +257,7 @@ impact <- investments |>
     total_investments = sum(number_of_investments),
     total_dollars = sum(investment_dollars)
   ) |> 
-  inner_join(estimates23, by=c("county_fips" = "GEOID")) |> 
+  inner_join(estimates25, by=c("county_fips" = "GEOID")) |> 
   mutate(
     ____ = (total_dollars/value)
   ) |> 
@@ -274,7 +274,7 @@ impact <- investments |>
     total_investments = sum(number_of_investments),
     total_dollars = sum(investment_dollars)
   ) |> 
-  inner_join(estimates23, by=c("county_fips" = "GEOID")) |> 
+  inner_join(estimates25, by=c("county_fips" = "GEOID")) |> 
   mutate(
     investment_dollars_per_person = (total_dollars/value)
   ) |> 
