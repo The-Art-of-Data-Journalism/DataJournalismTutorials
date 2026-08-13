@@ -102,7 +102,7 @@ totals <- crashes |>
   group_by(floor_year) |> 
   tally() |> 
   ungroup() |> 
-  filter(floor_year == as.Date("2024-01-01"))
+  filter(floor_year == as.Date("2025-01-01"))
 ```
 ## The Goal
 
@@ -327,7 +327,7 @@ grade_this_code()
 ```
 
 ```{r results, exercise=FALSE, exercise.eval=TRUE, exercise.setup = "load-data", results='asis'}
-glue("A paragraph you can write about plane crashes: In {stateName$State}, there's been {nrows} airplane accidents investigated by the National Transportation Board since 2019. So far, in 2024, there's been {totals[2]}.")
+glue("A paragraph you can write about plane crashes: In {stateName$State}, there's been {nrows} airplane accidents investigated by the National Transportation Board since 2019. In 2025, there were {totals[2]}.")
 ```
 
 You could go further, of course. How many deaths? How many injuries? How does this year compare to last? What kind of pace is this year on? Has there been other accidents at this airport since 2019? **These are all questions you can answer, right now, with what you know.**
