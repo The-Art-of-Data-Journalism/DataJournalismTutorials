@@ -94,21 +94,21 @@ nrows <- nrow(counties)
 ncolumns <- ncol(counties)
 
 first <- counties |> mutate(
-  percent_change = ((POPESTIMATE2023 - POPESTIMATE2022)/POPESTIMATE2022)*100
+  percent_change = ((POPESTIMATE2025 - POPESTIMATE2025)/POPESTIMATE2025)*100
 ) |> slice(1)
 
 fastest <- counties |> mutate(
-  percent_change = ((POPESTIMATE2023 - POPESTIMATE2022)/POPESTIMATE2022)*100
+  percent_change = ((POPESTIMATE2025 - POPESTIMATE2024)/POPESTIMATE2024)*100
 ) |>
   arrange(desc(percent_change)) |> slice(1)
 
 biggest <- counties |> mutate(
-  rawchange = POPESTIMATE2023 - POPESTIMATE2022
+  rawchange = POPESTIMATE2025 - POPESTIMATE2024
 ) |>
   arrange(desc(rawchange)) |> slice(1)
 
 countieswithrawchange <- counties |> mutate(
-  rawchange = POPESTIMATE2023 - POPESTIMATE2022
+  rawchange = POPESTIMATE2025 - POPESTIMATE2024
 ) |>
   arrange(desc(rawchange))
 ```
@@ -183,7 +183,7 @@ grade_this_code()
 
 The code to calculate percent change is pretty simple. Remember, with `summarize`, we used `n()` to count things. With `mutate`, we use very similar syntax to calculate a new value -- a new column of data -- using other values in our dataset. So in this case, we're trying to do (new-old)/old, but we're doing it with column names. 
 
-If we look at what we got when we imported the data, you'll see there's a column called POPESTIMATE2023 as the new data, and we'll use POPESTIMATE2022 as the old data. So we're looking at one year. Then, to help us, we'll use arrange again to sort it, so we get the fastest growing county over one year. 
+If we look at what we got when we imported the data, you'll see there's a column called POPESTIMATE2025 as the new data, and we'll use POPESTIMATE2024 as the old data. So we're looking at one year. Then, to help us, we'll use arrange again to sort it, so we get the fastest growing county over one year. 
 
 ```{r mutate-change, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
 ____ |> mutate(
@@ -192,7 +192,7 @@ ____ |> mutate(
 ```
 ```{r mutate-change-solution, exercise.reveal_solution = FALSE}
 counties |> mutate(
-  percent_change = (POPESTIMATE2023 - POPESTIMATE2022)/POPESTIMATE2022
+  percent_change = (POPESTIMATE2025 - POPESTIMATE2024)/POPESTIMATE2024
 ) 
 ```
 ```{r mutate-change-check}
@@ -212,7 +212,7 @@ ____ |> mutate(
 ```
 ```{r mutate-change2-solution, exercise.reveal_solution = FALSE}
 counties |> mutate(
-  percent_change = ((POPESTIMATE2023 - POPESTIMATE2022)/POPESTIMATE2022)*100
+  percent_change = ((POPESTIMATE2025 - POPESTIMATE2024)/POPESTIMATE2024)*100
 ) 
 ```
 ```{r mutate-change2-check}
@@ -231,13 +231,13 @@ So who had the most growth in that one year? We can find that with arrange, whic
 
 ```{r mutate-change-percent, exercise=TRUE, exercise.setup = "load-data", message=FALSE, warning=FALSE}
 counties |> mutate(
-  percent_change = ((POPESTIMATE2023 - POPESTIMATE2022)/POPESTIMATE2022)*100
+  percent_change = ((POPESTIMATE2025 - POPESTIMATE2024)/POPESTIMATE2024)*100
 ) |>
   arrange(desc(____))
 ```
 ```{r mutate-change-percent-solution, exercise.reveal_solution = FALSE}
 counties |> mutate(
-  percent_change = ((POPESTIMATE2023 - POPESTIMATE2022)/POPESTIMATE2022)*100
+  percent_change = ((POPESTIMATE2025 - POPESTIMATE2024)/POPESTIMATE2024)*100
 )  |>
   arrange(desc(percent_change))
 ```
@@ -265,7 +265,7 @@ counties |> mutate(
 ```
 ```{r mutate-change-percent-arrange-solution, exercise.reveal_solution = FALSE, warning=FALSE}
 counties |> mutate(
-  rawchange = POPESTIMATE2023 - POPESTIMATE2022
+  rawchange = POPESTIMATE2025 - POPESTIMATE2024
 ) |>
   arrange(desc(rawchange))
 ```
@@ -318,7 +318,7 @@ ____ <- counties |> mutate(
 ```
 ```{r mutate-new-dataframe-solution, exercise.reveal_solution = FALSE, warning=FALSE}
 countieswithrawchange <- counties |> mutate(
-  rawchange = POPESTIMATE2023 - POPESTIMATE2022
+  rawchange = POPESTIMATE2025 - POPESTIMATE2024
 ) |>
   arrange(desc(rawchange))
 ```
