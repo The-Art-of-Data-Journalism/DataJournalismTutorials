@@ -170,7 +170,7 @@ Now we can start with our questions: What story does this tell? Is it very clear
 
 Now that we have something to work with, it's time to start improving it. It would be good to label the state we're highlighting. Maybe we label them on each end of the graph to help people follow the line. Given how much space the default ggplot behavior has left us to do that, we're going to need to make some space.
 
-We can do that with some clever manipulations of the x axis. In ggplot, there are all kinds of ways to work with the x and y axis scales. In this case, we have a year on the x axis, which to R is just a number, so we'll use `scale_x_continuous` to work with that kind of scale. We're going to first set the line breaks manually so there's just 2020 and 2024. Then, we're going to set the limits of our x axis so that it doesn't just default to 2020-2024, but is a little wider so we have extra space. We're going to add one year on each side to pad it out. But think about it -- how do you *add* one year of space to the *left* of 2020? You subtract one year. How do you *add* a year of space to the *right* of 2024? You add one year. 
+We can do that with some clever manipulations of the x axis. In ggplot, there are all kinds of ways to work with the x and y axis scales. In this case, we have a year on the x axis, which to R is just a number, so we'll use `scale_x_continuous` to work with that kind of scale. We're going to first set the line breaks manually so there's just 2020 and 2026. Then, we're going to set the limits of our x axis so that it doesn't just default to 2020-2026, but is a little wider so we have extra space. We're going to add one year on each side to pad it out. But think about it -- how do you *add* one year of space to the *left* of 2020? You subtract one year. How do you *add* a year of space to the *right* of 2026? You add one year. 
 
 ```{r slope4, exercise=TRUE, exercise.setup = "load-data", message=FALSE}
 ggplot() + 
@@ -186,7 +186,7 @@ ggplot() +
   geom_point(data=peak, aes(x=year, y=Unemployment_Rate, group=Location), color="grey") +
   geom_line(data=state_peak, aes(x=year, y=Unemployment_Rate, group=Location), color="red") +
   geom_point(data=state_peak, aes(x=year, y=Unemployment_Rate, group=Location), color="red") + 
-  scale_x_continuous(breaks = c(2020, 2024), limits = c(2019, 2025)) 
+  scale_x_continuous(breaks = c(2020, 2026), limits = c(2019, 2027)) 
 ```
 ```{r slope4-check}
 grade_this_code()
@@ -196,7 +196,7 @@ A ha! Better. We now just have the two years and we have some space to put our s
 
 ### Exercise 5: adding labels
 
-To add the labels, we again need to be a bit clever. We want to label each dot *twice* -- once for 2020 and once for 2024. To do this *looks* like a lot, but it really isn't. It's two rows for each state, but most of it is copy and paste work. Once you get one state working, you can add more with copy, paste, change the dataframe and done. 
+To add the labels, we again need to be a bit clever. We want to label each dot *twice* -- once for 2020 and once for 2026. To do this *looks* like a lot, but it really isn't. It's two rows for each state, but most of it is copy and paste work. Once you get one state working, you can add more with copy, paste, change the dataframe and done. 
 
 The first problem we have is our `state_peak` data has both years in it, so we're going to have to do something we don't do a lot of: put a `dplyr` filter into our data= bits. 
 
@@ -210,7 +210,7 @@ ggplot() +
   geom_point(data=state_peak, aes(x=year, y=Unemployment_Rate, group=Location), color="red") + 
   geom_text(data=____ |> filter(year == max(____)), aes(x=year + .5, y=Unemployment_Rate, group=Location, label=____)) + 
   geom_text(data=____ |> filter(year == min(____)), aes(x=year - .5, y=Unemployment_Rate, group=Location, label=____)) + 
-  scale_x_continuous(breaks = c(2020, 2024), limits = c(2019, 2025)) 
+  scale_x_continuous(breaks = c(2020, 2026), limits = c(2019, 2027.5)) 
 ```
 ```{r slope5-solution, exercise.reveal_solution = FALSE}
 ggplot() + 
@@ -220,7 +220,7 @@ ggplot() +
   geom_point(data=state_peak, aes(x=year, y=Unemployment_Rate, group=Location), color="red") + 
   geom_text(data=state_peak |> filter(year == max(year)), aes(x=year + .5, y=Unemployment_Rate, group=Location, label=Location)) + 
   geom_text(data=state_peak |> filter(year == min(year)), aes(x=year - .5, y=Unemployment_Rate, group=Location, label=Location)) + 
-  scale_x_continuous(breaks = c(2020, 2024), limits = c(2019, 2025)) 
+  scale_x_continuous(breaks = c(2020, 2026), limits = c(2019, 2027)) 
 ```
 ```{r slope5-check}
 grade_this_code()

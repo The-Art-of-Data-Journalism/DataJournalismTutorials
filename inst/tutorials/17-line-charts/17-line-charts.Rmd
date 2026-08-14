@@ -270,7 +270,7 @@ ggplot() +
 grade_this_code()
 ```
 
-So what story does this tell? Looks like before the pandemic, unemployment was humming along reasonably stable, and then boom. The pandemic hits and the unemployment rate balloons. Then, after a bit, it returns to more normal ranges. 
+So what story does this tell? Looks like before the pandemic, unemployment was humming along reasonably stable, and then boom. The pandemic hits and the unemployment rate balloons. Then, after a bit, it returns to more normal ranges. That gap in the data? It was when the lengthy government shutdown happened. You'll see it again soon.  
 
 But a one-line line chart is usually not a line chart. At least, not a very good one. It doesn't tell a complete of a story as it could. We need more to compare to. 
 
