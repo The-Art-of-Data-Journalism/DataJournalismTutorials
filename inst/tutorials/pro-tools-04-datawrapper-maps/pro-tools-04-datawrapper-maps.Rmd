@@ -49,7 +49,7 @@ So like every presidential election, we have poll aggregators who average togeth
 I've gone ahead to Groundhog-Day.com and scraped the data. You need this url:
 
 ```
-https://the-art-of-data-journalism.github.io/tutorial-data/groundhogs/predictions2024.csv
+https://the-art-of-data-journalism.github.io/tutorial-data/groundhogs/predictions2026.csv
 ```
 
 In your Datawrapper dashboard, we want to start with a new chart. One thing Datawrapper does exceptionally well is create interactive maps. So let's make one.
